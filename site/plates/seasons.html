@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summer is not when the Earth is closer to the sun — Errata</title>
+<meta name="description" content="Earth is nearest the sun in early January. If distance drove the seasons, January would be the hottest month of the year — and both hemispheres would have summer at the same time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Errata<span>.</span></a>
+  <p class="masthead-note">Plate 02 of 10</p>
+</header>
+
+<article>
+  <div class="plate-head">
+    <p class="eyebrow">Plate <b>02</b> &nbsp;/&nbsp; Astronomy</p>
+    <h1>Summer is not when the Earth is closer to the sun</h1>
+    <p class="standfirst">Earth is nearest the sun in early January. If distance drove the seasons, January would be the hottest month of the year — and both hemispheres would have summer at the same time.</p>
+  </div>
+
+  <dl class="claim">
+    <div class="wrong">
+      <dt>The usual picture</dt>
+      <dd>Earth's orbit is an ellipse. When we swing closer to the sun we get more heat, and that is summer.</dd>
+    </div>
+    <div class="right">
+      <dt>What is actually happening</dt>
+      <dd>The axis is tilted 23.4&deg; and always points the same way. That changes the <em>angle</em> sunlight strikes the ground, spreading the same beam over more or less area — and changes how long the sun stays up.</dd>
+    </div>
+  </dl>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 680 340" role="img" aria-labelledby="t2">
+  <title id="t2">Earth's orbit with fixed axial tilt, and a sunbeam striking the ground at an angle</title>
+  <ellipse cx="170" cy="170" rx="128" ry="118" class="f-faint f-dash"/>
+  <circle cx="170" cy="170" r="17" fill="#F2557A" opacity="0.85"/>
+  <text class="f-label" x="170" y="207" text-anchor="middle">SUN</text>
+  <g id="planet">
+    <circle r="16" fill="#12262B" stroke="#EDE7DA"/>
+    <line class="f-correct" x1="-6.4" y1="-15" x2="6.4" y2="15"/>
+  </g>
+  <text class="f-label" id="seasonLbl" x="170" y="322" text-anchor="middle">NORTHERN SUMMER</text>
+  <line class="f-faint" x1="306" y1="40" x2="306" y2="300"/>
+  <line class="f-line" x1="370" y1="250" x2="665" y2="250"/>
+  <text class="f-label" x="545" y="272" text-anchor="middle">GROUND</text>
+  <g id="beam">
+    <path id="b1" class="f-correct" d=""/>
+    <path id="b2" class="f-correct" d=""/>
+    <path id="patch" stroke="#F2557A" stroke-width="4" d=""/>
+  </g>
+  <text class="f-label" x="330" y="40">SAME BEAM, SAME ENERGY</text>
+  <text class="f-label-c" id="spread" x="330" y="60">SPREAD OVER --</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="switch" role="group" aria-label="Model">
+  <button id="mWrong" aria-pressed="false">Distance</button>
+  <button id="mRight" class="is-actual" aria-pressed="true">Tilt</button>
+</div>
+<div class="control">
+  <label for="day">Day of year</label>
+  <input type="range" id="day" min="1" max="365" step="1" value="172">
+  <span class="readout" id="dayOut">Jun 21</span>
+</div>
+<div class="control" style="flex:0 0 auto">
+  <label id="metricLbl">Noon sunlight</label>
+  <span class="readout" id="metric">1000</span>
+</div>
+    </div>
+    <figcaption class="caption">Scrub through the year at 45&deg;N. <b>The distance model varies the readout by about 7% across the whole orbit, and peaks in January.</b> The tilt model varies it by a factor of three and peaks in June. Only one of those matches the weather outside.</figcaption>
+  </figure>
+
+<section class="module">
+  <p class="module-label">The failure</p>
+  <div class="module-body"><h2>Run the numbers on distance</h2>
+<p>Switch to the distance model and drag through the year. Earth's orbit is very nearly
+circular — it ranges from 0.983 to 1.017 astronomical units. That is a 3.4% swing in
+distance and roughly 7% in received energy.</p>
+<p>And the peak lands on <strong>3 January</strong>. The model does not merely predict too
+small an effect. It predicts the seasons backwards for the half of humanity that lives
+north of the equator.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">The mechanism</p>
+  <div class="module-body"><h2>The same beam, spread thinner</h2>
+<p>Sunlight arrives as a beam of fixed intensity. What changes through the year is the
+angle it meets the ground.</p>
+<p>Strike a surface head-on and a beam one metre wide covers one metre of ground. Strike it
+at 20&deg; and the same beam smears across nearly three metres. <strong>Same energy,
+triple the area, a third of the heating.</strong> That is the whole of it.</p>
+<p>Tilt does a second job as well: it lengthens the day. In June the northern hemisphere is
+turned toward the sun for more of each rotation, so the ground gets weaker-but-longer
+heating on top of stronger noon sun. The two effects compound.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">The correction</p>
+  <div class="module-body"><h2>Two hemispheres, opposite seasons, same instant</h2>
+<p>The decisive test costs nothing. It is July in Kerala and July in Melbourne at the same
+moment, and one is in summer while the other is in winter. Distance from the sun is
+identical for both. Tilt is not — the axis leans toward one hemisphere and away from the
+other, always.</p>
+<p>The axis keeps pointing at the same patch of sky all year, at Polaris. It is the orbit
+that carries us around it, so the same fixed tilt faces the sun in June and away from it in
+December.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">Loose end</p>
+  <div class="module-body"><p>The hottest weeks lag the solstice by about six weeks, because land and ocean take time
+to warm. Peak sunlight is late June; peak temperature is early August. Seasonal lag is why
+"longest day" and "hottest day" are never the same day.</p></div>
+</section>
+</article>
+
+<nav class="plate-foot">
+  <a href="tides.html">&larr; Tides</a>
+  <a href="sky-colour.html">Sky colour &rarr;</a>
+</nav>
+
+<script>
+(function(){
+var actual=true;
+var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    D=[31,28,31,30,31,30,31,31,30,31,30,31];
+var day=document.getElementById('day'), dayOut=document.getElementById('dayOut'),
+    metric=document.getElementById('metric'), metricLbl=document.getElementById('metricLbl'),
+    planet=document.getElementById('planet'), seasonLbl=document.getElementById('seasonLbl'),
+    b1=document.getElementById('b1'), b2=document.getElementById('b2'),
+    patch=document.getElementById('patch'), spread=document.getElementById('spread'),
+    mW=document.getElementById('mWrong'), mR=document.getElementById('mRight');
+
+function dateStr(n){var i=0;while(n>D[i]){n-=D[i];i++;}return M[i]+' '+n;}
+
+function calc(n){
+  var lat=45*Math.PI/180;
+  var decl=23.44*Math.PI/180*Math.sin(2*Math.PI*(n-80)/365.25);
+  var alt=Math.PI/2-Math.abs(lat-decl);
+  var r=1-0.0167*Math.cos(2*Math.PI*(n-3)/365.25);
+  return {alt:alt, decl:decl, r:r, flux:1361*Math.max(0.02,Math.sin(alt))/(r*r)};
+}
+
+function render(){
+  var n=parseInt(day.value,10), c=calc(n);
+  dayOut.textContent=dateStr(n);
+
+  var th=2*Math.PI*(n-3)/365.25;
+  planet.setAttribute('transform','translate('+(170+128*Math.cos(th)).toFixed(1)+','+
+    (170+118*Math.sin(th)).toFixed(1)+')');
+  seasonLbl.textContent = c.decl>0.06?'NORTHERN SUMMER':(c.decl<-0.06?'NORTHERN WINTER':'EQUINOX');
+
+  var a = actual ? c.alt : Math.PI/2.6;
+  var half=22, gy=250, gx=545, L=175;
+  var w = half/Math.max(0.34,Math.sin(a));
+  var dx=Math.cos(a)*L, dy=Math.sin(a)*L;
+  b1.setAttribute('d','M'+(gx-w-dx).toFixed(0)+' '+(gy-dy).toFixed(0)+'L'+(gx-w).toFixed(0)+' '+gy);
+  b2.setAttribute('d','M'+(gx+w-dx).toFixed(0)+' '+(gy-dy).toFixed(0)+'L'+(gx+w).toFixed(0)+' '+gy);
+  patch.setAttribute('d','M'+(gx-w).toFixed(0)+' '+gy+'L'+(gx+w).toFixed(0)+' '+gy);
+
+  if(actual){
+    metricLbl.textContent='Noon sunlight';
+    metric.textContent=Math.round(c.flux)+' W';
+    spread.textContent='SPREAD OVER '+(w/half).toFixed(2)+'\u00D7 AREA';
+  }else{
+    metricLbl.textContent='Distance to sun';
+    metric.textContent=c.r.toFixed(4)+' AU';
+    spread.textContent='ANGLE UNCHANGED \u2014 NO SEASON';
+  }
+  mW.setAttribute('aria-pressed', !actual);
+  mR.setAttribute('aria-pressed', actual);
+  var col = actual ? '#F2557A' : '#5E7F8C';
+  [b1,b2,patch].forEach(function(e){e.setAttribute('stroke',col);});
+  spread.setAttribute('fill', col);
+}
+mW.onclick=function(){actual=false;render();};
+mR.onclick=function(){actual=true;render();};
+day.oninput=render;
+render();
+})();
+</script>
+</div>
+</body>
+</html>

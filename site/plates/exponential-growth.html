@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exponential growth looks like nothing until it looks like everything — Errata</title>
+<meta name="description" content="The human default is to extrapolate in straight lines. Applied to anything that doubles &amp;mdash; infections, compound interest, algal blooms &amp;mdash; that instinct does not slightly underestimate the outcome. It misses it by orders of magnitude.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Errata<span>.</span></a>
+  <p class="masthead-note">Plate 08 of 10</p>
+</header>
+
+<article>
+  <div class="plate-head">
+    <p class="eyebrow">Plate <b>08</b> &nbsp;/&nbsp; Mathematics</p>
+    <h1>Exponential growth looks like nothing until it looks like everything</h1>
+    <p class="standfirst">The human default is to extrapolate in straight lines. Applied to anything that doubles &mdash; infections, compound interest, algal blooms &mdash; that instinct does not slightly underestimate the outcome. It misses it by orders of magnitude.</p>
+  </div>
+
+  <dl class="claim">
+    <div class="wrong">
+      <dt>The usual picture</dt>
+      <dd>It has taken thirty days to reach 1% of capacity, so there is plenty of time. At this rate we will be fine for years.</dd>
+    </div>
+    <div class="right">
+      <dt>What is actually happening</dt>
+      <dd>A quantity with a fixed <em>doubling time</em> spends most of its history looking negligible. Getting from 1% to 100% takes only about <em>seven doublings</em> &mdash; the same effort that took it from 0.008% to 1%.</dd>
+    </div>
+  </dl>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 680 340" role="img" aria-labelledby="t8">
+  <title id="t8">Exponential growth compared with a straight-line extrapolation</title>
+  <line class="f-faint" x1="60" y1="290" x2="650" y2="290"/>
+  <line class="f-faint" x1="60" y1="30" x2="60" y2="290"/>
+  <line class="f-faint f-dash" x1="60" y1="40" x2="650" y2="40"/>
+  <text class="f-label" x="66" y="34">CAPACITY</text>
+  <path id="expo" class="f-correct" d=""/>
+  <path id="lin" class="f-assume f-dash" d=""/>
+  <line id="now" class="f-faint" x1="300" y1="20" x2="300" y2="300"/>
+  <circle id="dot" r="5" fill="#F2557A"/>
+  <text class="f-label" x="60" y="312">DAY 0</text>
+  <text class="f-label" x="650" y="312" text-anchor="end">DAY 60</text>
+  <text class="f-label-a" id="linLbl" x="360" y="240">STRAIGHT-LINE FORECAST</text>
+  <text class="f-label-c" id="expLbl" x="90" y="70">ACTUAL</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="switch" role="group" aria-label="Model">
+  <button id="mWrong" aria-pressed="false">Straight line</button>
+  <button id="mRight" class="is-actual" aria-pressed="true">Doubling</button>
+</div>
+<div class="control">
+  <label for="day">Today is day</label>
+  <input type="range" id="day" min="4" max="56" step="1" value="30">
+  <span class="readout" id="dayOut">30</span>
+</div>
+<div class="control" style="flex:0 0 auto">
+  <label>Now at</label>
+  <span class="readout" id="pctOut">1.6%</span>
+</div>
+<div class="control" style="flex:0 0 auto">
+  <label>Full on day</label>
+  <span class="readout" id="fullOut">36</span>
+</div>
+    </div>
+    <figcaption class="caption">Something doubles every day and fills its container on day 36. <b>Move "today" and read the straight-line forecast against the real curve.</b> Standing on day 30 the tank is 1.6% full and the linear estimate says you have a century. You have six days.</figcaption>
+  </figure>
+
+<section class="module">
+  <p class="module-label">The failure</p>
+  <div class="module-body"><h2>Linear extrapolation is not conservative</h2>
+<p>The straight-line forecast is not a cautious estimate that errs on the safe side. Standing
+at 1.6% of capacity it puts the deadline decades out. The true answer is six days.</p>
+<p>This is why exponential threats are chronically under-reacted to. At the moment when
+action is cheapest, the quantity is genuinely tiny &mdash; and the evidence of urgency looks
+identical to the evidence of nothing happening.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">The mechanism</p>
+  <div class="module-body"><h2>Constant ratio, not constant increment</h2>
+<p>Linear growth adds the same amount each step. Exponential growth <strong>multiplies by the
+same factor</strong> each step. The difference is not one of degree.</p>
+<p>The consequence people miss: on a doubling curve, the amount added in the final step
+exceeds everything accumulated in all previous steps combined. The day before the pond is
+full, it is half empty. The day before that, a quarter.</p>
+<p>And the fraction of the timeline spent looking negligible is enormous. Reaching 1% takes
+as many doublings from the start as reaching 100% takes from 1%.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">The correction</p>
+  <div class="module-body"><h2>Learn to read the doubling time</h2>
+<p>The one number that makes an exponential legible is not the current value or the current
+rate. It is the <strong>doubling time</strong> &mdash; and its arithmetic is easy. Divide 70 by
+the percentage growth per period and you get the doublings.</p>
+<p>7% a year doubles in ten years, so it is 128&times; in a lifetime. 0.5% a week doubles in
+about 140 weeks. Once you have that number, "how long until this is a hundred times bigger"
+becomes seven doublings, and you can answer it in your head.</p></div>
+</section>
+<section class="module">
+  <p class="module-label">Loose end</p>
+  <div class="module-body"><p>Nothing grows exponentially forever &mdash; something always runs out, and the curve turns
+over into an S. But the moment of turnover is usually set by a hard limit arriving, not by
+the growth politely slowing. Assuming an S-curve does not license assuming a gentle one.</p></div>
+</section>
+</article>
+
+<nav class="plate-foot">
+  <a href="time-dilation.html">&larr; Time dilation</a>
+  <a href="natural-selection.html">Selection &rarr;</a>
+</nav>
+
+<script>
+(function(){
+var actual=true, T=36;
+var day=document.getElementById('day'), dayOut=document.getElementById('dayOut'),
+    pctOut=document.getElementById('pctOut'), fullOut=document.getElementById('fullOut'),
+    expo=document.getElementById('expo'), lin=document.getElementById('lin'),
+    now=document.getElementById('now'), dot=document.getElementById('dot'),
+    linLbl=document.getElementById('linLbl'), expLbl=document.getElementById('expLbl'),
+    mW=document.getElementById('mWrong'), mR=document.getElementById('mRight');
+
+function f(d){ return Math.pow(2, d-T); }
+function X(d){ return 60+d/60*590; }
+function Y(v){ return 290-Math.min(1.02,v)*250; }
+
+function render(){
+  var d=parseInt(day.value,10), v=f(d);
+  dayOut.textContent=d;
+  pctOut.textContent=(v*100).toFixed(v*100<10?2:0)+'%';
+  fullOut.textContent=T;
+
+  var de='';
+  for(var i=0;i<=240;i++){
+    var x=i/240*60, y=f(x);
+    if(y>1.05) break;
+    de+=(i?'L':'M')+X(x).toFixed(1)+' '+Y(y).toFixed(1);
+  }
+  expo.setAttribute('d',de);
+
+  var rate=v*Math.LN2;
+  var dFull=d+(1-v)/rate;
+  var xEnd=Math.min(60,dFull);
+  lin.setAttribute('d','M'+X(d)+' '+Y(v)+'L'+X(xEnd)+' '+Y(v+rate*(xEnd-d)));
+  now.setAttribute('x1',X(d)); now.setAttribute('x2',X(d));
+  dot.setAttribute('cx',X(d)); dot.setAttribute('cy',Y(v));
+  linLbl.textContent='STRAIGHT LINE SAYS DAY '+Math.round(dFull);
+  linLbl.setAttribute('x', Math.min(470,X(d)+14));
+  linLbl.setAttribute('y', Math.max(60,Y(v)-12));
+  expLbl.textContent='DOUBLING SAYS DAY '+T;
+
+  expo.setAttribute('opacity', actual?1:0.18);
+  lin.setAttribute('opacity', actual?0.55:1);
+  mW.setAttribute('aria-pressed', !actual);
+  mR.setAttribute('aria-pressed', actual);
+}
+mW.onclick=function(){actual=false;render();};
+mR.onclick=function(){actual=true;render();};
+day.oninput=render;
+render();
+})();
+</script>
+</div>
+</body>
+</html>

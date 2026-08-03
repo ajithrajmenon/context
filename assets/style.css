@@ -217,7 +217,7 @@ img, svg, canvas { max-width: 100%; }
    STORY = a stack of cards. Colour lives on the card.
    ================================================================== */
 
-.stack { display: grid; gap: 1.5rem; width: min(58rem, 100%); margin: 0 auto; padding-bottom: 3rem; list-style: none; }
+.stack { display: grid; gap: 1.5rem; min-width: 0; width: min(58rem, 100%); margin: 0 auto; padding-bottom: 3rem; list-style: none; }
 
 /* the opening card */
 .story-hero { margin: .5rem 0 1.5rem; }
@@ -331,3 +331,29 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
   .step-n { width: 2.5rem; height: 2.5rem; border-radius: 12px; font-size: 1rem; }
   .card-scene { min-height: 22rem; }
 }
+
+/* ---------- labelled diagram cards -----------------------------------
+   These teach, so they behave like printed material: light ground, dark
+   labels, no motion. The dark scene panels are for atmosphere only.
+--------------------------------------------------------------------- */
+
+.stack > li { min-width: 0; }
+
+.card-dia {
+  margin: 0;
+  min-width: 0;
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.dia-stage {
+  background: var(--surface);
+  padding: clamp(1rem, 2.6vw, 1.9rem);
+  overflow-x: auto;
+}
+.dia-stage .dia { display: block; width: 100%; height: auto; min-width: 27rem; }
+
+/* thumbnails carry the topic, so they must not be cropped away */
+.card-art .dia { position: absolute; inset: 0; width: 100%; height: 100%; }
+.card-art { background: var(--surface); }

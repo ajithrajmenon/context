@@ -16,6 +16,7 @@ change.
 import os
 import shutil
 
+import diagram
 import illustrate
 from stories_data import STORIES
 
@@ -36,6 +37,8 @@ ART = {
 
 
 def art(scene, seed, light=False):
+    """Ambient artwork. Only the hero panels use it — everything that has to
+    teach something uses a labelled diagram instead, and holds still."""
     return illustrate.render(ART.get(scene, 'cosmos'), seed, light=light)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -90,7 +93,7 @@ def foot(prefix):
 def card(s, prefix, delay=0):
     return f'''<li class="t-{s['card_tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
-    <span class="card-art scene">{art(s['card_scene'], s['slug'], light=True)}</span>
+    <span class="card-art">{diagram.thumb(s['thumb'])}</span>
     <span class="card-body">
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>
@@ -110,6 +113,15 @@ def block_scene(b, i, story):
       <p>{b['p']}</p>
     </div>
   </div>
+</li>'''
+
+
+def block_diagram(b, i, story):
+    return f'''<li data-reveal="0">
+  <figure class="card-dia">
+    <div class="dia-stage">{diagram.render(b['name'])}</div>
+    <figcaption class="caption">{b['caption']}</figcaption>
+  </figure>
 </li>'''
 
 
@@ -151,7 +163,6 @@ def block_figure(b, i, story):
     return f'''<li class="t-{b['tone']}" data-reveal="0">
   <figure class="card-figure">
     <div class="figure-stage">
-{art(story['hero']['scene'], story['slug'] + 'fig' + str(i))}
 {b['svg']}
     </div>
     <div class="controls">
@@ -163,6 +174,7 @@ def block_figure(b, i, story):
 
 
 BLOCKS = {
+    'diagram': block_diagram,
     'scene': block_scene,
     'text': block_text,
     'turn': block_turn,
@@ -187,7 +199,7 @@ PILLARS = [
 
 
 def build_home():
-    featured = [s for s in STORIES if s.get('featured')][:4]
+    featured = [s for s in STORIES if s.get('featured')]
     kickers = []
     for s in STORIES:
         if s['kicker'] not in kickers:

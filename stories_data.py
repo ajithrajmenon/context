@@ -1062,3 +1062,7 @@ draw();
 },
 
 ]
+
+# The second shelf lives in its own file; build.py only ever sees one list.
+from stories_more import MORE  # noqa: E402
+STORIES = STORIES + MORE

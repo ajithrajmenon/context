@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why are ants everywhere? &#8212; Context</title>
+<meta name="description" content="Around twenty quadrillion of them. Together they weigh about as much as all wild birds and mammals put together.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-solar">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-solar">
+  <div class="scene" data-scene="colony" data-seed="why-are-ants-everywhere">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Life</p>
+      <h1 data-reveal="80">Why are ants everywhere?</h1>
+      <p class="standfirst" data-reveal="160">Ants have been running the same business model for a hundred million years, on every continent except Antarctica, and no single ant has any idea how any of it works.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The numbers are hard to hold</h2>
+    <p>The best estimate is about twenty thousand trillion ants alive right now. For every person, there are roughly two and a half million of them.</p><p>Weighed together they come to something like <strong>all the wild birds and wild mammals on Earth, combined</strong>.</p>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="scene card-scene" data-scene="colony" data-seed="b1">
+    <div class="scene-pad">
+      <h2>A colony behaves like one animal</h2>
+      <p>Trails form, jobs get allocated, the nest gets repaired. Nobody is directing any of it.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The queen is not in charge of anything</h2>
+    <p>She lays eggs. That is the whole job. She issues no orders and has no overview of the colony.</p><p>Every decision comes from individual ants following simple local rules — mostly "follow the strongest smell" and "do the job nobody else is doing".</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>No ant knows the plan. There is no plan. The colony still farms, builds, wages war and adapts.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What a colony can do as it grows</title>
+  <g id="nest"></g>
+  <text class="f-label" x="360" y="60">COLONY SIZE</text>
+  <text class="f-value" id="sizeTxt" x="360" y="96" style="font-size:26px">&#8212;</text>
+  <text class="f-label" x="360" y="146">WHAT IT CAN DO</text>
+  <text class="f-value" id="canTxt" x="360" y="180" style="font-size:19px">&#8212;</text>
+  <text class="f-label" id="noteTxt" x="360" y="232">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="n">Ants in the colony</label>
+  <input type="range" id="n" min="1" max="70" step="1" value="20">
+  <span class="readout" id="nOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Nothing about the individual ant changes as you slide this. Only the number does — and past certain sizes, behaviours appear that no ant contains.</figcaption>
+  </figure>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="scene card-scene" data-scene="swarm" data-seed="b5">
+    <div class="scene-pad">
+      <h2>They invented farming first</h2>
+      <p>Some ants have been growing fungus underground for fifty million years, weeding it, fertilising it and dosing it with antibiotics they carry on their bodies.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Why this keeps coming up elsewhere</h2>
+    <p>Simple parts, local rules, no central control, complicated behaviour out the far end. That is ants, and it is also your brain cells, and flocks, and markets.</p><p>The lesson ants keep teaching is that <strong>you do not need anyone in charge</strong> to get something that looks designed.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>One ant is close to nothing — a few hundred thousand neurons and a handful of reflexes. A million of them, following the same reflexes, build something that farms. Nothing was added but number.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="why-time-slows-when-scared.html">Why does time slow down when you are scared? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var n = document.getElementById('n');
+var COL = ['#FBBF24', '#FCD34D', '#A3E635', '#FB7185'];
+var nest = document.getElementById('nest'), ants = [];
+for (var i = 0; i < 70; i++) {
+  var c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 40 + (i % 10) * 27);
+  c.setAttribute('cy', 60 + ((i / 10) | 0) * 30);
+  c.setAttribute('r', 5);
+  c.setAttribute('fill', COL[i % COL.length]);
+  nest.appendChild(c);
+  ants.push(c);
+}
+
+function draw() {
+  var k = +n.value;
+  var size = Math.round(Math.pow(10, k / 14));   // 1 up to about a million
+  document.getElementById('nOut').textContent = size.toLocaleString('en-GB');
+  document.getElementById('sizeTxt').textContent = size.toLocaleString('en-GB') + ' ants';
+  document.getElementById('canTxt').textContent =
+    size < 10 ? 'not much. it dies.' :
+    size < 200 ? 'dig a nest, feed itself' :
+    size < 5000 ? 'organised trails, division of labour' :
+    size < 100000 ? 'farm fungus, herd aphids, raid rivals' :
+                    'build bridges from its own bodies, run supply lines for miles';
+  document.getElementById('noteTxt').textContent =
+    size < 200 ? 'THE RULES EACH ANT FOLLOWS NEVER CHANGE' : 'SAME RULES. MORE ANTS. NEW BEHAVIOUR.';
+  ants.forEach(function (a, i) {
+    a.setAttribute('opacity', i < k ? .95 : .12);
+  });
+}
+n.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

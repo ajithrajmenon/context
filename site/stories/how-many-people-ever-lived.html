@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How many people have ever lived? &#8212; Context</title>
+<meta name="description" content="Around 117 billion. The dead outnumber the living by roughly fourteen to one.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-deepsea">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-deepsea">
+  <div class="scene" data-scene="crowd" data-seed="how-many-people-ever-lived">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">People</p>
+      <h1 data-reveal="80">How many people have ever lived?</h1>
+      <p class="standfirst" data-reveal="160">Everyone who has ever been born, added up, comes to about 117 billion people. Eight billion of them are here now. The rest is the crowd standing behind you.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>You can actually estimate this</h2>
+    <p>Take a start date, take the best guess at population at each point in history, apply a birth rate, and add it up.</p><p>The answer lands near <strong>117 billion</strong>. It is an estimate with real error bars, but the scale is solid.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="crowd" data-seed="b1">
+    <div class="scene-pad">
+      <h2>For every person alive, about fourteen have already gone</h2>
+      <p>The bright ones are everyone here now. The rest is everyone else who ever was.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Most of that crowd never got to grow up</h2>
+    <p>For nearly all of history, something close to <strong>half of all children died before the age of fifteen</strong>.</p><p>That is the single biggest thing separating your life from almost every human life that came before it, and it changed within about four generations.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-turn">
+    <p>You are living in the most crowded moment in human history, and also the safest one anybody has ever been born into.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Population alive against the total who had ever lived</title>
+  <line class="f-faint" x1="50" y1="240" x2="630" y2="240"/>
+  <path id="everLine" d="" fill="none" stroke="#A78BFA" stroke-width="3"/>
+  <path id="aliveLine" d="" fill="none" stroke="#22D3EE" stroke-width="3"/>
+  <line id="cursor" class="f-faint" x1="50" y1="40" x2="50" y2="240"/>
+  <text class="f-label" x="50" y="264">10,000 BC</text>
+  <text class="f-label" x="630" y="264" text-anchor="end">TODAY</text>
+  <text class="f-label" x="50" y="40">ALIVE NOW</text>
+  <text class="f-value" id="aliveTxt" x="50" y="72" style="font-size:24px;fill:#22D3EE">&#8212;</text>
+  <text class="f-label" x="360" y="40">EVER BORN, BY THEN</text>
+  <text class="f-value" id="everTxt" x="360" y="72" style="font-size:24px;fill:#A78BFA">&#8212;</text>
+  <text class="f-label" id="ratioTxt" x="50" y="290">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="yr">Year</label>
+  <input type="range" id="yr" min="-10000" max="2026" step="50" value="2026">
+  <span class="readout" id="yrOut">2026</span>
+</div>
+    </div>
+    <figcaption class="caption">The cyan line is everyone alive at that moment. The violet one is everyone who had ever lived by then. Notice how recently the cyan line does anything at all.</figcaption>
+  </figure>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="scene card-scene" data-scene="crowd" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Almost everyone who ever lived, lived without any of this</h2>
+      <p>No anaesthetic, no clean water, no idea what a germ was. That was the normal human experience until about six generations ago.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>And the ratio is going to keep shifting</h2>
+    <p>Population growth is slowing worldwide. Birth rates have fallen faster than almost anyone predicted.</p><p>The share of all humans who are alive right now is about as high as it is ever likely to get.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>You are one of 117 billion, and one of the very small number who got antibiotics, and a reasonable chance of reaching seventy. On the balance of everyone who ever tried this, that is an extraordinary draw.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="why-do-we-get-bored.html">Why do we get bored? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var yr = document.getElementById('yr');
+
+// crude but honestly shaped: population creeps for millennia, then explodes
+function alive(y) {
+  if (y < -8000) return 0.005;
+  var f = (y + 10000) / 12026;
+  return 0.005 + 8.0 * Math.pow(f, 14);
+}
+function ever(y) {
+  var f = (y + 10000) / 12026;
+  return 117 * Math.pow(f, 2.4);
+}
+
+function path(fn, top) {
+  var d = '';
+  for (var i = 0; i <= 120; i++) {
+    var y = -10000 + (12026 * i / 120);
+    var x = 50 + (i / 120) * 580;
+    var py = 240 - (fn(y) / top) * 190;
+    d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + py.toFixed(1);
+  }
+  return d;
+}
+document.getElementById('everLine').setAttribute('d', path(ever, 117));
+document.getElementById('aliveLine').setAttribute('d', path(alive, 117));
+
+function draw() {
+  var y = +yr.value;
+  document.getElementById('yrOut').textContent = y < 0 ? Math.abs(y) + ' BC' : y;
+  var a = alive(y), e = ever(y);
+  document.getElementById('aliveTxt').textContent = a.toFixed(2) + ' billion';
+  document.getElementById('everTxt').textContent = e.toFixed(0) + ' billion';
+  document.getElementById('ratioTxt').textContent =
+    'THAT IS ABOUT ' + Math.round(e / Math.max(a, .001)) + ' PEOPLE WHO HAVE LIVED FOR EVERY ONE ALIVE';
+  var x = 50 + ((y + 10000) / 12026) * 580;
+  document.getElementById('cursor').setAttribute('x1', x);
+  document.getElementById('cursor').setAttribute('x2', x);
+}
+yr.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

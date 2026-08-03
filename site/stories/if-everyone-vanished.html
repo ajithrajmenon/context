@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What if every human vanished tomorrow? &#8212; Context</title>
+<meta name="description" content="The lights go out in hours. The cities last centuries. A few things we made outlast all of it.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-forest">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-forest">
+  <div class="scene" data-scene="overgrow" data-seed="if-everyone-vanished">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Earth</p>
+      <h1 data-reveal="80">What if every human vanished tomorrow?</h1>
+      <p class="standfirst" data-reveal="160">Not an apocalypse — just everybody gone, everything else left exactly as it is. What happens next is a good way of finding out how much of the world is being actively held in place.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Hours: the lights go out</h2>
+    <p>Most power stations need someone to feed them. Within hours the grid fails, and almost everywhere goes dark that first night.</p><p>For the first time in two centuries, you could see the stars from the middle of a city.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="stars" data-seed="b1">
+    <div class="scene-pad">
+      <h2>The night sky comes back immediately</h2>
+      <p>No lights, no aircraft, no noise. Within a day the planet sounds and looks the way it did for the previous few hundred thousand years.</p>
+    </div>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-steps">
+    <h2>Then it is just a matter of waiting</h2>
+    <ol class="steps"><li class="step">
+      <span class="step-n">1</span>
+      <div>
+        <h3>Days</h3>
+        <p>Pumps stop. Underground railways flood. Livestock and pets are on their own.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">2</span>
+      <div>
+        <h3>Years</h3>
+        <p>Water gets into every roof. Frost cracks it wider. Plants take the roads apart from underneath.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">3</span>
+      <div>
+        <h3>Decades</h3>
+        <p>Wooden buildings collapse. Fires run unchecked through cities. Rivers go back to their old courses.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">4</span>
+      <div>
+        <h3>Centuries</h3>
+        <p>Steel corrodes through and the tall buildings come down. Forest covers most of what was city.</p>
+      </div>
+    </li></ol>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-turn">
+    <p>Nature does not have to fight the city. It only has to wait, and it is extremely good at waiting.</p>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What is left of human things as time passes</title>
+  <g id="things"></g>
+  <text class="f-label" id="eraTxt" x="30" y="286">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="t">Time since we vanished</label>
+  <input type="range" id="t" min="0" max="100" step="1" value="0">
+  <span class="readout" id="tOut">day one</span>
+</div>
+    </div>
+    <figcaption class="caption">Each step multiplies the time. Everything we think of as permanent is gone within a few thousand years — and the longest-lasting thing we ever made is a set of footprints somewhere with no weather.</figcaption>
+  </figure>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="scene card-scene" data-scene="overgrow" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Some of it recovers faster than you would think</h2>
+      <p>Places we have already abandoned fill with wildlife within decades. Not because they are clean, but because we are not there.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>What actually outlasts us</h2>
+    <p>Not the buildings. Plastic in the sediment, a thin layer of odd chemistry in the rock, and the radio signals already on their way out.</p><p>And the footprints on the Moon, which have no wind or water to remove them and could plausibly still be there in <strong>ten million years</strong>.</p>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Everything around you is being actively held in place. Stop holding, and the world does not end — it just carries on without the maintenance, and gets on perfectly well.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="why-are-ants-everywhere.html">Why are ants everywhere? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var tt = document.getElementById('t');
+// how long each thing survives, in log10(years)
+var THINGS = [
+  { n: 'The power grid',   life: -2.5, col: '#FBBF24' },
+  { n: 'Glass windows',    life: 1.4,  col: '#22D3EE' },
+  { n: 'Wooden houses',    life: 2,    col: '#A3E635' },
+  { n: 'Steel towers',     life: 2.6,  col: '#60A5FA' },
+  { n: 'Concrete dams',    life: 3.2,  col: '#A78BFA' },
+  { n: 'Plastic',          life: 3.6,  col: '#F472B6' },
+  { n: 'Footprints on the Moon', life: 7, col: '#FCD34D' }
+];
+var host = document.getElementById('things'), rows = [];
+THINGS.forEach(function (o, i) {
+  var g = document.createElementNS(NS, 'g'), y = 40 + i * 32;
+  g.innerHTML =
+    '<circle cx="42" cy="' + y + '" r="8" fill="' + o.col + '"/>' +
+    '<text x="66" y="' + (y + 5) + '" class="f-value" style="font-size:16px">' + o.n + '</text>' +
+    '<text x="470" y="' + (y + 5) + '" class="f-label">still here</text>';
+  host.appendChild(g);
+  rows.push({ o: o, dot: g.children[0], lab: g.children[2] });
+});
+
+function draw() {
+  var p = +tt.value / 10 - 3;             // log10 years, from about a day to 10^7
+  var yrs = Math.pow(10, p);
+  document.getElementById('tOut').textContent =
+    yrs < 0.01 ? 'day one' :
+    yrs < 1 ? Math.round(yrs * 365) + ' days' :
+    yrs < 1000 ? Math.round(yrs) + ' years' :
+    Math.round(yrs).toExponential(0).replace('e+', ' x 10^') + ' years';
+  rows.forEach(function (r) {
+    var gone = p > r.o.life;
+    r.dot.setAttribute('opacity', gone ? .2 : 1);
+    r.lab.textContent = gone ? 'gone' : 'still here';
+    r.lab.setAttribute('opacity', gone ? .4 : 1);
+  });
+  document.getElementById('eraTxt').textContent =
+    p < -1 ? 'THE GRID IS THE FIRST THING TO GO, AND IT GOES ALMOST IMMEDIATELY' :
+    p < 2  ? 'WATER AND FROST ARE DOING MOST OF THE WORK NOW' :
+    p < 3.4 ? 'THE CITIES ARE FOREST. ONLY THE HEAVIEST THINGS REMAIN.' :
+              'NOTHING BUILT ON EARTH IS LEFT. THE MOON STILL HAS OUR FOOTPRINTS.';
+}
+tt.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

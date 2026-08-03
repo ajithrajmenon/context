@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why do we get old? &#8212; Context</title>
+<meta name="description" content="Ageing is not simple wear and tear. Some animals barely do it at all.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-rose">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-rose">
+  <div class="scene" data-scene="telomere" data-seed="why-do-we-age">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Your body</p>
+      <h1 data-reveal="80">Why do we get old?</h1>
+      <p class="standfirst" data-reveal="160">A car wears out because nothing repairs it. You are repaired constantly, by trillions of cells whose entire job is maintenance. So why does it stop working?</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>You are rebuilt all the time</h2>
+    <p>Your gut lining is days old. Your skin is weeks old. Even bone replaces itself over about a decade.</p><p>If ageing were just things wearing out, constant rebuilding should hold it off indefinitely. It does not.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="scene card-scene" data-scene="telomere" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Every copy is slightly worse than the last</h2>
+      <p>Cells carry protective caps on their DNA that get shorter each time they divide. When the cap runs out, the cell stops dividing for good.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>And the repair crew ages too</h2>
+    <p>Worn-out cells do not always leave quietly. Many stick around, stop working and start leaking signals that inflame the tissue near them.</p><p>So damage accumulates while the ability to fix it declines. Those two curves crossing is a decent working definition of <strong>getting old</strong>.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-turn">
+    <p>Evolution has no reason to keep you in good repair after you have had children. Ageing is the point where it stops paying.</p>
+  </div>
+</li>
+<li class="t-rose" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Damage building up against the body's ability to repair it</title>
+  <line class="f-faint" x1="50" y1="230" x2="630" y2="230"/>
+  <path id="dmg" d="" fill="none" stroke="#FB7185" stroke-width="3.5"/>
+  <path id="rep" d="" fill="none" stroke="#34D399" stroke-width="3.5"/>
+  <line id="cursor" class="f-faint" x1="50" y1="40" x2="50" y2="230"/>
+  <text class="f-label" x="50" y="254">BIRTH</text>
+  <text class="f-label" x="630" y="254" text-anchor="end">100</text>
+  <text class="f-label" x="50" y="36">DAMAGE (PINK) &#183; REPAIR (GREEN)</text>
+  <text class="f-value" id="stateTxt" x="50" y="286" style="font-size:20px">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="age">Age</label>
+  <input type="range" id="age" min="0" max="100" step="1" value="30">
+  <span class="readout" id="ageOut">30</span>
+</div>
+    </div>
+    <figcaption class="caption">Nothing dramatic happens at any particular age. The two lines simply cross, somewhere in your forties or fifties, and after that the balance runs the other way.</figcaption>
+  </figure>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="scene card-scene" data-scene="cells" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Some animals barely bother with it</h2>
+      <p>A bowhead whale can pass two hundred. Some tortoises show almost no rise in death rate with age at all. Ageing is clearly not compulsory.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Which is why anyone thinks it is treatable</h2>
+    <p>If ageing were simple decay, there would be nothing to do about it. Because it is a set of specific processes, each one is a thing you could target.</p><p>Clearing out worn-out cells extends healthy life in mice. Whether any of it transfers to people is genuinely not known yet.</p>
+  </div>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Ageing looks less like a law of nature and more like a maintenance contract that runs out. That does not make it easy to renegotiate — but it does make it the kind of problem that can, in principle, be worked on.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="is-a-virus-alive.html">Is a virus alive? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var age = document.getElementById('age');
+
+function damage(a) { return Math.min(1, Math.pow(a / 100, 1.9) * 1.35); }
+function repair(a) { return Math.max(.05, 1 - Math.pow(a / 100, 1.6) * 1.15); }
+
+function path(fn) {
+  var d = '';
+  for (var i = 0; i <= 100; i++) {
+    d += (i ? 'L' : 'M') + (50 + i * 5.8).toFixed(1) + ' ' + (230 - fn(i) * 180).toFixed(1);
+  }
+  return d;
+}
+document.getElementById('dmg').setAttribute('d', path(damage));
+document.getElementById('rep').setAttribute('d', path(repair));
+
+function draw() {
+  var a = +age.value;
+  document.getElementById('ageOut').textContent = a;
+  var x = 50 + a * 5.8;
+  document.getElementById('cursor').setAttribute('x1', x);
+  document.getElementById('cursor').setAttribute('x2', x);
+  var d = damage(a), r = repair(a);
+  document.getElementById('stateTxt').textContent =
+    r > d + .35 ? 'Repair is winning comfortably' :
+    r > d       ? 'Still ahead, but the gap is closing' :
+    r > d - .3  ? 'The lines have crossed. This is what ageing feels like.' :
+                  'Damage is accumulating faster than anything can fix it';
+}
+age.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

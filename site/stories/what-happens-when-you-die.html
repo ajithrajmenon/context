@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What actually happens when you die? &#8212; Context</title>
+<meta name="description" content="Not a switch flicking off. A shutdown that runs in a specific order and takes hours.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-void">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-void">
+  <div class="scene" data-scene="pulse" data-seed="what-happens-when-you-die">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Your body</p>
+      <h1 data-reveal="80">What actually happens when you die?</h1>
+      <p class="standfirst" data-reveal="160">We talk about death as a moment — a line you cross. Biologically there is no line. There is a sequence, it has an order, and it takes much longer than anyone expects.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The heart stops. Almost nothing else does.</h2>
+    <p>Your brain has about ten seconds of oxygen left in it. That part is quick.</p><p>Everything else keeps going. Your cells do not know anything has happened. They have fuel, they have a job, and they carry on doing it for <strong>minutes to hours</strong>.</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="scene card-scene" data-scene="pulse" data-seed="b1">
+    <div class="scene-pad">
+      <h2>The rhythm slows, and then it does not come back</h2>
+      <p>Everything downstream of it keeps running on what it already has.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>This is why transplants are possible at all</h2>
+    <p>A donated heart can be restarted in someone else hours after its owner died. A cornea works after a day. Bone and skin last longer still.</p><p>None of that would work if death were a single instant.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-turn">
+    <p>You do not die all at once. Different parts of you stop at different times, over hours.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What is still viable at different times after the heart stops</title>
+  <g id="organs"></g>
+  <line class="f-faint" x1="30" y1="252" x2="630" y2="252"/>
+  <circle id="mark" cx="30" cy="252" r="6" fill="#FCD34D"/>
+  <text class="f-label" x="30" y="276">HEART STOPS</text>
+  <text class="f-label" x="630" y="276" text-anchor="end">24 HOURS</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="mins">Time since the heart stopped</label>
+  <input type="range" id="mins" min="0" max="1440" step="1" value="0">
+  <span class="readout" id="minsOut">0 min</span>
+</div>
+    </div>
+    <figcaption class="caption">The brain goes first and goes fast. Everything else has hours, which is exactly the window transplant teams are working inside.</figcaption>
+  </figure>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="scene card-scene" data-scene="swarm" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Then the ones that helped you take over</h2>
+      <p>The microbes that spent your life digesting your food begin, without any change of behaviour, to digest you. They were never doing anything else.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Which is why the definition had to change</h2>
+    <p>For most of history, death meant the heart stopped. Then we learned to restart hearts, and the definition stopped working.</p><p>Now the line is drawn at the brain, because that is the one part that cannot be replaced, restarted, or waited on.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Nothing about you is destroyed. Every atom carries on, gets taken up, and ends up somewhere else. The arrangement is what ends — and the arrangement was always the temporary part.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="why-do-we-sleep.html">Why do we sleep? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var mins = document.getElementById('mins');
+// roughly how long each tissue stays viable without circulation
+var ORGANS = [
+  { n: 'Brain',   life: 0.3,  col: '#F472B6' },
+  { n: 'Heart',   life: 240,  col: '#FB7185' },
+  { n: 'Liver',   life: 720,  col: '#FBBF24' },
+  { n: 'Kidneys', life: 1080, col: '#A3E635' },
+  { n: 'Cornea',  life: 1440, col: '#22D3EE' },
+  { n: 'Skin',    life: 1440, col: '#A78BFA' }
+];
+var host = document.getElementById('organs'), rows = [];
+ORGANS.forEach(function (o, i) {
+  var g = document.createElementNS(NS, 'g');
+  var y = 40 + i * 33;
+  g.innerHTML =
+    '<text x="30" y="' + (y + 5) + '" class="f-label">' + o.n.toUpperCase() + '</text>' +
+    '<rect x="150" y="' + (y - 9) + '" width="380" height="16" rx="8" fill="rgba(255,255,255,.12)"/>' +
+    '<rect x="150" y="' + (y - 9) + '" width="380" height="16" rx="8" fill="' + o.col + '"/>' +
+    '<text x="548" y="' + (y + 5) + '" class="f-label">alive</text>';
+  host.appendChild(g);
+  rows.push({ o: o, bar: g.children[2], lab: g.children[3] });
+});
+
+function draw() {
+  var m = +mins.value;
+  document.getElementById('minsOut').textContent =
+    m < 60 ? m + ' min' : (m / 60).toFixed(1) + ' hours';
+  document.getElementById('mark').setAttribute('cx', 30 + (m / 1440) * 600);
+  rows.forEach(function (r) {
+    var left = Math.max(0, 1 - m / r.o.life);
+    r.bar.setAttribute('width', 380 * left);
+    r.lab.textContent = left > 0 ? 'alive' : 'gone';
+    r.lab.setAttribute('opacity', left > 0 ? 1 : .45);
+  });
+}
+mins.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

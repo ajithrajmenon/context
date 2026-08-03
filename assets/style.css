@@ -40,15 +40,20 @@
   --ease: cubic-bezier(.22,.72,.28,1);
 }
 
-/* --- tones. any card can wear any of these ------------------------- */
-.t-nebula  { --g1:#3B0764; --g2:#7E22CE; --g3:#DB2777; --accent:#6D28D9; }
-.t-deepsea { --g1:#0C4A6E; --g2:#0891B2; --g3:#22D3EE; --accent:#0E7490; }
-.t-ember   { --g1:#4C0519; --g2:#9F1239; --g3:#F97316; --accent:#BE123C; }
-.t-forest  { --g1:#064E3B; --g2:#059669; --g3:#34D399; --accent:#047857; }
-.t-dusk    { --g1:#1E1B4B; --g2:#1D4ED8; --g3:#8B5CF6; --accent:#1D4ED8; }
-.t-solar   { --g1:#451A03; --g2:#B45309; --g3:#FBBF24; --accent:#B45309; }
-.t-void    { --g1:#020617; --g2:#111C3A; --g3:#334155; --accent:#334155; }
-.t-rose    { --g1:#4A044E; --g2:#A21CAF; --g3:#FB7185; --accent:#A21CAF; }
+/* --- tones -----------------------------------------------------------
+   These are stage lighting, not the picture. Scenes paint in cyan, lime,
+   magenta, amber and the rest all at once, and those only glow against a
+   deep ground — so every tone stays dark and lets the scene supply the
+   colour. A bright gradient here would flatten everything drawn on it.
+--------------------------------------------------------------------- */
+.t-nebula  { --g1:#240545; --g2:#4C1D95; --g3:#7E22CE; --accent:#6D28D9; }
+.t-deepsea { --g1:#042F4B; --g2:#0C4A6E; --g3:#0E7490; --accent:#0E7490; }
+.t-ember   { --g1:#3B0212; --g2:#7F1D1D; --g3:#B91C1C; --accent:#BE123C; }
+.t-forest  { --g1:#052E1B; --g2:#064E3B; --g3:#047857; --accent:#047857; }
+.t-dusk    { --g1:#12103A; --g2:#1E1B4B; --g3:#3730A3; --accent:#1D4ED8; }
+.t-solar   { --g1:#2E1002; --g2:#7C2D12; --g3:#B45309; --accent:#B45309; }
+.t-void    { --g1:#020617; --g2:#0B1220; --g3:#1E293B; --accent:#334155; }
+.t-rose    { --g1:#2E0331; --g2:#701A75; --g3:#A21CAF; --accent:#A21CAF; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -96,7 +101,7 @@ img, svg, canvas { max-width: 100%; }
 .scene::after {
   content: '';
   position: absolute; inset: -40%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.16), transparent 55%);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.09), transparent 55%);
   animation: drift 24s linear infinite;
   z-index: 0;
 }

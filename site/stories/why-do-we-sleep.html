@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why do we sleep? &#8212; Context</title>
+<meta name="description" content="A third of your life, unconscious and defenceless. Evolution kept it anyway, so it must be worth it.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-dusk">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-dusk">
+  <div class="scene" data-scene="sleepcycle" data-seed="why-do-we-sleep">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Your body</p>
+      <h1 data-reveal="80">Why do we sleep?</h1>
+      <p class="standfirst" data-reveal="160">Lying still and unaware for eight hours is about the most dangerous thing an animal can do. Every animal does it anyway. Whatever sleep is for, it is worth being eaten over.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>It is far too expensive to be an accident</h2>
+    <p>You cannot eat, defend yourself, or watch for anything while asleep. If it were optional, something would have dropped it by now.</p><p>Nothing has. Not one animal with a brain has managed to do without it.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="scene card-scene" data-scene="sleepcycle" data-seed="b1">
+    <div class="scene-pad">
+      <h2>A night is four or five loops, not one long blank</h2>
+      <p>You sink into deep sleep, climb back toward dreaming, and repeat. The deep part loads the front of the night; the dreaming part loads the end.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The brain cleans itself while you are out</h2>
+    <p>During deep sleep the gaps between brain cells widen, and fluid is pushed through to flush out the waste of the day.</p><p>It appears to be far more effective asleep than awake — which is a good reason the brain would rather do it while you are not using it.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-turn">
+    <p>Sleep is not the brain switching off. It is the brain doing the maintenance it cannot do while you are using it.</p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What changes with different amounts of sleep</title>
+  <g id="bars"></g>
+  <text class="f-label" x="30" y="284" id="verdict">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="hrs">Hours of sleep</label>
+  <input type="range" id="hrs" min="0" max="10" step="1" value="8">
+  <span class="readout" id="hrsOut">8 hours</span>
+</div>
+    </div>
+    <figcaption class="caption">The cruel part is that the feeling of being fine recovers long before the performance does. People running on five hours consistently rate themselves as unaffected.</figcaption>
+  </figure>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="scene card-scene" data-scene="attention" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Dreams look like the filing being done</h2>
+      <p>The night replays pieces of the day, keeps some, drops most, and files what is left next to things you already knew.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>What happens if you stop</h2>
+    <p>A day without sleep is roughly being drunk. Two days and your body starts forcing microsleeps — seconds at a time, whether you agree or not.</p><p>Push much further and thinking falls apart entirely. There is no known way to train yourself out of needing it.</p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>You will spend around twenty-six years of your life asleep. Not lost time — it is the maintenance window that makes the other fifty-odd years work at all.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="how-many-people-ever-lived.html">How many people have ever lived? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var hrs = document.getElementById('hrs');
+var MEASURES = [
+  { n: 'Reaction time', col: '#22D3EE', best: 8 },
+  { n: 'Memory',        col: '#A3E635', best: 8 },
+  { n: 'Mood',          col: '#FBBF24', best: 8 },
+  { n: 'Immune system', col: '#F472B6', best: 8 }
+];
+var host = document.getElementById('bars'), rows = [];
+MEASURES.forEach(function (m, i) {
+  var g = document.createElementNS(NS, 'g'), y = 48 + i * 52;
+  g.innerHTML =
+    '<text x="30" y="' + (y - 12) + '" class="f-label">' + m.n.toUpperCase() + '</text>' +
+    '<rect x="30" y="' + (y - 2) + '" width="600" height="18" rx="9" fill="rgba(255,255,255,.12)"/>' +
+    '<rect x="30" y="' + (y - 2) + '" width="0" height="18" rx="9" fill="' + m.col + '"/>';
+  host.appendChild(g);
+  rows.push({ m: m, bar: g.children[2] });
+});
+
+function draw() {
+  var h = +hrs.value;
+  document.getElementById('hrsOut').textContent = h + (h === 1 ? ' hour' : ' hours');
+  rows.forEach(function (r) {
+    // performance climbs steeply to about eight hours and then flattens
+    var v = Math.min(1, Math.pow(h / r.m.best, 1.7));
+    r.bar.setAttribute('width', 600 * v);
+  });
+  document.getElementById('verdict').textContent =
+    h <= 2 ? 'AFTER A FULL NIGHT AWAKE YOU PERFORM LIKE SOMEONE OVER THE DRINK-DRIVE LIMIT' :
+    h <= 5 ? 'YOU WILL FEEL FINE. YOU WILL NOT BE FINE.' :
+    h <= 7 ? 'CLOSE, BUT THE DEBT STILL ADDS UP NIGHT AFTER NIGHT' :
+             'THIS IS WHAT MOST ADULTS ACTUALLY NEED';
+}
+hrs.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

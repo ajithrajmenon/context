@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why does time slow down when you are scared? &#8212; Context</title>
+<meta name="description" content="The crash felt like it lasted forever. Your brain was not running faster — it was recording more.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-nebula">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-nebula">
+  <div class="scene" data-scene="timewarp" data-seed="why-time-slows-when-scared">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Mind</p>
+      <h1 data-reveal="80">Why does time slow down when you are scared?</h1>
+      <p class="standfirst" data-reveal="160">Almost everyone who has been in an accident describes the same thing: everything went slow. It is such a consistent report that somebody eventually went and tested whether it was true.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The obvious explanation</h2>
+    <p>If time seems to slow, your brain must be running faster — taking in more per second, like a high-speed camera.</p><p>It is a good theory. It makes a clear prediction, which is what makes it testable.</p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <div class="scene card-scene" data-scene="timewarp" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Same stretch of time, two different speeds</h2>
+      <p>The top row is an ordinary minute. The bottom is the same minute, remembered after something frightening.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>So somebody dropped people off a tower</h2>
+    <p>Volunteers fell fifty metres backwards into a net, wearing a display flickering numbers just too fast to read normally.</p><p>If perception really sped up, they would be able to read it during the fall. <strong>Nobody could.</strong> They were terrified, they reported the fall lasting far longer than it did, and they still could not read the display.</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>Time did not slow down. Your memory got unusually detailed, and you read that density back as length.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Real duration against remembered duration</title>
+  <text class="f-label" x="30" y="52">WHAT THE CLOCK SAYS</text>
+  <rect x="30" y="66" width="600" height="26" rx="13" fill="rgba(255,255,255,.14)"/>
+  <rect id="realBar" x="30" y="66" width="120" height="26" rx="13" fill="#22D3EE"/>
+  <text class="f-value" id="realTxt" x="30" y="126" style="font-size:22px">&#8212;</text>
+
+  <text class="f-label" x="30" y="176">WHAT YOU REMEMBER</text>
+  <rect x="30" y="190" width="600" height="26" rx="13" fill="rgba(255,255,255,.14)"/>
+  <rect id="feltBar" x="30" y="190" width="120" height="26" rx="13" fill="#F472B6"/>
+  <text class="f-value" id="feltTxt" x="30" y="250" style="font-size:22px">&#8212;</text>
+  <text class="f-label" id="noteTxt" x="30" y="288">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="fear">How frightening it was</label>
+  <input type="range" id="fear" min="0" max="100" step="1" value="10">
+  <span class="readout" id="fearOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">The cyan bar is the truth and it never changes. Only the pink one moves — and the pink one is the only one you have any access to.</figcaption>
+  </figure>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="scene card-scene" data-scene="bloom" data-seed="b5">
+    <div class="scene-pad">
+      <h2>The same trick runs your whole life</h2>
+      <p>A week somewhere new feels long looking back. A month of the same commute vanishes. You are not measuring time, you are measuring how much of it you kept.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Which gives you something you can use</h2>
+    <p>You cannot slow time down. You can change how much of it gets recorded, and that is the thing you actually experience afterwards.</p><p>New places, new people, anything unfamiliar. It is the only known way to make a year feel long.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>You have never once experienced time directly. You experience a reconstruction, assembled afterwards out of whatever your brain thought was worth keeping — and its filing decisions are the closest thing you have to a clock.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="the-arrow-of-time.html">Why can you remember yesterday but not tomorrow? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var fear = document.getElementById('fear');
+var REAL = 3;      // seconds, always
+
+function draw() {
+  var f = +fear.value / 100;
+  document.getElementById('fearOut').textContent =
+    f < .2 ? 'an ordinary moment' : f < .5 ? 'startling' : f < .8 ? 'frightening' : 'the worst kind';
+
+  // duration is fixed; only the density of what got recorded changes
+  var felt = REAL * (1 + f * 3.2);
+  document.getElementById('realBar').setAttribute('width', 600 * REAL / 13);
+  document.getElementById('feltBar').setAttribute('width', 600 * felt / 13);
+  document.getElementById('realTxt').textContent = REAL.toFixed(1) + ' seconds';
+  document.getElementById('feltTxt').textContent = felt.toFixed(1) + ' seconds';
+  document.getElementById('noteTxt').textContent =
+    f < .2 ? 'NOT MUCH WORTH STORING, SO NOT MUCH GETS STORED'
+           : 'THE TOP BAR NEVER MOVES. IT NEVER DOES.';
+}
+fear.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

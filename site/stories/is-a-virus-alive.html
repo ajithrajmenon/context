@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is a virus alive? &#8212; Context</title>
+<meta name="description" content="It cannot eat, move, grow or reproduce by itself. It is also extraordinarily good at what it does.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-ember">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-ember">
+  <div class="scene" data-scene="virus" data-seed="is-a-virus-alive">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Life</p>
+      <h1 data-reveal="80">Is a virus alive?</h1>
+      <p class="standfirst" data-reveal="160">A virus sits at the exact edge of the definition of life, and biology has never fully agreed which side it falls on. That is not a gap in our knowledge — it is a problem with the definition.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>A virus is instructions in a box</h2>
+    <p>Strip one down and you find a short set of genetic instructions wrapped in a protein shell. Sometimes a fatty coat over that.</p><p>That is the entire organism. No mouth, no engine, no way of making anything. <strong>Left alone, it does nothing at all — indefinitely.</strong></p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="scene card-scene" data-scene="virus" data-seed="b1">
+    <div class="scene-pad">
+      <h2>It only becomes anything when it finds a cell</h2>
+      <p>The shell docks, the instructions go in, and the cell starts building copies of the thing that infected it.</p>
+    </div>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="card-steps">
+    <h2>The usual tests for being alive</h2>
+    <ol class="steps"><li class="step">
+      <span class="step-n">1</span>
+      <div>
+        <h3>Uses energy</h3>
+        <p>A virus does not. It has no metabolism of any kind. FAILS.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">2</span>
+      <div>
+        <h3>Grows</h3>
+        <p>It never grows. It is assembled at full size. FAILS.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">3</span>
+      <div>
+        <h3>Reproduces</h3>
+        <p>Only by making a cell do it. On its own, never. HALF.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">4</span>
+      <div>
+        <h3>Evolves</h3>
+        <p>Spectacularly well. This is why flu jabs are yearly. PASSES.</p>
+      </div>
+    </li></ol>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-turn">
+    <p>A virus is not alive, and not dead. It is a set of instructions waiting for a machine that can read them.</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Which tests for life a virus passes</title>
+  <g id="tests"></g>
+  <text class="f-label" x="30" y="252">ON THIS DEFINITION, A VIRUS IS</text>
+  <text class="f-value" id="verdict" x="30" y="286" style="font-size:26px">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="chips" role="group" aria-label="What you require of life">
+  <button class="chip" id="tEnergy" aria-pressed="true">Uses energy</button>
+  <button class="chip" id="tGrow" aria-pressed="true">Grows</button>
+  <button class="chip" id="tRepro" aria-pressed="true">Reproduces alone</button>
+  <button class="chip" id="tEvolve" aria-pressed="true">Evolves</button>
+</div>
+    </div>
+    <figcaption class="caption">Switch requirements off and on. The answer changes — which tells you the argument was never about viruses. It was about where we drew the line.</figcaption>
+  </figure>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="swarm" data-seed="b5">
+    <div class="scene-pad">
+      <h2>There are more of them than anything else</h2>
+      <p>Around ten to the thirty-first, by rough count. Laid end to end they would reach further than the nearest galaxies. Most infect bacteria, not you.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>And some of them are in you permanently</h2>
+    <p>About eight per cent of your DNA came from viruses that infected your ancestors and never left.</p><p>One of those leftover genes is essential for building a placenta. Mammals may owe live birth to an ancient infection.</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Nature does not care about our categories. We drew a line called "alive", and viruses sat down exactly on top of it and have not moved since.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="if-everyone-vanished.html">What if every human vanished tomorrow? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+// whether a virus meets each requirement
+var TESTS = [
+  { id: 'tEnergy', n: 'Uses energy',       pass: false, col: '#FB7185' },
+  { id: 'tGrow',   n: 'Grows',             pass: false, col: '#FBBF24' },
+  { id: 'tRepro',  n: 'Reproduces alone',  pass: false, col: '#F472B6' },
+  { id: 'tEvolve', n: 'Evolves',           pass: true,  col: '#A3E635' }
+];
+var host = document.getElementById('tests'), rows = [];
+TESTS.forEach(function (t, i) {
+  var g = document.createElementNS(NS, 'g'), y = 54 + i * 44;
+  g.innerHTML =
+    '<circle cx="46" cy="' + y + '" r="13" fill="' + t.col + '"/>' +
+    '<text x="46" y="' + (y + 6) + '" text-anchor="middle" class="f-value" style="font-size:15px;fill:#0b1220">' +
+      (t.pass ? 'Y' : 'N') + '</text>' +
+    '<text x="80" y="' + (y + 6) + '" class="f-value" style="font-size:18px">' + t.n + '</text>' +
+    '<text x="380" y="' + (y + 6) + '" class="f-label">' + (t.pass ? 'a virus does this' : 'a virus cannot') + '</text>';
+  host.appendChild(g);
+  rows.push({ t: t, g: g });
+});
+
+function draw() {
+  var required = TESTS.filter(function (t) {
+    return document.getElementById(t.id).getAttribute('aria-pressed') === 'true';
+  });
+  rows.forEach(function (r) {
+    var on = document.getElementById(r.t.id).getAttribute('aria-pressed') === 'true';
+    r.g.setAttribute('opacity', on ? 1 : .25);
+  });
+  var fails = required.filter(function (t) { return !t.pass; }).length;
+  document.getElementById('verdict').textContent =
+    required.length === 0 ? 'alive, but so is a rock' :
+    fails === 0 ? 'alive' :
+    fails === required.length ? 'not alive' : 'somewhere in between';
+}
+TESTS.forEach(function (t) {
+  var b = document.getElementById(t.id);
+  b.addEventListener('click', function () {
+    b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    draw();
+  });
+});
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

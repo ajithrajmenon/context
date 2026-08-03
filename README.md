@@ -9,15 +9,16 @@ Not an encyclopedia and not a course. Every piece is built as a story — a hook
 a turn, and a landing — because people remember what happened to somebody, in what order,
 and why it mattered. The mechanism goes in only once you care about the answer.
 
-The library grows. Subjects are not fixed: space, bodies, time, Earth, the numbers that
-break intuition, and whatever else turns out to be worth being curious about. New
-categories cost nothing — the nav and the filters build themselves from the stories.
+The library grows. Subjects are not fixed: space, time, matter, life, minds, bodies,
+people, Earth, and whatever else turns out to be worth being curious about. New categories
+cost nothing — the nav and the filters build themselves from the stories.
 
 ## Structure
 
 ```
 build.py          generates the site
-stories_data.py   every story — one dict each
+stories_data.py   every story — one dict each (imports the second shelf)
+stories_more.py   stories 11-20, same shape
 assets/style.css  the design system
 assets/motion.js  reveals and the canvas scenes
 assets/fonts/     self-hosted woff2
@@ -91,28 +92,47 @@ and links on white, which is the one that has to clear 4.5:1 — they all do.
 
 ### Motion
 
-`assets/motion.js` handles scroll reveals and eleven canvas scenes. Five are general —
-`stars`, `orbit`, `swarm`, `waves`, `bloom` — and six were written for particular ideas:
+`assets/motion.js` handles scroll reveals and the canvas scenes. Two rules govern all of
+them:
 
-| scene | what it shows |
+**Multicolour.** A scene carries many hues at once, from a shared palette — cyan, lime,
+magenta, violet, amber, emerald, coral, sky, orchid, teal. The card's gradient is the
+lighting; the scene is the life on top of it. One flat hue per panel reads as decoration,
+which is why the tones above stay dark: they exist so the scene's colours can glow.
+
+**Literal.** Every scene draws its own subject. No scene is picked because it looks nice.
+
+| scene | what it draws |
 |-------|---------------|
-| `entropy` | a tidy grid falling apart and never tidying itself |
-| `expand` | everything moving away from everything else, with no centre |
-| `atom` | a speck of nucleus in an enormous amount of nothing |
-| `cells` | cells drifting; a few flaring as something finds them |
-| `beam` | rays crossing at a fixed speed |
-| `grid` | space dented by something heavy sitting on it |
-| `flicker` | pairs popping out of nothing and cancelling again |
-| `dying` | the lights going out, one at a time |
-| `replace` | every piece swapped out, and the shape still holding |
-
-Scenes draw in white only. The card's own gradient supplies the hue, which is what lets a
-single story walk through several tones without any scene knowing about colour.
+| `stars` | a star field in real stellar colours, blue giants through red dwarfs |
+| `orbit` | a star with planets, each its own world |
+| `expand` | galaxies drifting apart, with no centre |
+| `dying` | stars going out; the cool red ones outlast the rest |
+| `grid` | space as a sheet, dented by something heavy |
+| `beam` | light split into the colours it is made of |
+| `entropy` | coloured blocks in a tidy row, scattering and never returning |
+| `atom` | a speck of nucleus in an enormous gap, electrons far out |
+| `flicker` | matter and antimatter, borrowed from nothing and paid back |
+| `bloom` | rings pushing outward, each a different colour |
+| `waves` | layered bands, motion without particles |
+| `swarm` | a crowd of microbes, no two the same |
+| `cells` | immune cells hunting invaders and swallowing them |
+| `virus` | virus particles docking onto a cell |
+| `colony` | ant trails between nests, traffic both ways |
+| `telomere` | cells dividing, their protective caps shortening |
+| `replace` | every piece swapped out, the shape still holding |
+| `depths` | the ocean in zones, bioluminescence below the light |
+| `crowd` | a crowd where most of the figures are the people already gone |
+| `overgrow` | plants taking a city back |
+| `sleepcycle` | a night of sleep, cycling through its stages |
+| `attention` | focus sliding off the thing it is meant to be on |
+| `pulse` | a rhythm slowing, and the pieces drifting free |
+| `timewarp` | the same stretch of time, felt at two speeds |
 
 Rules the file keeps:
 
 - nothing animates off-screen; an `IntersectionObserver` parks each scene
-- `prefers-reduced-motion` gets one static frame, never a frozen blank panel
+- `prefers-reduced-motion` gets one composed static frame, never a frozen blank panel
 - scenes are seeded from the slug, so a card looks identical on every load
 - anything scrolled past without intersecting still reveals — a jumped-over element must
   never stay invisible

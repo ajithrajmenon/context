@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why do we get bored? &#8212; Context</title>
+<meta name="description" content="Boredom feels like nothing happening. It is one of the most useful signals your brain sends.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-nebula">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-nebula">
+  <div class="scene" data-scene="attention" data-seed="why-do-we-get-bored">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Mind</p>
+      <h1 data-reveal="80">Why do we get bored?</h1>
+      <p class="standfirst" data-reveal="160">Boredom is genuinely unpleasant — people will give themselves small electric shocks rather than sit alone with nothing to do. That is a strange amount of pressure for a feeling that seems to do nothing.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>It is an alarm, not a mood</h2>
+    <p>Bored means two things at once: you want to be engaged with something, and nothing available is doing it.</p><p>That gap is the whole feeling. It is your attention system reporting that <strong>it is being wasted</strong>.</p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <div class="scene card-scene" data-scene="attention" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Attention will not sit still for something worthless</h2>
+      <p>The focus keeps sliding off, and everything at the edges starts looking more interesting than the middle.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>And that is exactly the point</h2>
+    <p>An animal that felt fine doing nothing forever would sit in one place and starve. Boredom is the push that makes you go and look.</p><p>People made to do something tedious then score higher on tests of coming up with new ideas. The restlessness is doing something.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-turn">
+    <p>Boredom is not the absence of something to do. It is your brain telling you that what you are doing is not worth it.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How engaged you are at different levels of challenge</title>
+  <path id="curve" d="" fill="none" stroke="#A3E635" stroke-width="3.5"/>
+  <line class="f-faint" x1="50" y1="230" x2="630" y2="230"/>
+  <circle id="you" cx="340" cy="80" r="10" fill="#FBBF24"/>
+  <text class="f-label" x="50" y="256">TOO EASY</text>
+  <text class="f-label" x="340" y="256" text-anchor="middle">JUST HARD ENOUGH</text>
+  <text class="f-label" x="630" y="256" text-anchor="end">TOO HARD</text>
+  <text class="f-label" x="50" y="40">YOU FEEL</text>
+  <text class="f-value" id="feelTxt" x="50" y="74" style="font-size:26px">&#8212;</text>
+  <text class="f-label" id="tipTxt" x="50" y="290">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="chal">How hard the task is</label>
+  <input type="range" id="chal" min="0" max="100" step="1" value="50">
+  <span class="readout" id="chalOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Boredom and panic are the same curve at opposite ends. The fix for boredom is almost never more entertainment — it is a harder version of what you are already doing.</figcaption>
+  </figure>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="scene card-scene" data-scene="flicker" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Why a phone makes it worse</h2>
+      <p>An endless feed is engaging enough to stop the discomfort and never engaging enough to satisfy it. The alarm gets muffled instead of answered.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Being bored on purpose</h2>
+    <p>Ideas turn up in showers and on walks because those are the last places left with nothing to look at.</p><p>If you never let yourself be bored, you never get the part that comes after it.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Boredom is a demand for something better, and it is one of the few feelings that goes away only when you actually do something worth doing.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="bottom-of-the-ocean.html">What lives at the bottom of the ocean? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var chal = document.getElementById('chal');
+
+function engage(x) {           // an upside-down U: bored, then absorbed, then swamped
+  return Math.exp(-Math.pow((x - 50) / 26, 2));
+}
+
+var d = '';
+for (var i = 0; i <= 100; i++) {
+  d += (i ? 'L' : 'M') + (50 + i * 5.8).toFixed(1) + ' ' + (230 - engage(i) * 170).toFixed(1);
+}
+document.getElementById('curve').setAttribute('d', d);
+
+function draw() {
+  var x = +chal.value, e = engage(x);
+  document.getElementById('you').setAttribute('cx', 50 + x * 5.8);
+  document.getElementById('you').setAttribute('cy', 230 - e * 170);
+  document.getElementById('chalOut').textContent =
+    x < 30 ? 'far too easy' : x < 45 ? 'a bit easy' : x < 58 ? 'about right' : x < 75 ? 'a bit hard' : 'far too hard';
+  document.getElementById('feelTxt').textContent =
+    x < 30 ? 'bored' : x < 45 ? 'restless' : x < 58 ? 'absorbed' : x < 75 ? 'stretched' : 'overwhelmed';
+  document.getElementById('tipTxt').textContent =
+    x < 45 ? 'MAKE IT HARDER, NOT LONGER' :
+    x > 62 ? 'BREAK IT INTO A SMALLER PIECE' :
+             'THIS IS THE BAND WHERE TIME DISAPPEARS';
+}
+chal.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

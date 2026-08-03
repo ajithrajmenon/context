@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-blue">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why does your phone die in the cold? &#8212; Context</title>
+<meta name="description" content="Cold slows the chemistry inside the battery, so it cannot push charge out fast enough. The energy is still in there. The battery just cannot hand it over until it warms up.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">4 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Tech</p>
+    <h1>Why does your phone die in the cold?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Cold slows the chemistry inside the battery, so it cannot push charge out fast enough. The energy is still in there. The battery just cannot hand it over until it warms up.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 280" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Usable battery charge against temperature</title>
+  <rect x="60" y="90" width="230" height="110" rx="16" fill="#fff" stroke="var(--bright)" stroke-width="3"/>
+  <rect x="292" y="126" width="14" height="38" rx="5" class="f-fill"/>
+  <rect id="fill" x="70" y="100" width="210" height="90" rx="9" class="f-fill"/>
+  <text class="f-value" id="pctTxt" x="175" y="240" text-anchor="middle">100%</text>
+  <text class="f-label" x="175" y="70" text-anchor="middle">WHAT YOU CAN ACTUALLY USE</text>
+  <text class="f-label" x="400" y="70">WHAT THE PHONE REPORTS</text>
+  <text class="f-value" id="showTxt" x="400" y="112" style="font-size:34px">100%</text>
+  <text class="f-label" id="noteTxt" x="400" y="150">Everything is fine.</text>
+  <rect x="400" y="180" width="200" height="12" rx="6" fill="#fff" stroke="var(--border)"/>
+  <rect id="tempBar" x="400" y="180" width="140" height="12" rx="6" class="f-fill"/>
+  <text class="f-label" x="400" y="216">COLD</text>
+  <text class="f-label" x="600" y="216" text-anchor="end">WARM</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="temp">Temperature</label>
+  <input type="range" id="temp" min="-20" max="35" step="1" value="22">
+  <span class="readout" id="tempOut">22&#176;C</span>
+</div>
+    </div>
+    <figcaption class="caption">Drag the temperature down. The charge does not leave the battery — the amount it can deliver shrinks, and the phone, which guesses the percentage from voltage, starts reporting nonsense.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>The charge is still there</h2>
+  <p>A battery makes power by shuffling lithium ions through a liquid. Cool that liquid and everything moves more slowly, so the battery cannot supply current as quickly.</p><p>Ask for a lot at once — camera, torch, mobile signal hunting — and the voltage sags. Your phone reads that sag as "empty" and shuts down, <strong>with charge still in the battery</strong>. Warm it up and the charge comes back.</p>
+</section>
+<section class="section">
+  <h2>Why the percentage lies</h2>
+  <p>No phone measures charge directly. It measures voltage and infers the rest from a model built at room temperature.</p><p>In the cold that model is simply wrong, which is why you get 40%, then 12%, then nothing, then 25% once you are indoors again.</p>
+</section>
+<section class="section">
+  <h2>What to do in winter</h2>
+  <ul class="tips"><li>Keep the phone in an inside pocket — body heat is enough.</li><li>If it shuts down cold, warm it in your hands before deciding it is broken.</li><li>Do not charge a phone that is properly cold; let it reach room temperature first.</li></ul>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="stale-bread.html">Why is the fridge the worst place for bread? &#8594;</a>
+</nav>
+
+<script>
+
+var temp = document.getElementById('temp');
+
+function draw() {
+  var t = +temp.value;
+  document.getElementById('tempOut').textContent = t + '\u00b0C';
+  // usable capacity falls away steeply below freezing, flat once warm
+  var cap = t >= 20 ? 100 : 100 - Math.pow((20 - t) / 40, 1.5) * 105;
+  cap = Math.max(18, Math.min(100, cap));
+
+  document.getElementById('fill').setAttribute('width', 210 * cap / 100);
+  document.getElementById('pctTxt').textContent = Math.round(cap) + '% available';
+  document.getElementById('showTxt').textContent = t < 5 ? 'jumps around' : Math.round(cap) + '%';
+  document.getElementById('noteTxt').textContent =
+    t < -5 ? 'It may shut off with charge left.'
+    : t < 5 ? 'The reading gets unreliable.'
+    : t < 15 ? 'Slightly short, nothing odd.'
+    : 'Everything is fine.';
+  document.getElementById('tempBar').setAttribute('width', 200 * (t + 20) / 55);
+}
+temp.addEventListener('input', draw);
+draw();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

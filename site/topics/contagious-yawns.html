@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-violet">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why are yawns contagious? &#8212; Context</title>
+<meta name="description" content="Watching someone yawn quietly switches on the same parts of your brain that would produce a yawn of your own. It is the same copying reflex that makes laughter spread — and it works better on people you like.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">8 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Your head</p>
+    <h1>Why are yawns contagious?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Watching someone yawn quietly switches on the same parts of your brain that would produce a yawn of your own. It is the same copying reflex that makes laughter spread — and it works better on people you like.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 260" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">A room of faces catching each other's yawns</title>
+  <g id="faces"></g>
+  <text class="f-label" x="10" y="248">CLICK ANY FACE TO START A YAWN</text>
+  <text class="f-value" id="caughtTxt" x="650" y="248" text-anchor="end">0 of 12 caught it</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="close">How close are they</label>
+  <input type="range" id="close" min="0" max="100" step="1" value="60">
+  <span class="readout" id="closeOut">Friends</span>
+</div>
+<button class="btn" id="reset">Start over</button>
+    </div>
+    <figcaption class="caption">Click a face and watch it travel. Slide the closeness down to strangers and it mostly dies out — the effect really is stronger between people who know each other.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>Your brain rehearses what it watches</h2>
+  <p>A lot of what you see other people do gets quietly run through your own motor system, as if you were about to do it too. Most of the time that rehearsal stops before it becomes movement.</p><p>Yawning slips through. Watching one, hearing one, even reading the word is often enough to tip the rehearsal into <strong>the real thing</strong>.</p>
+</section>
+<section class="section">
+  <h2>It tracks who you care about</h2>
+  <p>Contagious yawning is strongest with family, weaker with friends, weaker still with strangers. It travels between dogs and their owners, and across a few other social species.</p><p>Children mostly do not catch yawns until around age four or five, which is roughly when a lot of other social copying arrives.</p>
+</section>
+<section class="section">
+  <h2>And the yawn itself?</h2>
+  <p>The old story was that yawning tops up oxygen. That one has not held up — breathing extra oxygen does not stop you yawning.</p><p>The better current guess is that a yawn cools the brain slightly, which fits the timing: people yawn most when tired, bored, or overheated.</p>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="blocked-nose-taste.html">Why does food taste like nothing with a cold? &#8594;</a>
+</nav>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var faces = document.getElementById('faces'), close = document.getElementById('close');
+var N = 12, state = [], nodes = [];
+
+for (var i = 0; i < N; i++) {
+  var col = i % 6, row = (i / 6) | 0;
+  var cx = 70 + col * 105, cy = 70 + row * 100;
+  var g = document.createElementNS(NS, 'g');
+  g.setAttribute('style', 'cursor:pointer');
+  g.innerHTML =
+    '<circle cx="' + cx + '" cy="' + cy + '" r="34" fill="#fff" stroke="var(--border)" stroke-width="2.5"/>' +
+    '<circle cx="' + (cx - 11) + '" cy="' + (cy - 9) + '" r="3.2" fill="var(--muted)"/>' +
+    '<circle cx="' + (cx + 11) + '" cy="' + (cy - 9) + '" r="3.2" fill="var(--muted)"/>' +
+    '<ellipse cx="' + cx + '" cy="' + (cy + 12) + '" rx="6" ry="3" fill="var(--muted)"/>';
+  faces.appendChild(g);
+  nodes.push({ g: g, cx: cx, cy: cy, circle: g.children[0], mouth: g.children[3] });
+  state.push(0);
+  (function (k) { g.addEventListener('click', function () { infect(k); }); }(i));
+}
+
+function paint() {
+  nodes.forEach(function (n, i) {
+    var yawning = state[i] > 0;
+    n.circle.setAttribute('fill', yawning ? 'var(--wash)' : '#fff');
+    n.circle.setAttribute('stroke', yawning ? 'var(--bright)' : 'var(--border)');
+    n.mouth.setAttribute('ry', yawning ? 13 : 3);
+    n.mouth.setAttribute('rx', yawning ? 8 : 6);
+    n.mouth.setAttribute('fill', yawning ? 'var(--bright)' : 'var(--muted)');
+  });
+  var c = state.filter(function (s) { return s > 0; }).length;
+  document.getElementById('caughtTxt').textContent = c + ' of ' + N + ' caught it';
+}
+
+function infect(i) {
+  if (state[i] > 0) return;
+  state[i] = 1;
+  paint();
+  // closeness raises the chance a neighbour catches it
+  var p = 0.15 + (+close.value / 100) * 0.75;
+  nodes.forEach(function (n, j) {
+    if (state[j] > 0) return;
+    var d = Math.hypot(n.cx - nodes[i].cx, n.cy - nodes[i].cy);
+    if (d > 160) return;
+    if (Math.random() < p) setTimeout(function () { infect(j); }, 500 + Math.random() * 900);
+  });
+}
+
+close.addEventListener('input', function () {
+  var v = +close.value;
+  document.getElementById('closeOut').textContent =
+    v < 25 ? 'Strangers' : v < 55 ? 'Colleagues' : v < 80 ? 'Friends' : 'Family';
+});
+
+document.getElementById('reset').addEventListener('click', function () {
+  state = state.map(function () { return 0; });
+  paint();
+});
+paint();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

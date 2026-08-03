@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-amber">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why is the fridge the worst place for bread? &#8212; Context</title>
+<meta name="description" content="Going stale is starch quietly recrystallising, and that happens fastest just above freezing. The fridge sits exactly in the worst zone. The counter is slower; the freezer nearly stops it.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">5 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Kitchen</p>
+    <h1>Why is the fridge the worst place for bread?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Going stale is starch quietly recrystallising, and that happens fastest just above freezing. The fridge sits exactly in the worst zone. The counter is slower; the freezer nearly stops it.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 290" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How quickly bread goes stale in different places</title>
+  <path d="M70 90c0-30 30-44 68-44s68 14 68 44v78a12 12 0 0 1-12 12H82a12 12 0 0 1-12-12z"
+        id="loaf" class="f-soft" stroke="var(--bright)" stroke-width="2.5"/>
+  <g id="crystals"></g>
+  <text class="f-label" x="330" y="70">HOW STALE IT IS</text>
+  <rect x="330" y="86" width="300" height="30" rx="15" fill="#fff" stroke="var(--border)"/>
+  <rect id="staleBar" x="330" y="86" width="0" height="30" rx="15" class="f-fill"/>
+  <text class="f-value" id="staleTxt" x="330" y="146">Fresh</text>
+  <text class="f-label" x="330" y="196">SAME BREAD, LEFT ON THE COUNTER</text>
+  <rect x="330" y="212" width="300" height="14" rx="7" fill="#fff" stroke="var(--border)"/>
+  <rect id="refBar" x="330" y="212" width="0" height="14" rx="7" fill="var(--border)"/>
+</svg>
+    </div>
+    <div class="controls">
+<div class="chips" role="group" aria-label="Where you keep it">
+  <button class="chip" id="wCounter" aria-pressed="true">Counter</button>
+  <button class="chip" id="wFridge" aria-pressed="false">Fridge</button>
+  <button class="chip" id="wFreezer" aria-pressed="false">Freezer</button>
+</div>
+<div class="control">
+  <label for="days">Days</label>
+  <input type="range" id="days" min="0" max="7" step="0.5" value="2">
+  <span class="readout" id="daysOut">2</span>
+</div>
+    </div>
+    <figcaption class="caption">The grey bar underneath is always the counter, for comparison. Put the same loaf in the fridge and it stales roughly twice as fast — the freezer is the only place that really stops it.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>Stale is not dry</h2>
+  <p>It is easy to assume bread goes hard because it dries out. Wrap a loaf in a sealed bag so it cannot lose any water and it still goes stale.</p><p>What is happening is that starch, forced into a loose disordered arrangement by baking, slowly settles back into ordered crystals. Those crystals grab water and stiffen the crumb. The bread is not drier — it is <strong>firmer, and holding its water differently</strong>.</p>
+</section>
+<section class="section">
+  <h2>Why the fridge is the trap</h2>
+  <p>That recrystallising happens fastest a little above freezing — right where your fridge lives. Chilling bread makes it stale faster than leaving it out.</p><p>Below freezing the molecules barely move, so a freezer nearly stops the clock. This is also why warming a stale slice revives it: heat breaks the crystals up again, for a while.</p>
+</section>
+<section class="section">
+  <h2>Where to actually put it</h2>
+  <ul class="tips"><li>Eating it in a couple of days: counter, in a paper bag or a bread bin.</li><li>Longer than that: slice it and freeze it, then toast straight from frozen.</li><li>The fridge is for sandwiches, not for loaves.</li><li>A stale slice in a warm oven for a few minutes comes back to life.</li></ul>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="small-savings.html">How does a little money turn into a lot? &#8594;</a>
+</nav>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var RATE = { wCounter: 12, wFridge: 26, wFreezer: 1.5 };
+var where = 'wCounter';
+var days = document.getElementById('days');
+
+var crystals = document.getElementById('crystals'), dots = [];
+for (var i = 0; i < 40; i++) {
+  var c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 86 + Math.random() * 104);
+  c.setAttribute('cy', 66 + Math.random() * 106);
+  c.setAttribute('r', 1.6 + Math.random() * 2.2);
+  c.setAttribute('fill', 'var(--bright)');
+  c.setAttribute('opacity', '0');
+  crystals.appendChild(c);
+  dots.push(c);
+}
+
+function draw() {
+  var d = +days.value;
+  document.getElementById('daysOut').textContent = d;
+  var v = Math.min(100, d * RATE[where]);
+  var ref = Math.min(100, d * RATE.wCounter);
+
+  document.getElementById('staleBar').setAttribute('width', 300 * v / 100);
+  document.getElementById('refBar').setAttribute('width', 300 * ref / 100);
+  document.getElementById('staleTxt').textContent =
+    v < 12 ? 'Fresh' : v < 35 ? 'Softening off' : v < 65 ? 'Firm and dull' : 'Toast it, honestly';
+  dots.forEach(function (dot, i) {
+    dot.setAttribute('opacity', i / dots.length < v / 100 ? 0.85 : 0);
+  });
+}
+
+Object.keys(RATE).forEach(function (id) {
+  document.getElementById(id).addEventListener('click', function () {
+    where = id;
+    Object.keys(RATE).forEach(function (o) {
+      document.getElementById(o).setAttribute('aria-pressed', o === id ? 'true' : 'false');
+    });
+    draw();
+  });
+});
+days.addEventListener('input', draw);
+draw();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

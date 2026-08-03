@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-amber">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is the big box actually cheaper? &#8212; Context</title>
+<meta name="description" content="Compare the price per 100 grams, not the price on the front. Big packs are normally better value, but often enough the small one wins, and the label never tells you which is which.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">3 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Money</p>
+    <h1>Is the big box actually cheaper?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Compare the price per 100 grams, not the price on the front. Big packs are normally better value, but often enough the small one wins, and the label never tells you which is which.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Two pack sizes compared by price per 100 grams</title>
+  <rect id="boxA" x="80" y="150" width="110" height="90" rx="10" class="f-soft" stroke="var(--bright)" stroke-width="2.5"/>
+  <text class="f-label" x="135" y="264" text-anchor="middle">SMALL &#183; 250 g</text>
+  <text class="f-value" id="perA" x="135" y="134" text-anchor="middle">&#8212;</text>
+  <rect id="boxB" x="400" y="60" width="180" height="180" rx="10" class="f-soft" stroke="var(--bright)" stroke-width="2.5"/>
+  <text class="f-label" x="490" y="264" text-anchor="middle">BIG &#183; 750 g</text>
+  <text class="f-value" id="perB" x="490" y="44" text-anchor="middle">&#8212;</text>
+  <g id="winner" opacity="0">
+    <rect id="winBox" x="0" y="0" width="150" height="30" rx="15" class="f-fill"/>
+    <text id="winTxt" x="0" y="0" text-anchor="middle" fill="#fff"
+          style="font-family:var(--display);font-size:14px;font-weight:700">BETTER VALUE</text>
+  </g>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="pa">Small pack</label>
+  <input type="range" id="pa" min="50" max="400" step="5" value="180">
+  <span class="readout" id="paOut">&#8212;</span>
+</div>
+<div class="control">
+  <label for="pb">Big pack</label>
+  <input type="range" id="pb" min="150" max="900" step="5" value="480">
+  <span class="readout" id="pbOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Slide the two prices around. The badge follows whichever pack is actually cheaper per 100 g — which is not always the big one, however much bigger it looks.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>The number on the front is the wrong number</h2>
+  <p>A price tag answers "what leaves my wallet today". It cannot answer "is this good value", because it says nothing about how much you are getting.</p><p>The only figure that compares two packs is <strong>price divided by size</strong>. Most shops print it in small grey type on the shelf label. It is the single most useful number in the shop and the least legible.</p>
+</section>
+<section class="section">
+  <h2>Why bigger is usually, but not always, cheaper</h2>
+  <p>Packing, shipping and shelf space cost roughly the same whether a box is big or small, so spreading them over more product usually lowers the unit price.</p><p>But pricing is also a guess about what you will pay. Family sizes get promoted, then quietly stop being a bargain once the promotion ends. Small packs on offer routinely beat big packs at full price.</p>
+</section>
+<section class="section">
+  <h2>In the aisle</h2>
+  <ul class="tips"><li>Read the small per-unit price on the shelf label, not the big one on the pack.</li><li>Check that both labels use the same unit — per 100 g against per kg is a trap.</li><li>Bigger is only cheaper if you actually use it before it goes off.</li></ul>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="cold-phone.html">Why does your phone die in the cold? &#8594;</a>
+</nav>
+
+<script>
+
+var pa = document.getElementById('pa'), pb = document.getElementById('pb');
+var SIZE_A = 250, SIZE_B = 750;
+
+function money(cents) { return '\u00a3' + (cents / 100).toFixed(2); }
+
+function draw() {
+  var a = +pa.value, b = +pb.value;
+  document.getElementById('paOut').textContent = money(a);
+  document.getElementById('pbOut').textContent = money(b);
+
+  var perA = a / (SIZE_A / 100), perB = b / (SIZE_B / 100);
+  document.getElementById('perA').textContent = money(perA) + ' / 100g';
+  document.getElementById('perB').textContent = money(perB) + ' / 100g';
+
+  var aWins = perA < perB;
+  var g = document.getElementById('winner');
+  g.setAttribute('opacity', '1');
+  var cx = aWins ? 135 : 490;
+  document.getElementById('winBox').setAttribute('x', cx - 75);
+  document.getElementById('winBox').setAttribute('y', aWins ? 160 : 120);
+  document.getElementById('winTxt').setAttribute('x', cx);
+  document.getElementById('winTxt').setAttribute('y', (aWins ? 160 : 120) + 20);
+  var gap = Math.abs(perA - perB) / Math.max(perA, perB) * 100;
+  document.getElementById('winTxt').textContent =
+    gap < 1 ? 'LINE BALL' : 'BETTER BY ' + gap.toFixed(0) + '%';
+}
+pa.addEventListener('input', draw);
+pb.addEventListener('input', draw);
+draw();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

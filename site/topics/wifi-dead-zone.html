@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-blue">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why is the wifi terrible in one room? &#8212; Context</title>
+<meta name="description" content="Wifi is radio, and it loses strength going through walls — worst of all thick or wet ones. A router in the corner spends half its signal on next door. Moving it to the middle, out in the open, usually fixes the bad room.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">10 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Tech</p>
+    <h1>Why is the wifi terrible in one room?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Wifi is radio, and it loses strength going through walls — worst of all thick or wet ones. A router in the corner spends half its signal on next door. Moving it to the middle, out in the open, usually fixes the bad room.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 340" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">A flat plan showing signal strength in each room</title>
+  <g id="rooms"></g>
+  <rect x="40" y="30" width="580" height="270" rx="10" fill="none" stroke="var(--ink)" stroke-width="3"/>
+  <line x1="330" y1="30" x2="330" y2="300" stroke="var(--ink)" stroke-width="3"/>
+  <line x1="40" y1="165" x2="620" y2="165" stroke="var(--ink)" stroke-width="3"/>
+  <circle id="router" cx="150" cy="90" r="11" class="f-fill"/>
+  <circle id="halo" cx="150" cy="90" r="26" fill="none" stroke="var(--bright)" stroke-width="2" opacity=".45"/>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="rx">Router left / right</label>
+  <input type="range" id="rx" min="60" max="600" step="5" value="150">
+</div>
+<div class="control">
+  <label for="ry">Router up / down</label>
+  <input type="range" id="ry" min="50" max="280" step="5" value="90">
+</div>
+<div class="control" style="flex:0 0 auto">
+  <label>Worst room</label>
+  <span class="readout" id="worstOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Slide the router around the flat. Notice how much more it costs to cross a wall than to travel across an open room — the corner is nearly always the worst spot you could pick.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>Walls cost more than distance</h2>
+  <p>Open air barely troubles a wifi signal. A solid wall can take a big bite out of it, and brick, concrete, tile and anything with water or metal in it are far worse than a plasterboard partition.</p><p>That is why a room fifteen feet away through two walls can be much worse than a room forty feet away down a hallway. <strong>Count walls, not metres.</strong></p>
+</section>
+<section class="section">
+  <h2>The corner problem</h2>
+  <p>A router radiates roughly all around itself. Put it in the corner of the flat and a large share of that is going straight out into the street or your neighbours.</p><p>Move it toward the middle and the same router covers far more of your home, without spending anything.</p>
+</section>
+<section class="section">
+  <h2>Before you buy anything</h2>
+  <ul class="tips"><li>Move the router to the middle of the home, out in the open, off the floor.</li><li>Keep it away from the microwave, the fish tank and big metal appliances.</li><li>Use the 5 GHz network up close for speed, and 2.4 GHz further away — it travels better through walls.</li><li>If one room is still dead, a mesh point or a wired access point beats a bigger router.</li></ul>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="time-speeds-up.html">Why does a year feel faster every time? &#8594;</a>
+</nav>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var rx = document.getElementById('rx'), ry = document.getElementById('ry');
+var ROOMS = [
+  { name: 'Kitchen',  x: 40,  y: 30,  w: 290, h: 135 },
+  { name: 'Bedroom',  x: 330, y: 30,  w: 290, h: 135 },
+  { name: 'Living',   x: 40,  y: 165, w: 290, h: 135 },
+  { name: 'Bathroom', x: 330, y: 165, w: 290, h: 135 }
+];
+var rooms = document.getElementById('rooms'), cells = [];
+ROOMS.forEach(function (r) {
+  var g = document.createElementNS(NS, 'g');
+  g.innerHTML =
+    '<rect x="' + r.x + '" y="' + r.y + '" width="' + r.w + '" height="' + r.h + '" fill="var(--wash)"/>' +
+    '<text x="' + (r.x + 20) + '" y="' + (r.y + 34) + '" class="f-label">' + r.name.toUpperCase() + '</text>' +
+    '<text x="' + (r.x + 20) + '" y="' + (r.y + 74) + '" class="f-value" style="font-size:22px">&#8212;</text>' +
+    '<g class="bars"></g>';
+  rooms.appendChild(g);
+  cells.push({ r: r, rect: g.children[0], val: g.children[2], bars: g.children[3] });
+});
+
+function draw() {
+  var x = +rx.value, y = +ry.value;
+  document.getElementById('router').setAttribute('cx', x);
+  document.getElementById('router').setAttribute('cy', y);
+  document.getElementById('halo').setAttribute('cx', x);
+  document.getElementById('halo').setAttribute('cy', y);
+
+  var worst = 100, worstName = '';
+  cells.forEach(function (c) {
+    var cx = c.r.x + c.r.w / 2, cy = c.r.y + c.r.h / 2;
+    var d = Math.hypot(cx - x, cy - y);
+    // each wall the signal crosses costs far more than distance does
+    var walls = ((x < 330) !== (cx < 330) ? 1 : 0) + ((y < 165) !== (cy < 165) ? 1 : 0);
+    var s = 100 - d * 0.13 - walls * 26;
+    s = Math.max(4, Math.min(100, s));
+    if (s < worst) { worst = s; worstName = c.r.name; }
+
+    c.rect.setAttribute('fill', s > 65 ? 'var(--wash)' : '#fff');
+    c.val.textContent = s > 75 ? 'Great' : s > 50 ? 'Fine' : s > 28 ? 'Patchy' : 'Dead';
+    // .f-value already sets fill in the stylesheet, and a class beats a
+    // presentation attribute — so this has to go through style to land
+    c.val.style.fill = s > 50 ? 'var(--hue-ink)' : 'var(--muted)';
+
+    var b = '';
+    for (var i = 0; i < 4; i++) {
+      var lit = s > i * 25;
+      b += '<rect x="' + (c.r.x + 20 + i * 14) + '" y="' + (c.r.y + 90 + (3 - i) * 5) +
+           '" width="9" height="' + (10 + i * 5) + '" rx="2" fill="' +
+           (lit ? 'var(--bright)' : 'var(--border)') + '"/>';
+    }
+    c.bars.innerHTML = b;
+  });
+  document.getElementById('worstOut').textContent = worstName;
+}
+rx.addEventListener('input', draw);
+ry.addEventListener('input', draw);
+draw();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

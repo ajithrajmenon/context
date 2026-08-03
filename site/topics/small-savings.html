@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="hue-green">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How does a little money turn into a lot? &#8212; Context</title>
+<meta name="description" content="Money you put away earns a little. Then that little earns too. For years it looks like nothing is happening — the gap only opens up late, and then it opens fast.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<span>.</span></a>
+  <p class="masthead-note">6 of 10</p>
+</header>
+<article>
+  <div class="topic-head">
+    <p class="eyebrow">Money</p>
+    <h1>How does a little money turn into a lot?</h1>
+  </div>
+
+  <div class="answer">
+    <b>Short answer</b>
+    <p>Money you put away earns a little. Then that little earns too. For years it looks like nothing is happening — the gap only opens up late, and then it opens fast.</p>
+  </div>
+
+  <figure class="figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What you put in against what it grows to</title>
+  <line class="f-faint" x1="60" y1="240" x2="640" y2="240"/>
+  <!-- area first: it would otherwise paint over the deposits line -->
+  <path id="totArea" d="" class="f-soft"/>
+  <path id="inLine" d="" fill="none" stroke="var(--muted)" stroke-width="3" stroke-dasharray="7 5"/>
+  <path id="totLine" d="" class="f-line"/>
+  <text class="f-label" x="60" y="264">START</text>
+  <text class="f-label" id="endLbl" x="640" y="264" text-anchor="end">40 YEARS</text>
+  <text class="f-label" x="60" y="30">WHAT IT BECOMES</text>
+  <text class="f-value" id="totTxt" x="60" y="58" style="font-size:26px">&#8212;</text>
+  <text class="f-label" x="330" y="30">YOU ACTUALLY PUT IN</text>
+  <text class="f-value" id="inTxt" x="330" y="58" style="font-size:26px;fill:var(--muted)">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="amt">Each month</label>
+  <input type="range" id="amt" min="10" max="400" step="10" value="50">
+  <span class="readout" id="amtOut">&#8212;</span>
+</div>
+<div class="control">
+  <label for="yrs">For</label>
+  <input type="range" id="yrs" min="1" max="40" step="1" value="30">
+  <span class="readout" id="yrsOut">30 years</span>
+</div>
+    </div>
+    <figcaption class="caption">The dashed line is your own money going in, steadily. The coloured one is what it turns into. Drag the years down to ten and the two lines almost touch — nearly all of the gap arrives in the last stretch.</figcaption>
+  </figure>
+
+<section class="section">
+  <h2>Why it looks like nothing for so long</h2>
+  <p>In year one, your savings earn a small amount. In year two, your savings and that small amount both earn. The extra bit is tiny, so early on the whole thing looks like a slightly better piggy bank.</p><p>But the growing part keeps growing, and it grows <strong>on itself</strong>. Halfway along, the interest starts earning more each year than you are putting in, and the line bends away from the dashed one.</p>
+</section>
+<section class="section">
+  <h2>This is also how debt works</h2>
+  <p>Exactly the same machinery runs behind a credit card, only pointed at you. Unpaid interest joins the balance and then earns interest of its own.</p><p>That is why a card balance you only make minimum payments on can take decades to clear, and why clearing expensive debt beats saving almost every time.</p>
+</section>
+<section class="section">
+  <h2>What matters most</h2>
+  <ul class="tips"><li>Starting earlier beats saving more. Ten extra years usually outweighs doubling the amount.</li><li>Make it automatic on payday so it never becomes a decision.</li><li>Pay off anything charging more than your savings earn, first.</li></ul>
+</section>
+</article>
+
+<nav class="pager">
+<a href="../index.html">&#8592; All questions</a>
+<a href="shower-curtain.html">Why does the shower curtain attack you? &#8594;</a>
+</nav>
+
+<script>
+
+var amt = document.getElementById('amt'), yrs = document.getElementById('yrs');
+var RATE = 0.06 / 12;   // 6% a year, a long-run average
+
+function money(v) {
+  return '\u00a3' + Math.round(v).toLocaleString('en-GB');
+}
+
+function draw() {
+  var m = +amt.value, y = +yrs.value;
+  document.getElementById('amtOut').textContent = money(m);
+  document.getElementById('yrsOut').textContent = y + (y === 1 ? ' year' : ' years');
+  document.getElementById('endLbl').textContent = y + (y === 1 ? ' YEAR' : ' YEARS');
+
+  var months = y * 12;
+  var total = m * ((Math.pow(1 + RATE, months) - 1) / RATE);
+  var paid = m * months;
+  document.getElementById('totTxt').textContent = money(total);
+  document.getElementById('inTxt').textContent = money(paid);
+
+  var top = total;
+  var tot = [], inp = [];
+  for (var i = 0; i <= 60; i++) {
+    var k = i / 60, mm = months * k;
+    var t = m * ((Math.pow(1 + RATE, mm) - 1) / RATE);
+    var p = m * mm;
+    var x = 60 + 580 * k;
+    tot.push([x, 240 - 200 * (t / top)]);
+    inp.push([x, 240 - 200 * (p / top)]);
+  }
+  var d = function (pts) { return pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' '); };
+  document.getElementById('totLine').setAttribute('d', d(tot));
+  document.getElementById('inLine').setAttribute('d', d(inp));
+  document.getElementById('totArea').setAttribute('d', d(tot) + ' L640 240 L60 240 Z');
+}
+amt.addEventListener('input', draw);
+yrs.addEventListener('input', draw);
+draw();
+
+</script>
+<footer class="site-foot">
+  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+</footer>
+</div>
+</body>
+</html>

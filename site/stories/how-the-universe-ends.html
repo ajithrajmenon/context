@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How does the universe end? &#8212; Context</title>
+<meta name="description" content="Not with a bang. With a very, very long dimming.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-void">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-void">
+  <div class="scene" data-scene="dying" data-seed="how-the-universe-ends">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Time</p>
+      <h1 data-reveal="80">How does the universe end?</h1>
+      <p class="standfirst" data-reveal="160">The universe is 13.8 billion years old, which sounds ancient. On the timeline of how long it has left, it has barely started.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Stars are a phase, not a feature</h2>
+    <p>Stars need gas to form from, and every star burns some of it permanently into heavier stuff.</p><p>There is a fixed budget. In about a hundred trillion years the last star will form, burn, and go out. <strong>After that, no new ones. Ever.</strong></p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <div class="scene card-scene" data-scene="dying" data-seed="b1">
+    <div class="scene-pad">
+      <h2>The lights go out one at a time</h2>
+      <p>The small red ones last longest. The last of them will still be glowing faintly a thousand times longer than the universe has existed so far.</p>
+    </div>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="card-steps">
+    <h2>What comes after the lights</h2>
+    <ol class="steps"><li class="step">
+      <span class="step-n">1</span>
+      <div>
+        <h3>The dark era</h3>
+        <p>Cold leftovers drifting: dead stars, dead planets, black holes. Nothing shines.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">2</span>
+      <div>
+        <h3>The black holes eat</h3>
+        <p>They pull in what is left and become the only structures of any size in the universe.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">3</span>
+      <div>
+        <h3>The black holes leak</h3>
+        <p>Even they evaporate, unbelievably slowly. The largest take longer than any number worth writing down.</p>
+      </div>
+    </li></ol>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>Everything ends the same way: spread out, cooled down, and too even for anything to happen.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What still exists at different points in the far future</title>
+  <g id="sky"></g>
+  <line class="f-faint" x1="30" y1="200" x2="630" y2="200"/>
+  <circle id="mark" cx="30" cy="200" r="6" fill="#fff"/>
+  <text class="f-label" x="30" y="222">NOW</text>
+  <text class="f-label" x="630" y="222" text-anchor="end">10^100 YEARS</text>
+  <text class="f-label" x="30" y="256">WHAT IS LEFT</text>
+  <text class="f-value" id="eraTxt" x="30" y="288" style="font-size:22px">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="pow">Years from now</label>
+  <input type="range" id="pow" min="0" max="100" step="1" value="1">
+  <span class="readout" id="powOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Each step on this slider multiplies the time by ten. Almost the entire history of stars — including every one you have ever seen — happens in the first sliver on the left.</figcaption>
+  </figure>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>This is not a sad story yet</h2>
+    <p>We are in the brightest, busiest, most eventful slice the universe will ever have. Stars are burning, planets are forming, chemistry is happening.</p><p>By any measure of time, we turned up <strong>at the beginning</strong>, while the lights were still on.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Everything ends. It just takes so long that the ending is not really the point. The point is that for one brief, absurdly early moment there was enough going on for something to sit up and notice.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="why-is-there-anything.html">Why is there something instead of nothing? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var pow = document.getElementById('pow');
+var sky = document.getElementById('sky'), stars = [];
+for (var i = 0; i < 90; i++) {
+  var c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 30 + Math.random() * 600);
+  c.setAttribute('cy', 30 + Math.random() * 140);
+  c.setAttribute('r', 1 + Math.random() * 2.4);
+  c.setAttribute('fill', '#fff');
+  sky.appendChild(c);
+  stars.push(c);
+}
+
+function draw() {
+  var p = +pow.value;                       // exponent: 10^p years from now
+  document.getElementById('powOut').textContent =
+    p < 1 ? 'today' : '10^' + p + ' years';
+  document.getElementById('mark').setAttribute('cx', 30 + (p / 100) * 600);
+
+  var era, lit;
+  if (p < 10)      { era = 'Stars, planets, and us';            lit = 1; }
+  else if (p < 14) { era = 'The last stars are forming';        lit = .55; }
+  else if (p < 15) { era = 'The final stars burn out';          lit = .12; }
+  else if (p < 40) { era = 'Cold dead remnants, drifting';      lit = .02; }
+  else if (p < 67) { era = 'Only black holes remain';           lit = .008; }
+  else if (p < 100){ era = 'Even the black holes are leaking';  lit = .004; }
+  else             { era = 'Nothing but thin, even, cold light'; lit = 0; }
+
+  document.getElementById('eraTxt').textContent = era;
+  stars.forEach(function (s, i) {
+    s.setAttribute('opacity', i / stars.length < lit ? .9 : 0);
+  });
+}
+pow.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

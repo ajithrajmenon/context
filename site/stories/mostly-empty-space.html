@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You are almost entirely empty space &#8212; Context</title>
+<meta name="description" content="If atoms are mostly nothing, why does the floor hold you up?">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-deepsea">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-deepsea">
+  <div class="scene" data-scene="atom" data-seed="mostly-empty-space">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Matter</p>
+      <h1 data-reveal="80">You are almost entirely empty space</h1>
+      <p class="standfirst" data-reveal="160">Everything you have ever touched is more than 99.999% empty. So is your hand. Somehow the two of them still refuse to pass through each other.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>An atom is nearly all gap</h2>
+    <p>Almost all of an atom's weight sits in a nucleus at the centre. Around it, a long way out, are the electrons.</p><p>Blow an atom up so the nucleus is a marble on a football pitch. The nearest electron is <strong>somewhere in the stands</strong>. Between them: nothing.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="atom" data-seed="b1">
+    <div class="scene-pad">
+      <h2>A marble in a stadium</h2>
+      <p>That is the actual ratio. Every solid thing you know is built out of this.</p>
+    </div>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>Nothing ever really touches anything. You have never made contact with a single object in your life.</p>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>So what stops your hand going through the table?</h2>
+    <p>Two things, and neither of them is solidity. First, electrons repel other electrons — same charge, pushing apart, harder the closer they get.</p><p>Second, and stranger: electrons flatly <strong>refuse to share a state</strong>. Squeeze them together and they push back, not because of a force, but because the universe will not allow the arrangement.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">The size of a nucleus compared with its atom</title>
+  <circle id="shell" cx="200" cy="150" r="120" fill="none" stroke="rgba(255,255,255,.35)" stroke-dasharray="5 6"/>
+  <circle id="nuc" cx="200" cy="150" r="3" fill="#fff"/>
+  <text class="f-label" x="200" y="290" text-anchor="middle">THE WHOLE ATOM</text>
+  <text class="f-label" x="400" y="70">IF THE NUCLEUS WERE</text>
+  <text class="f-value" id="objTxt" x="400" y="104" style="font-size:24px">&#8212;</text>
+  <text class="f-label" x="400" y="152">THE ATOM WOULD BE</text>
+  <text class="f-value" id="scaleTxt" x="400" y="186" style="font-size:24px">&#8212;</text>
+  <text class="f-label" x="400" y="234">EMPTY SPACE INSIDE YOU</text>
+  <text class="f-value" id="emptyTxt" x="400" y="266" style="font-size:20px">99.9999999999999%</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="chips" role="group" aria-label="Pick something to compare">
+  <button class="chip" id="oMarble" aria-pressed="true">A marble</button>
+  <button class="chip" id="oPea" aria-pressed="false">A pea</button>
+  <button class="chip" id="oBall" aria-pressed="false">A football</button>
+</div>
+    </div>
+    <figcaption class="caption">The white dot in the middle is drawn far too big to be honest. At the real ratio it would be smaller than one pixel on your screen.</figcaption>
+  </figure>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="scene card-scene" data-scene="grid" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Solidity is a feeling, not a fact</h2>
+      <p>What you call touching is the push of one electron cloud against another, reported to your brain as a surface.</p>
+    </div>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>You are a very thin arrangement of almost nothing, held apart from all the other almost-nothing by rules rather than by substance. And it holds. It has held every second of your life.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="the-war-inside-you.html">There is a war going on inside you right now &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+// a nucleus is roughly 1/100,000 the width of its atom
+var OBJ = {
+  oMarble: { name: 'a marble (1 cm)',   out: 'about 1 km wide' },
+  oPea:    { name: 'a pea (5 mm)',      out: 'about 500 m wide' },
+  oBall:   { name: 'a football (22 cm)', out: 'about 22 km wide' }
+};
+
+function show(key) {
+  Object.keys(OBJ).forEach(function (k) {
+    document.getElementById(k).setAttribute('aria-pressed', k === key ? 'true' : 'false');
+  });
+  document.getElementById('objTxt').textContent = OBJ[key].name;
+  document.getElementById('scaleTxt').textContent = OBJ[key].out;
+}
+Object.keys(OBJ).forEach(function (k) {
+  document.getElementById(k).addEventListener('click', function () { show(k); });
+});
+
+// gently breathe the shell so the emptiness reads as a volume, not a ring
+var shell = document.getElementById('shell'), t0 = null;
+function tick(ts) {
+  if (t0 === null) t0 = ts;
+  var s = 120 + Math.sin((ts - t0) / 1400) * 6;
+  shell.setAttribute('r', s);
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+show('oMarble');
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

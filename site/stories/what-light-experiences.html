@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For light, no time passes at all &#8212; Context</title>
+<meta name="description" content="A photon from the edge of the universe travelled 13 billion years. From its side, it arrived instantly.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-solar">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-solar">
+  <div class="scene" data-scene="beam" data-seed="what-light-experiences">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Light</p>
+      <h1 data-reveal="80">For light, no time passes at all</h1>
+      <p class="standfirst" data-reveal="160">Go faster and your clock slows down. Everyone knows that bit. What is less well known is what happens when you reach the top speed — because the clock does not slow. It stops.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Speed borrows from time</h2>
+    <p>Everything is always moving through space and through time together, and there is a fixed budget shared between them.</p><p>Stand still and all of it goes into time. Move fast and you spend some of it on space, so <strong>less is left for the clock</strong>.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="beam" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Light spends the whole budget on motion</h2>
+      <p>Nothing is left over. Its clock does not run slowly — it does not run.</p>
+    </div>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="card-turn">
+    <p>A photon that crossed the entire universe was emitted and absorbed in the same instant, as far as it is concerned.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How much time passes for a traveller at different speeds</title>
+  <line class="f-faint" x1="40" y1="120" x2="620" y2="120"/>
+  <circle id="ship" cx="40" cy="120" r="11" fill="#fff"/>
+  <text class="f-label" x="40" y="96">YOU SET OFF</text>
+  <text class="f-label" x="620" y="96" text-anchor="end">10 LIGHT YEARS LATER</text>
+  <text class="f-label" x="40" y="184">TIME PASSING ON EARTH</text>
+  <text class="f-value" id="earthTxt" x="40" y="218" style="font-size:26px">&#8212;</text>
+  <text class="f-label" x="360" y="184">TIME PASSING FOR YOU</text>
+  <text class="f-value" id="youTxt" x="360" y="218" style="font-size:26px">&#8212;</text>
+  <text class="f-label" id="noteTxt" x="40" y="268">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="v">Your speed</label>
+  <input type="range" id="v" min="0" max="99999" step="1" value="50000">
+  <span class="readout" id="vOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Push the speed to the far right. Earth's clock keeps ticking through the whole trip while yours very nearly stops — and light sits just past the end of this slider, where it stops completely.</figcaption>
+  </figure>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>This is why the speed limit exists</h2>
+    <p>It is not that we lack a fast enough engine. At light speed there is no time left to experience, so there is nothing further to go.</p><p>The limit is not a wall in front of you. It is the <strong>edge of what moving even means</strong>.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="scene card-scene" data-scene="stars" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Every star you see reached you instantly</h2>
+      <p>From your side, that light is thousands of years old. From its side, it left and arrived in the same moment. Both are completely true.</p>
+    </div>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Time is not a stage everything sits on. It is something each thing has its own supply of, spent at its own rate — and light, moving as fast as anything can, has none to spend at all.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="the-arrow-of-time.html">Why can you remember yesterday but not tomorrow? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var v = document.getElementById('v');
+
+function draw() {
+  var beta = +v.value / 100000;              // fraction of the speed of light
+  document.getElementById('vOut').textContent = (beta * 100).toFixed(3) + '% of light';
+  document.getElementById('ship').setAttribute('cx', 40 + beta * 580);
+
+  var earth = 10 / Math.max(beta, 1e-5);     // years, from Earth's point of view
+  var you = earth * Math.sqrt(1 - beta * beta);
+
+  document.getElementById('earthTxt').textContent =
+    earth > 9999 ? 'a very long time' : earth.toFixed(1) + ' years';
+  document.getElementById('youTxt').textContent =
+    you < 0.02 ? 'almost none' : you.toFixed(2) + ' years';
+  document.getElementById('noteTxt').textContent =
+    beta > 0.9999 ? 'AT EXACTLY LIGHT SPEED, THE TRIP TAKES YOU NO TIME AT ALL'
+    : beta > 0.99 ? 'THE JOURNEY IS BARELY LASTING FOR YOU'
+    : 'BOTH CLOCKS STILL ROUGHLY AGREE';
+}
+v.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

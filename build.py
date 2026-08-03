@@ -7,9 +7,11 @@ No dependencies and no framework — read stories_data.py, write HTML.
     site/stories.html        every story, filterable
     site/stories/<slug>.html one story
 
-Adding a story means appending one dict to STORIES and running this again.
-Categories are derived from the stories themselves, so a new subject area
-needs no other change.
+A story is a stack of cards, and colour belongs to the card rather than
+the page, so a piece walks through several tones as it goes. Adding a
+story means appending one dict to STORIES and running this again.
+Categories are derived from the stories, so a new subject needs no other
+change.
 """
 import os
 import shutil
@@ -39,8 +41,8 @@ def head(title, desc, prefix, tone):
 
 
 def masthead(prefix, current):
-    def mark(page):
-        return ' aria-current="page"' if page == current else ''
+    def mark(p):
+        return ' aria-current="page"' if p == current else ''
     return f'''<div class="shell">
 <header class="masthead">
   <a class="wordmark" href="{prefix}index.html">Context<i></i></a>
@@ -66,9 +68,9 @@ def foot(prefix):
 
 
 def card(s, prefix, delay=0):
-    return f'''<li class="t-{s['tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
+    return f'''<li class="t-{s['card_tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
-    <span class="card-art" data-scene="{s['scene']}" data-seed="{s['slug']}"></span>
+    <span class="card-art scene" data-scene="{s['card_scene']}" data-seed="{s['slug']}"></span>
     <span class="card-body">
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>
@@ -78,48 +80,119 @@ def card(s, prefix, delay=0):
 </li>'''
 
 
+# ---------------------------------------------------------------- blocks
+
+def block_scene(b, i):
+    return f'''<li class="t-{b['tone']}" data-reveal="0">
+  <div class="scene card-scene" data-scene="{b['scene']}" data-seed="b{i}">
+    <div class="scene-pad">
+      <h2>{b['h']}</h2>
+      <p>{b['p']}</p>
+    </div>
+  </div>
+</li>'''
+
+
+def block_text(b, i):
+    ps = ''.join(f'<p>{p}</p>' for p in b['p'])
+    return f'''<li data-reveal="0">
+  <div class="card-text">
+    <h2>{b['h']}</h2>
+    {ps}
+  </div>
+</li>'''
+
+
+def block_turn(b, i):
+    return f'''<li class="t-{b['tone']}" data-reveal="0">
+  <div class="card-turn">
+    <p>{b['text']}</p>
+  </div>
+</li>'''
+
+
+def block_steps(b, i):
+    items = ''.join(f'''<li class="step">
+      <span class="step-n">{n + 1}</span>
+      <div>
+        <h3>{it['h']}</h3>
+        <p>{it['p']}</p>
+      </div>
+    </li>''' for n, it in enumerate(b['items']))
+    return f'''<li class="t-{b['tone']}" data-reveal="0">
+  <div class="card-steps">
+    <h2>{b['h']}</h2>
+    <ol class="steps">{items}</ol>
+  </div>
+</li>'''
+
+
+def block_figure(b, i):
+    return f'''<li class="t-{b['tone']}" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+{b['svg']}
+    </div>
+    <div class="controls">
+{b['controls']}
+    </div>
+    <figcaption class="caption">{b['caption']}</figcaption>
+  </figure>
+</li>'''
+
+
+BLOCKS = {
+    'scene': block_scene,
+    'text': block_text,
+    'turn': block_turn,
+    'steps': block_steps,
+    'figure': block_figure,
+}
+
+
+# ---------------------------------------------------------------- pages
+
 PILLARS = [
-    ('Start where curiosity does',
-     'Not with a syllabus. With the question you would actually ask out loud, '
-     'phrased the way you would actually ask it.'),
-    ('Show the thing, not a diagram of it',
-     'Every story hands you the controls at the point where words stop working. '
-     'You move it yourself and watch what happens.'),
-    ('Keep the numbers honest',
-     'The wonder has to survive being checked. Where a figure is contested or a '
-     'famous version is wrong, we say so.'),
+    ('One idea at a time',
+     'Every card carries a single thought. You are never asked to hold two new '
+     'things at once.'),
+    ('Show it before you explain it',
+     'The picture comes first and the words caption it. Where words run out, you '
+     'get the controls instead.'),
+    ('Simple, not dumbed down',
+     'Ordinary vocabulary and short sentences, with nothing quietly made untrue '
+     'to get there.'),
 ]
 
 
 def build_home():
-    featured = [s for s in STORIES if s.get('featured')][:3]
+    featured = [s for s in STORIES if s.get('featured')][:4]
     kickers = []
     for s in STORIES:
         if s['kicker'] not in kickers:
             kickers.append(s['kicker'])
 
-    pillars = ''.join(f'''<li class="pillar" data-reveal="{i * 90}">
+    pillars = ''.join(f'''<li class="pillar t-{t}" data-reveal="{i * 90}">
   <span class="pillar-mark"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="{3 + i}" fill="#fff"/></svg></span>
   <h3>{h}</h3>
   <p>{p}</p>
-</li>''' for i, (h, p) in enumerate(PILLARS))
+</li>''' for i, ((h, p), t) in enumerate(zip(PILLARS, ['nebula', 'deepsea', 'ember'])))
 
-    chips = ''.join(
-        f'<li><a class="filter" href="stories.html">{k}</a></li>' for k in kickers)
+    chips = ''.join(f'<li><a class="filter" href="stories.html">{k}</a></li>' for k in kickers)
 
     return (
         head(f'Context &#8212; {TAGLINE}',
-             'A storytelling team. We break big ideas down into stories anyone can '
-             'follow, with something to operate in every one.', '', 'nebula')
+             'A storytelling team. We break the biggest ideas down into stories '
+             'anyone can follow, with something to operate in every one.', '', 'nebula')
         + masthead('', 'home')
         + f'''<div class="shell">
 <section class="hero">
-  <div class="stage" data-scene="orbit" data-seed="home" data-focus="0.74,0.5">
-    <div class="stage-pad">
+  <div class="scene" data-scene="orbit" data-seed="home" data-focus="0.74,0.5">
+    <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">A storytelling team</p>
       <h1 data-reveal="80">Big ideas, small enough to hold.</h1>
       <p data-reveal="160">We take the things that are too large, too old or too strange to picture,
-      and put them next to something you already know. Then we hand you the controls.</p>
+      and turn them into stories you can walk through. Then we hand you the controls.</p>
       <a class="cta" href="stories.html" data-reveal="240">Read the stories &#8594;</a>
     </div>
   </div>
@@ -128,8 +201,8 @@ def build_home():
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>Understanding is a story problem</h2>
-    <p>Most explanations fail because they start with the mechanism. People remember what
-    happened to somebody, in what order, and why it mattered &#8212; so that is how we build them.</p>
+    <p>Most explanations fail because they open with the mechanism. People remember what
+    happened, in what order, and why it mattered &#8212; so that is how we build them.</p>
   </div>
   <ul class="pillars">{pillars}</ul>
 </section>
@@ -140,7 +213,7 @@ def build_home():
     <p>A few we are proud of. There are more, and there will keep being more.</p>
   </div>
   <ul class="grid">
-{chr(10).join(card(s, '', i * 90) for i, s in enumerate(featured))}
+{chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(featured))}
   </ul>
 </section>
 
@@ -167,15 +240,15 @@ def build_stories():
         for k in kickers)
 
     return (
-        head(f'Stories &#8212; Context',
-             'Every story we have told so far, across space, bodies, time, Earth and '
-             'the numbers that break intuition.', '', 'dusk')
+        head('Stories &#8212; Context',
+             'Every story we have told so far, across space, time, matter, life and mind.',
+             '', 'dusk')
         + masthead('', 'stories')
         + f'''<div class="shell">
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>Stories</h2>
-    <p>Everything we have published, newest thinking first. Filter by subject, or just scroll.</p>
+    <p>Everything we have published. Filter by subject, or just scroll.</p>
   </div>
   <ul class="filters" data-reveal="60">
     <li><button class="filter" data-filter="" aria-pressed="true">Everything</button></li>
@@ -194,12 +267,9 @@ var buttons = document.querySelectorAll('.filter[data-filter]');
 buttons.forEach(function (b) {{
   b.addEventListener('click', function () {{
     var want = b.getAttribute('data-filter');
-    buttons.forEach(function (o) {{
-      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
-    }});
+    buttons.forEach(function (o) {{ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); }});
     Array.prototype.forEach.call(grid.children, function (li) {{
-      var show = !want || li.getAttribute('data-kicker') === want;
-      li.hidden = !show;
+      li.hidden = !(!want || li.getAttribute('data-kicker') === want);
     }});
   }});
 }});
@@ -210,62 +280,43 @@ buttons.forEach(function (b) {{
 
 
 def build_story(s, nxt):
-    def beats(items):
-        return ''.join(f'''<section class="beat" data-reveal="0">
-  <h2>{b['h']}</h2>
-  {''.join(f'<p>{p}</p>' for p in b['p'])}
-</section>''' for b in items)
+    hero = s['hero']
+    stack = '\n'.join(BLOCKS[b['type']](b, i) for i, b in enumerate(s['blocks']))
+    scripts = '\n'.join(b['js'] for b in s['blocks'] if b['type'] == 'figure')
+    zoom = s['zoomout']
 
-    f = s['figure']
     return (
-        head(f"{s['title']} &#8212; Context", s['teaser'], '../', s['tone'])
+        head(f"{s['title']} &#8212; Context", s['teaser'], '../', hero['tone'])
         + masthead('../', 'stories')
         + f'''<div class="shell">
-<section class="story-hero">
-  <div class="stage" data-scene="{s['scene']}" data-seed="{s['slug']}">
-    <div class="stage-pad">
+<section class="story-hero t-{hero['tone']}">
+  <div class="scene" data-scene="{hero['scene']}" data-seed="{s['slug']}">
+    <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">{s['kicker']}</p>
       <h1 data-reveal="80">{s['title']}</h1>
-      <p class="standfirst" data-reveal="160">{s['standfirst']}</p>
+      <p class="standfirst" data-reveal="160">{hero['standfirst']}</p>
     </div>
   </div>
 </section>
 
-<article class="narrow">
-{beats(s['beats'])}
-
-  <p class="turn" data-reveal="0">{s['turn']}</p>
-
-{beats(s['after'])}
-</article>
-
-<div class="wide">
-  <figure class="figure" data-reveal="0">
-    <div class="figure-stage">
-{f['svg']}
-    </div>
-    <div class="controls">
-{f['controls']}
-    </div>
-    <figcaption class="caption">{f['caption']}</figcaption>
-  </figure>
-</div>
-
-<div class="narrow">
-  <section class="zoomout" data-reveal="0">
+<ol class="stack">
+{stack}
+<li class="t-{zoom['tone']}" data-reveal="0">
+  <div class="card-zoom">
     <h2>Zoom out</h2>
-    <p>{s['zoomout']}</p>
-  </section>
+    <p>{zoom['text']}</p>
+  </div>
+</li>
+</ol>
 
-  <nav class="pager">
-    <a href="../stories.html">&#8592; All stories</a>
-    <a href="{nxt['slug']}.html">{nxt['title']} &#8594;</a>
-  </nav>
-</div>
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="{nxt['slug']}.html">{nxt['title']} &#8594;</a>
+</nav>
 </div>
 
 <script>
-{f['js']}
+{scripts}
 </script>
 '''
         + foot('../')
@@ -290,7 +341,9 @@ def main():
         with open(os.path.join(SITE, 'stories', f"{s['slug']}.html"), 'w') as fh:
             fh.write(build_story(s, nxt))
 
-    print(f'built home + stories index + {len(STORIES)} stories into {SITE}')
+    scenes = sum(1 for s in STORIES for b in s['blocks'] if b['type'] == 'scene') + len(STORIES)
+    print(f'built home + stories index + {len(STORIES)} stories '
+          f'({scenes} animated scenes) into {SITE}')
 
 
 if __name__ == '__main__':

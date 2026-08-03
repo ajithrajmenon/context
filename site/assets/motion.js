@@ -1,21 +1,23 @@
 /* ------------------------------------------------------------------
    Context — motion
 
-   Two jobs. Reveal things as they arrive, and run the ambient canvas
-   scenes that live inside every dark panel.
+   Two jobs. Reveal cards as they arrive, and run the canvas scenes that
+   do most of the explaining. A story stacks several of these, so the
+   engine has to stay cheap.
 
    Rules the whole file obeys:
    - nothing animates off-screen; an IntersectionObserver parks each scene
-   - prefers-reduced-motion gets one static frame, not a frozen blank
-   - every scene is deterministic from a seed, so a card looks the same
-     on every load and the page does not shimmer on refresh
+   - prefers-reduced-motion gets one static frame, never a frozen blank
+   - scenes are seeded, so a card looks identical on every load
+   - scenes draw in white only; the card's own gradient supplies the hue,
+     which is what lets one story walk through several tones
 ------------------------------------------------------------------- */
 (function () {
   'use strict';
 
   var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = 6.283185;
 
-  /* -- a tiny seeded RNG, so scenes are stable between loads ---------- */
   function rng(seed) {
     var s = seed >>> 0 || 1;
     return function () {
@@ -32,167 +34,290 @@
     return h >>> 0;
   }
 
-  /* ---------------- scenes -------------------------------------------
-     Each builds its state once from (w, h, rand) and returns a draw(ctx,
-     t, w, h) where t is seconds. Colours come from the panel's own
-     gradient, so a scene inherits whatever tone the story is in.
-  -------------------------------------------------------------------- */
+  // Point counts scale with panel area, but a card is a fraction of a hero.
+  // Without a floor, small panels end up with a handful of points and can
+  // look empty — especially in scenes where some of them switch off.
+  function count(w, h, per, min, max) {
+    return Math.max(min, Math.min(max, Math.round(w * h / per)));
+  }
+
+  function dot(c, x, y, r, a) {
+    c.globalAlpha = a;
+    c.beginPath();
+    c.arc(x, y, r, 0, TAU);
+    c.fillStyle = '#fff';
+    c.fill();
+    c.globalAlpha = 1;
+  }
+
+  /* ---------------- scenes ---------------------------------------- */
 
   var SCENES = {
 
-    // drifting depth field — the default backdrop
+    // depth field, drifting
     stars: function (w, h, rand) {
-      var n = Math.min(190, Math.round(w * h / 5200)), pts = [];
-      for (var i = 0; i < n; i++) {
-        pts.push({
-          x: rand(), y: rand(),
-          z: 0.25 + rand() * 0.75,          // depth drives size, speed and alpha
-          r: 0.5 + rand() * 1.9,
-          tw: rand() * 6.28
-        });
-      }
+      var n = count(w, h, 5200, 55, 190), pts = [];
+      for (var i = 0; i < n; i++) pts.push({ x: rand(), y: rand(), z: .25 + rand() * .75, r: .5 + rand() * 1.9, tw: rand() * TAU });
       return function (c, t, w, h) {
-        for (var i = 0; i < pts.length; i++) {
-          var p = pts[i];
-          var x = ((p.x + t * 0.006 * p.z) % 1.15 - 0.075) * w;
-          var y = p.y * h;
-          var a = (0.25 + p.z * 0.6) * (0.65 + 0.35 * Math.sin(t * 1.4 + p.tw));
-          c.globalAlpha = a;
-          c.beginPath();
-          c.arc(x, y, p.r * p.z * 1.6, 0, 6.2832);
-          c.fillStyle = '#fff';
-          c.fill();
-        }
-        c.globalAlpha = 1;
+        pts.forEach(function (p) {
+          var x = ((p.x + t * .006 * p.z) % 1.15 - .075) * w;
+          dot(c, x, p.y * h, p.r * p.z * 1.6, (.25 + p.z * .6) * (.65 + .35 * Math.sin(t * 1.4 + p.tw)));
+        });
       };
     },
 
-    // the identity mark: one bright point, things going round it.
-    // data-focus="x,y" moves the centre clear of the headline.
+    // one bright point, things going round it — the house mark
     orbit: function (w, h, rand, el) {
       var f = (el.getAttribute('data-focus') || '0.5,0.5').split(',').map(Number);
       var rings = [], bodies = [];
-      for (var i = 0; i < 4; i++) rings.push({ r: 0.16 + i * 0.11, tilt: 0.34 + i * 0.05 });
-      for (var j = 0; j < 7; j++) {
-        bodies.push({
-          ring: j % rings.length,
-          a: rand() * 6.2832,
-          sp: 0.12 + rand() * 0.3,
-          size: 2.5 + rand() * 5
-        });
-      }
+      for (var i = 0; i < 4; i++) rings.push({ r: .16 + i * .11, tilt: .34 + i * .05 });
+      for (var j = 0; j < 7; j++) bodies.push({ ring: j % 4, a: rand() * TAU, sp: .12 + rand() * .3, size: 2.5 + rand() * 5 });
       return function (c, t, w, h) {
         var cx = w * f[0], cy = h * f[1], R = Math.min(w, h);
         rings.forEach(function (ring) {
-          c.save();
-          c.translate(cx, cy);
-          c.scale(1, ring.tilt);
-          c.beginPath();
-          c.arc(0, 0, R * ring.r, 0, 6.2832);
-          c.strokeStyle = 'rgba(255,255,255,.16)';
-          c.lineWidth = 1;
-          c.stroke();
+          c.save(); c.translate(cx, cy); c.scale(1, ring.tilt);
+          c.beginPath(); c.arc(0, 0, R * ring.r, 0, TAU);
+          c.strokeStyle = 'rgba(255,255,255,.16)'; c.lineWidth = 1; c.stroke();
           c.restore();
         });
-        // the centre, breathing
-        var pulse = 1 + Math.sin(t * 1.1) * 0.08;
-        var g = c.createRadialGradient(cx, cy, 0, cx, cy, R * 0.12 * pulse);
+        var pulse = 1 + Math.sin(t * 1.1) * .08, gr = R * .12 * pulse;
+        var g = c.createRadialGradient(cx, cy, 0, cx, cy, gr);
         g.addColorStop(0, 'rgba(255,255,255,.95)');
-        g.addColorStop(0.4, 'rgba(255,255,255,.35)');
+        g.addColorStop(.4, 'rgba(255,255,255,.35)');
         g.addColorStop(1, 'rgba(255,255,255,0)');
-        c.fillStyle = g;
-        c.beginPath();
-        c.arc(cx, cy, R * 0.12 * pulse, 0, 6.2832);
-        c.fill();
-
+        c.fillStyle = g; c.beginPath(); c.arc(cx, cy, gr, 0, TAU); c.fill();
         bodies.forEach(function (b) {
-          var ring = rings[b.ring];
-          var a = b.a + t * b.sp;
-          var x = cx + Math.cos(a) * R * ring.r;
-          var y = cy + Math.sin(a) * R * ring.r * ring.tilt;
-          c.beginPath();
-          c.arc(x, y, b.size, 0, 6.2832);
-          c.fillStyle = '#fff';
-          c.globalAlpha = 0.9;
-          c.fill();
-          c.globalAlpha = 1;
+          var ring = rings[b.ring], a = b.a + t * b.sp;
+          dot(c, cx + Math.cos(a) * R * ring.r, cy + Math.sin(a) * R * ring.r * ring.tilt, b.size, .9);
         });
       };
     },
 
-    // soft blobs sliding past each other — warm, organic, non-cosmic
+    // soft blobs sliding past each other
     swarm: function (w, h, rand) {
-      var n = 16, blobs = [];
-      for (var i = 0; i < n; i++) {
-        blobs.push({
-          x: rand(), y: rand(),
-          r: 0.06 + rand() * 0.16,
-          sx: (rand() - 0.5) * 0.02,
-          sy: (rand() - 0.5) * 0.02,
-          ph: rand() * 6.28
-        });
-      }
+      var blobs = [];
+      for (var i = 0; i < 16; i++) blobs.push({ x: rand(), y: rand(), r: .06 + rand() * .16, sx: (rand() - .5) * .02, sy: (rand() - .5) * .02, ph: rand() * TAU });
       return function (c, t, w, h) {
         var R = Math.min(w, h);
         blobs.forEach(function (b) {
-          var x = (b.x + Math.sin(t * 0.18 + b.ph) * 0.08 + t * b.sx) % 1.2 - 0.1;
-          var y = (b.y + Math.cos(t * 0.15 + b.ph) * 0.08 + t * b.sy) % 1.2 - 0.1;
-          var rr = b.r * R * (1 + Math.sin(t * 0.5 + b.ph) * 0.12);
+          var x = (b.x + Math.sin(t * .18 + b.ph) * .08 + t * b.sx) % 1.2 - .1;
+          var y = (b.y + Math.cos(t * .15 + b.ph) * .08 + t * b.sy) % 1.2 - .1;
+          var rr = b.r * R * (1 + Math.sin(t * .5 + b.ph) * .12);
           var g = c.createRadialGradient(x * w, y * h, 0, x * w, y * h, rr);
           g.addColorStop(0, 'rgba(255,255,255,.14)');
           g.addColorStop(1, 'rgba(255,255,255,0)');
-          c.fillStyle = g;
-          c.beginPath();
-          c.arc(x * w, y * h, rr, 0, 6.2832);
-          c.fill();
+          c.fillStyle = g; c.beginPath(); c.arc(x * w, y * h, rr, 0, TAU); c.fill();
         });
       };
     },
 
-    // layered sine bands — motion without any particles
     waves: function (w, h, rand) {
       var layers = [];
-      for (var i = 0; i < 4; i++) {
-        layers.push({ amp: 0.05 + i * 0.02, freq: 1.2 + i * 0.7, sp: 0.25 + i * 0.16, y: 0.42 + i * 0.13, a: 0.16 - i * 0.03 });
-      }
+      for (var i = 0; i < 4; i++) layers.push({ amp: .05 + i * .02, freq: 1.2 + i * .7, sp: .25 + i * .16, y: .42 + i * .13, a: .16 - i * .03 });
       return function (c, t, w, h) {
         layers.forEach(function (L) {
-          c.beginPath();
-          c.moveTo(0, h);
-          for (var x = 0; x <= w; x += 8) {
-            var y = (L.y + Math.sin(x / w * 6.2832 * L.freq + t * L.sp) * L.amp) * h;
-            c.lineTo(x, y);
-          }
-          c.lineTo(w, h);
-          c.closePath();
-          c.fillStyle = 'rgba(255,255,255,' + L.a + ')';
-          c.fill();
+          c.beginPath(); c.moveTo(0, h);
+          for (var x = 0; x <= w; x += 8) c.lineTo(x, (L.y + Math.sin(x / w * TAU * L.freq + t * L.sp) * L.amp) * h);
+          c.lineTo(w, h); c.closePath();
+          c.fillStyle = 'rgba(255,255,255,' + L.a + ')'; c.fill();
         });
       };
     },
 
-    // rings pushing outward from the centre — used for scale stories
     bloom: function (w, h, rand) {
-      var n = 6;
       return function (c, t, w, h) {
-        var cx = w * 0.5, cy = h * 0.55, R = Math.max(w, h) * 0.72;
-        for (var i = 0; i < n; i++) {
-          var f = ((t * 0.13) + i / n) % 1;
+        var cx = w * .5, cy = h * .55, R = Math.max(w, h) * .72;
+        for (var i = 0; i < 6; i++) {
+          var f = ((t * .13) + i / 6) % 1;
+          c.beginPath(); c.arc(cx, cy, f * R, 0, TAU);
+          c.strokeStyle = 'rgba(255,255,255,' + (.3 * (1 - f)).toFixed(3) + ')';
+          c.lineWidth = 1.5; c.stroke();
+        }
+      };
+    },
+
+    /* --- scenes written for particular stories --------------------- */
+
+    // a tidy grid falls apart and never tidies itself — the arrow of time
+    entropy: function (w, h, rand) {
+      var cols = 16, rows = 8, pts = [];
+      for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) {
+        pts.push({ hx: (x + .5) / cols, hy: (y + .5) / rows, dx: (rand() - .5), dy: (rand() - .5), ph: rand() * TAU });
+      }
+      return function (c, t, w, h) {
+        var f = (t * .1) % 2;                        // 0..1 tidy->messy, then hold
+        var k = f < 1 ? f : 1;
+        k = k * k * (3 - 2 * k);                      // ease
+        pts.forEach(function (p) {
+          var x = (p.hx + p.dx * .42 * k) * w;
+          var y = (p.hy + p.dy * .42 * k) * h;
+          dot(c, x, y, 3, .28 + .5 * (1 - k * .5));
+        });
+      };
+    },
+
+    // everything moving away from everything else, with no centre
+    expand: function (w, h, rand) {
+      var pts = [];
+      for (var i = 0; i < 46; i++) pts.push({ x: rand() - .5, y: rand() - .5, r: 1.5 + rand() * 3 });
+      return function (c, t, w, h) {
+        var s = 1 + ((t * .12) % 1) * 1.6;
+        var fade = 1 - ((t * .12) % 1);
+        pts.forEach(function (p) {
+          var x = w * .5 + p.x * w * s, y = h * .5 + p.y * h * s;
+          if (x < -20 || x > w + 20 || y < -20 || y > h + 20) return;
+          dot(c, x, y, p.r, .2 + fade * .6);
+        });
+      };
+    },
+
+    // a speck of nucleus in an enormous amount of nothing
+    atom: function (w, h, rand) {
+      var shells = [{ r: .2, n: 2, sp: .55 }, { r: .32, n: 4, sp: -.36 }, { r: .43, n: 3, sp: .24 }];
+      return function (c, t, w, h) {
+        var cx = w * .5, cy = h * .5, R = Math.min(w, h);
+        shells.forEach(function (s) {
+          c.beginPath(); c.arc(cx, cy, R * s.r, 0, TAU);
+          c.strokeStyle = 'rgba(255,255,255,.12)'; c.lineWidth = 1; c.stroke();
+          for (var i = 0; i < s.n; i++) {
+            var a = t * s.sp + i * TAU / s.n;
+            dot(c, cx + Math.cos(a) * R * s.r, cy + Math.sin(a) * R * s.r, 3.5, .85);
+          }
+        });
+        // the nucleus is deliberately almost too small to see
+        var g = c.createRadialGradient(cx, cy, 0, cx, cy, R * .05);
+        g.addColorStop(0, 'rgba(255,255,255,.95)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * .05, 0, TAU); c.fill();
+        dot(c, cx, cy, Math.max(1.6, R * .006), 1);
+      };
+    },
+
+    // cells drifting; a few flare as something finds them
+    cells: function (w, h, rand) {
+      var cs = [];
+      for (var i = 0; i < 26; i++) cs.push({ x: rand(), y: rand(), r: 5 + rand() * 13, sp: .01 + rand() * .03, ph: rand() * TAU, hot: rand() < .22 });
+      return function (c, t, w, h) {
+        cs.forEach(function (b) {
+          var x = ((b.x + t * b.sp) % 1.1 - .05) * w;
+          var y = (b.y + Math.sin(t * .35 + b.ph) * .05) * h;
+          var flare = b.hot ? (.5 + .5 * Math.sin(t * 2.2 + b.ph)) : 0;
+          c.beginPath(); c.arc(x, y, b.r * (1 + flare * .18), 0, TAU);
+          c.strokeStyle = 'rgba(255,255,255,' + (.22 + flare * .55) + ')';
+          c.lineWidth = 1.6; c.stroke();
+          if (b.hot) dot(c, x, y, b.r * .3, .25 + flare * .5);
+        });
+      };
+    },
+
+    // rays crossing the panel, always at the same speed
+    beam: function (w, h, rand) {
+      var rays = [];
+      for (var i = 0; i < 22; i++) rays.push({ y: rand(), off: rand(), len: .12 + rand() * .22, a: .2 + rand() * .5 });
+      return function (c, t, w, h) {
+        rays.forEach(function (r) {
+          var x = ((r.off + t * .22) % 1.3 - .15) * w;
+          var L = r.len * w;
+          var g = c.createLinearGradient(x, 0, x + L, 0);
+          g.addColorStop(0, 'rgba(255,255,255,0)');
+          g.addColorStop(.5, 'rgba(255,255,255,' + r.a + ')');
+          g.addColorStop(1, 'rgba(255,255,255,0)');
+          c.strokeStyle = g; c.lineWidth = 2; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(x, r.y * h); c.lineTo(x + L, r.y * h); c.stroke();
+        });
+      };
+    },
+
+    // a grid of space, dented by something heavy sitting on it
+    grid: function (w, h, rand) {
+      return function (c, t, w, h) {
+        var cx = w * .5, cy = h * .56;
+        var depth = 1 + Math.sin(t * .5) * .18;
+        c.strokeStyle = 'rgba(255,255,255,.2)';
+        c.lineWidth = 1;
+        function warp(x, y) {
+          var dx = x - cx, dy = (y - cy) * 1.9;
+          var d = Math.sqrt(dx * dx + dy * dy) + 24;
+          var pull = Math.min(h * .3, (h * 5200 * depth) / (d * d));
+          return y + pull;
+        }
+        for (var gy = 0; gy <= 9; gy++) {
           c.beginPath();
-          c.arc(cx, cy, f * R, 0, 6.2832);
-          c.strokeStyle = 'rgba(255,255,255,' + (0.3 * (1 - f)).toFixed(3) + ')';
-          c.lineWidth = 1.5;
+          for (var x = 0; x <= w; x += 10) {
+            var y = warp(x, (gy / 9) * h);
+            x ? c.lineTo(x, y) : c.moveTo(x, y);
+          }
           c.stroke();
         }
+        for (var gx = 0; gx <= 14; gx++) {
+          var px = (gx / 14) * w;
+          c.beginPath();
+          for (var yy = 0; yy <= h; yy += 10) {
+            var wy = warp(px, yy);
+            yy ? c.lineTo(px, wy) : c.moveTo(px, wy);
+          }
+          c.stroke();
+        }
+        dot(c, cx, warp(cx, cy) - h * .02, 9, .95);
+      };
+    },
+
+    // pairs popping out of nothing and cancelling again
+    flicker: function (w, h, rand) {
+      var pairs = [];
+      for (var i = 0; i < 26; i++) pairs.push({ x: rand(), y: rand(), t0: rand() * 3, life: .5 + rand() * .9, gap: 6 + rand() * 14 });
+      return function (c, t, w, h) {
+        pairs.forEach(function (p) {
+          var age = (t - p.t0) % 3;
+          if (age < 0 || age > p.life) return;
+          var f = age / p.life;
+          var sep = Math.sin(f * Math.PI) * p.gap;
+          var a = Math.sin(f * Math.PI) * .85;
+          dot(c, p.x * w - sep, p.y * h, 2.6, a);
+          dot(c, p.x * w + sep, p.y * h, 2.6, a);
+        });
+      };
+    },
+
+    // the lights going out, one at a time, and not coming back
+    dying: function (w, h, rand) {
+      var n = count(w, h, 6000, 60, 150), pts = [];
+      for (var i = 0; i < n; i++) pts.push({ x: rand(), y: rand(), r: .6 + rand() * 2.1, out: rand() });
+      return function (c, t, w, h) {
+        // Sweeps out most of the field, then holds. Capped below 1 on purpose:
+        // a handful of long-lived stars survive, which is both true and keeps
+        // the panel from going completely blank and reading as broken.
+        var k = Math.min((t * .05) % 1.35, .88);
+        pts.forEach(function (p) {
+          if (p.out < k) return;                     // this one has gone out
+          dot(c, p.x * w, p.y * h, p.r, .3 + .55 * (1 - k));
+        });
+      };
+    },
+
+    // every piece swapped out, one by one, and it is still the same shape
+    replace: function (w, h, rand) {
+      var cols = 14, rows = 7, cells = [];
+      for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) cells.push({ x: (x + .5) / cols, y: (y + .5) / rows, when: rand() });
+      return function (c, t, w, h) {
+        var k = (t * .09) % 1;
+        cells.forEach(function (p) {
+          var swapped = p.when < k;
+          var d = Math.abs(p.when - k);
+          var flash = d < .05 ? (1 - d / .05) : 0;
+          c.beginPath();
+          c.arc(p.x * w, p.y * h, 5 + flash * 4, 0, TAU);
+          if (swapped) { c.fillStyle = 'rgba(255,255,255,' + (.5 + flash * .5) + ')'; c.fill(); }
+          else { c.strokeStyle = 'rgba(255,255,255,.32)'; c.lineWidth = 1.4; c.stroke(); }
+        });
       };
     }
   };
 
-  /* ---------------- runner -------------------------------------------- */
+  /* ---------------- runner ---------------------------------------- */
 
   function mount(el) {
-    var name = el.getAttribute('data-scene');
-    var build = SCENES[name];
+    var build = SCENES[el.getAttribute('data-scene')];
     if (!build) return;
 
     var canvas = document.createElement('canvas');
@@ -200,13 +325,13 @@
     el.insertBefore(canvas, el.firstChild);
     var c = canvas.getContext('2d');
 
-    var draw = null, w = 0, h = 0, dpr = 1, running = false, raf = 0, t0 = 0;
-    var seed = hash(name + (el.getAttribute('data-seed') || el.textContent.slice(0, 24)));
+    var draw = null, w = 0, h = 0, running = false, raf = 0, t0 = 0;
+    var seed = hash(el.getAttribute('data-scene') + (el.getAttribute('data-seed') || ''));
 
     function size() {
       var r = el.getBoundingClientRect();
       if (!r.width || !r.height) return false;
-      dpr = Math.min(devicePixelRatio || 1, 2);
+      var dpr = Math.min(devicePixelRatio || 1, 2);
       w = r.width; h = r.height;
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
@@ -224,22 +349,18 @@
     }
 
     function start() {
-      if (running || !draw) return;
-      if (REDUCED) { c.clearRect(0, 0, w, h); draw(c, 0, w, h); return; }
+      if (!draw || running) return;
+      if (REDUCED) { c.clearRect(0, 0, w, h); draw(c, 1.2, w, h); return; }
       running = true;
       raf = requestAnimationFrame(frame);
     }
     function stop() { running = false; cancelAnimationFrame(raf); }
 
-    if (!size()) {
-      // panel has no layout yet (hidden card, late font); try once more
-      requestAnimationFrame(function () { if (size()) start(); });
-    }
+    if (!size()) requestAnimationFrame(function () { if (size()) start(); });
 
-    var io = new IntersectionObserver(function (entries) {
-      entries[0].isIntersecting ? start() : stop();
-    }, { rootMargin: '120px' });
-    io.observe(el);
+    new IntersectionObserver(function (e) {
+      e[0].isIntersecting ? start() : stop();
+    }, { rootMargin: '150px' }).observe(el);
 
     var rt;
     addEventListener('resize', function () {
@@ -248,7 +369,7 @@
     });
   }
 
-  /* ---------------- reveal on scroll ---------------------------------- */
+  /* ---------------- reveals --------------------------------------- */
 
   function reveals() {
     var els = document.querySelectorAll('[data-reveal]');
@@ -257,48 +378,29 @@
       els.forEach(function (e) { e.classList.add('is-in'); });
       return;
     }
-    function reveal(el, delay) {
-      setTimeout(function () { el.classList.add('is-in'); }, delay || 0);
-    }
+    function show(el, d) { setTimeout(function () { el.classList.add('is-in'); }, d || 0); }
 
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        // A jump — an anchor link, a restored scroll position, a flick on
-        // mobile — can carry an element from below the fold to above it
-        // without it ever intersecting. Reveal anything already passed,
-        // otherwise that content stays invisible for good.
+        // A jump — anchor link, restored scroll, a fast flick — can carry an
+        // element from below the fold to above it without ever intersecting.
+        // Reveal anything already passed, or that content is gone for good.
         var passed = !en.isIntersecting && en.boundingClientRect.top < 0;
         if (!en.isIntersecting && !passed) return;
-        reveal(en.target, passed ? 0 : +(en.target.getAttribute('data-reveal') || 0));
+        show(en.target, passed ? 0 : +(en.target.getAttribute('data-reveal') || 0));
         io.unobserve(en.target);
       });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: .06 });
 
     els.forEach(function (e) {
-      if (e.getBoundingClientRect().bottom < 0) { reveal(e, 0); return; }
+      if (e.getBoundingClientRect().bottom < 0) { show(e, 0); return; }
       io.observe(e);
     });
-  }
-
-  /* ---------------- pointer parallax on the hero ----------------------- */
-
-  function parallax() {
-    if (REDUCED) return;
-    var hosts = document.querySelectorAll('[data-parallax]');
-    if (!hosts.length) return;
-    addEventListener('pointermove', function (e) {
-      var x = (e.clientX / innerWidth - 0.5), y = (e.clientY / innerHeight - 0.5);
-      hosts.forEach(function (host) {
-        var d = +(host.getAttribute('data-parallax') || 12);
-        host.style.transform = 'translate3d(' + (-x * d).toFixed(2) + 'px,' + (-y * d).toFixed(2) + 'px,0)';
-      });
-    }, { passive: true });
   }
 
   function init() {
     document.querySelectorAll('[data-scene]').forEach(mount);
     reveals();
-    parallax();
   }
 
   document.readyState === 'loading'

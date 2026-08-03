@@ -2,18 +2,17 @@
    Context — design system
 
    The idea the whole identity hangs on: context is what you get when you
-   zoom out. Every story takes one thing and puts something bigger next to
-   it, so the recurring motif is a small bright point inside a large field.
+   zoom out. Every story takes one thing and puts something bigger next
+   to it, so the recurring motif is a small bright point in a large field.
 
-   Where the look comes from: vivid multi-hue colour, rounded geometry,
-   ambient motion and a sense of scale. Where it deliberately parts company
-   with its influences: those live in the dark. We live in daylight, and the
-   dark is where the scenes happen. White page, glowing scene, hard cut
-   between them — that contrast is the signature.
+   Where it parts company with its influences: those live in the dark.
+   We live in daylight and the dark is where the scenes happen. White
+   page, glowing scene, hard cut between them.
 
-   Colour rules carried over from the research, unchanged:
-     stage tones  dark, saturated, three-stop; text on them is bone
-     accent       text and links on white, >= 4.5:1, verified per tone
+   Structural rule: a story is a STACK OF CARDS, and colour belongs to
+   the card, not the page. A story walks through several tones as it
+   goes, the way a film changes lighting between acts. Nothing is one
+   colour all the way down.
 ------------------------------------------------------------------- */
 
 @font-face { font-family:'Gabarito'; font-style:normal; font-weight:400 900; font-display:swap; src:url('fonts/gabarito.woff2') format('woff2'); }
@@ -25,9 +24,7 @@
   --ink:     #101828;
   --muted:   #5A6875;
   --border:  #E6EAF2;
-  --bone:    #F4F1FF;
 
-  /* default tone; every story and card overrides these */
   --g1: #1E1B4B; --g2: #4C1D95; --g3: #7C2D92;
   --accent: #6D28D9;
 
@@ -38,18 +35,20 @@
   --r-lg: 26px;
   --r-xl: 34px;
   --shadow: 0 2px 6px rgba(16,24,40,.05), 0 16px 44px rgba(16,24,40,.08);
-  --glow: 0 20px 60px rgba(76,29,149,.28);
-  --measure: 36rem;
+  --glow: 0 20px 60px rgba(76,29,149,.24);
+  --measure: 34rem;
   --ease: cubic-bezier(.22,.72,.28,1);
 }
 
-/* --- story tones. dark and saturated so the scenes can glow ---------- */
+/* --- tones. any card can wear any of these ------------------------- */
 .t-nebula  { --g1:#3B0764; --g2:#7E22CE; --g3:#DB2777; --accent:#6D28D9; }
 .t-deepsea { --g1:#0C4A6E; --g2:#0891B2; --g3:#22D3EE; --accent:#0E7490; }
 .t-ember   { --g1:#4C0519; --g2:#9F1239; --g3:#F97316; --accent:#BE123C; }
 .t-forest  { --g1:#064E3B; --g2:#059669; --g3:#34D399; --accent:#047857; }
 .t-dusk    { --g1:#1E1B4B; --g2:#1D4ED8; --g3:#8B5CF6; --accent:#1D4ED8; }
 .t-solar   { --g1:#451A03; --g2:#B45309; --g3:#FBBF24; --accent:#B45309; }
+.t-void    { --g1:#020617; --g2:#111C3A; --g3:#334155; --accent:#334155; }
+.t-rose    { --g1:#4A044E; --g2:#A21CAF; --g3:#FB7185; --accent:#A21CAF; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -59,62 +58,34 @@ body {
   color: var(--ink);
   font-family: var(--body);
   font-size: 1.0625rem;
-  line-height: 1.7;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-h1, h2, h3, .wordmark { font-family: var(--display); letter-spacing: -0.025em; text-wrap: balance; line-height: 1.1; }
+h1, h2, h3, .wordmark { font-family: var(--display); letter-spacing: -.025em; text-wrap: balance; line-height: 1.12; }
 a { color: var(--accent); }
 img, svg, canvas { max-width: 100%; }
-
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-.stage :focus-visible { outline-color: #fff; }
+.scene :focus-visible, .card-turn :focus-visible { outline-color: #fff; }
 
 .shell { width: min(74rem, 100% - 2.5rem); margin-inline: auto; }
-.narrow { width: min(var(--measure), 100%); margin-inline: auto; }
-/* figures get more room than prose — a scaled-down diagram is a useless one */
-.wide { width: min(52rem, 100%); margin-inline: auto; }
 
 /* ---------- masthead ---------- */
 
-.masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.5rem 0;
-}
+.masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 0; }
 
-.wordmark {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .12em;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--ink);
-  text-decoration: none;
-}
-/* the dot is the identity: one small bright point, always in orbit */
-.wordmark i {
-  width: .34em; height: .34em;
-  border-radius: 50%;
-  background: var(--accent);
-  display: inline-block;
-  animation: orbit 5s var(--ease) infinite;
-}
-@keyframes orbit {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-.42em); }
-}
+.wordmark { display: inline-flex; align-items: baseline; gap: .12em; font-size: 1.5rem; font-weight: 800; color: var(--ink); text-decoration: none; }
+.wordmark i { width: .34em; height: .34em; border-radius: 50%; background: var(--accent); display: inline-block; animation: orbit 5s var(--ease) infinite; }
+@keyframes orbit { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-.42em); } }
 
 .nav { display: flex; gap: 1.5rem; align-items: center; font-weight: 600; }
 .nav a { color: var(--muted); text-decoration: none; }
 .nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
 
-/* ---------- the scene: a dark vivid panel the page cuts a hole for ---- */
+/* ---------- the scene: a dark vivid panel ---------- */
 
-.stage {
+.scene {
   position: relative;
   border-radius: var(--r-xl);
   overflow: hidden;
@@ -122,177 +93,152 @@ img, svg, canvas { max-width: 100%; }
   color: #fff;
   isolation: isolate;
 }
-.stage::after {           /* a slow hue drift so the panel is never static */
+.scene::after {
   content: '';
   position: absolute; inset: -40%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%);
-  animation: drift 22s linear infinite;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.16), transparent 55%);
+  animation: drift 24s linear infinite;
   z-index: 0;
 }
-@keyframes drift {
-  0%   { transform: translate3d(0,0,0) rotate(0deg); }
-  100% { transform: translate3d(0,0,0) rotate(360deg); }
-}
-/* A floor for the text. The scene runs bright in places, and headline
-   contrast cannot depend on where a particle happens to drift. */
-.stage::before {
+@keyframes drift { to { transform: rotate(360deg); } }
+/* a floor for the text: contrast cannot depend on where a particle drifts */
+.scene::before {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(100deg, rgba(6,4,18,.62) 0%, rgba(6,4,18,.3) 46%, rgba(6,4,18,0) 76%);
+  background: linear-gradient(0deg, rgba(4,2,14,.72) 0%, rgba(4,2,14,.24) 44%, rgba(4,2,14,0) 74%);
   z-index: 1;
 }
-.stage > * { position: relative; z-index: 2; }
-.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
-
-.stage-pad { padding: clamp(2rem, 5vw, 4.5rem); }
+.scene > * { position: relative; z-index: 2; }
+.scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
 
 /* ---------- home hero ---------- */
 
-.hero { padding: 1rem 0 4rem; }
-.hero .stage { min-height: min(34rem, 78vh); display: grid; align-items: center; box-shadow: var(--glow); }
-
-.hero h1 {
-  margin: 0 0 1.1rem;
-  font-size: clamp(2.4rem, 6.4vw, 4.6rem);
-  font-weight: 800;
-  max-width: 16ch;
-}
-.hero p {
-  margin: 0 0 2rem;
-  max-width: 40ch;
-  font-size: clamp(1.05rem, 1.9vw, 1.3rem);
-  color: rgba(255,255,255,.86);
-}
+.hero { padding: .5rem 0 3.5rem; }
+.hero .scene { min-height: min(33rem, 76vh); display: grid; align-items: center; box-shadow: var(--glow); }
+.hero-pad { padding: clamp(2rem, 5vw, 4.5rem); }
+.hero h1 { margin: 0 0 1rem; font-size: clamp(2.4rem, 6.2vw, 4.4rem); font-weight: 800; max-width: 16ch; }
+.hero p { margin: 0 0 2rem; max-width: 38ch; font-size: clamp(1.05rem, 1.9vw, 1.28rem); color: rgba(255,255,255,.88); }
 
 .cta {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  background: #fff;
-  color: var(--ink);
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: 1.0625rem;
-  text-decoration: none;
-  padding: .85rem 1.6rem;
-  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: .6rem;
+  background: #fff; color: #101828;
+  font-family: var(--display); font-weight: 700; font-size: 1.0625rem;
+  text-decoration: none; padding: .85rem 1.6rem; border-radius: 999px;
   transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
 }
-.cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.22); }
+.cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.24); }
 
-/* ---------- generic band ---------- */
+/* ---------- bands ---------- */
 
-.band { padding: 4rem 0; }
-.band-head { max-width: var(--measure); margin: 0 0 2.25rem; }
-.band-head h2 { margin: 0 0 .6rem; font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 800; }
-.band-head p { margin: 0; color: var(--muted); font-size: 1.125rem; }
+.band { padding: 3.5rem 0; }
+.band-head { max-width: var(--measure); margin: 0 0 2rem; }
+.band-head h2 { margin: 0 0 .55rem; font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 800; }
+.band-head p { margin: 0; color: var(--muted); font-size: 1.1rem; }
 
 .eyebrow {
-  display: inline-block;
-  margin: 0 0 .85rem;
-  font-family: var(--display);
-  font-size: .78rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--accent);
+  display: inline-block; margin: 0 0 .8rem;
+  font-family: var(--display); font-size: .76rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
 }
-.stage .eyebrow { color: rgba(255,255,255,.82); }
+.scene .eyebrow, .card-turn .eyebrow { color: rgba(255,255,255,.84); }
 
-/* what we do */
 .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.75rem; list-style: none; padding: 0; margin: 0; }
-.pillar h3 { margin: .9rem 0 .4rem; font-size: 1.2rem; font-weight: 700; }
+.pillar h3 { margin: .9rem 0 .35rem; font-size: 1.15rem; font-weight: 700; }
 .pillar p { margin: 0; color: var(--muted); }
-.pillar-mark { width: 44px; height: 44px; border-radius: 14px; background: linear-gradient(135deg, var(--g2), var(--g3)); display: grid; place-items: center; }
+.pillar-mark { width: 42px; height: 42px; border-radius: 13px; background: linear-gradient(135deg, var(--g2), var(--g3)); display: grid; place-items: center; }
 
-/* ---------- story cards ---------- */
+/* ---------- story cards on grids ---------- */
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(18.5rem, 1fr)); gap: 1.5rem; list-style: none; padding: 0; margin: 0; }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  background: var(--page);
-  border: 1px solid var(--border);
+  display: flex; flex-direction: column; height: 100%;
+  border-radius: var(--r-lg); overflow: hidden;
+  text-decoration: none; color: inherit;
+  background: var(--page); border: 1px solid var(--border);
   transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
 }
 .card:hover, .card:focus-visible { transform: translateY(-5px); box-shadow: var(--shadow); }
 
-.card-art {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  background: linear-gradient(135deg, var(--g1), var(--g2) 55%, var(--g3));
-  overflow: hidden;
-}
+.card-art { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(135deg, var(--g1), var(--g2) 55%, var(--g3)); overflow: hidden; }
 .card-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.card:hover .card-art::after { transform: scale(1.15); }
-.card-art::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 70% 30%, rgba(255,255,255,.22), transparent 60%);
-  transition: transform 500ms var(--ease);
-}
 
-.card-body { display: flex; flex-direction: column; gap: .45rem; padding: 1.15rem 1.3rem 1.4rem; }
+.card-body { display: flex; flex-direction: column; gap: .4rem; padding: 1.1rem 1.3rem 1.35rem; }
 .card-kicker { font-family: var(--display); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
-.card-title { font-family: var(--display); font-size: 1.22rem; font-weight: 700; margin: 0; line-height: 1.22; }
-.card-teaser { margin: 0; color: var(--muted); font-size: .96rem; line-height: 1.55; }
+.card-title { font-family: var(--display); font-size: 1.2rem; font-weight: 700; margin: 0; line-height: 1.22; }
+.card-teaser { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.5; }
 
-/* filter chips on the stories index */
 .filters { display: flex; flex-wrap: wrap; gap: .55rem; margin: 0 0 2rem; padding: 0; list-style: none; }
 .filter {
-  display: inline-block;
-  text-decoration: none;
-  border: 1px solid var(--border);
-  background: var(--page);
-  border-radius: 999px;
-  padding: .45rem 1rem;
-  font: inherit; font-size: .95rem; font-weight: 600;
-  font-family: var(--display);
-  color: var(--muted);
-  cursor: pointer;
+  display: inline-block; text-decoration: none;
+  border: 1px solid var(--border); background: var(--page); border-radius: 999px;
+  padding: .45rem 1rem; font: inherit; font-family: var(--display); font-size: .94rem; font-weight: 600;
+  color: var(--muted); cursor: pointer;
   transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
 }
 .filter[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-/* ---------- story page ---------- */
+/* ==================================================================
+   STORY = a stack of cards. Colour lives on the card.
+   ================================================================== */
 
-.story-hero { padding: .5rem 0 3rem; }
-.story-hero .stage { min-height: min(30rem, 70vh); display: grid; align-items: end; box-shadow: var(--glow); }
-.story-hero h1 { margin: 0 0 1rem; font-size: clamp(2.1rem, 5.4vw, 3.8rem); font-weight: 800; max-width: 18ch; }
-.story-hero .standfirst { margin: 0; max-width: 44ch; font-size: clamp(1.05rem, 1.8vw, 1.25rem); color: rgba(255,255,255,.88); }
+.stack { display: grid; gap: 1.5rem; width: min(58rem, 100%); margin: 0 auto; padding-bottom: 3rem; list-style: none; }
 
-.beat { padding: 0 0 2.75rem; }
-.beat h2 { margin: 0 0 .7rem; font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 700; }
-.beat p { margin: 0 0 1rem; }
-.beat p:last-child { margin-bottom: 0; }
-.beat strong { color: var(--accent); font-weight: 600; }
+/* the opening card */
+.story-hero { margin: .5rem 0 1.5rem; }
+.story-hero .scene { min-height: min(30rem, 70vh); display: grid; align-items: end; box-shadow: var(--glow); }
+.story-hero h1 { margin: 0 0 .9rem; font-size: clamp(2rem, 5.2vw, 3.6rem); font-weight: 800; max-width: 17ch; }
+.story-hero .standfirst { margin: 0; max-width: 42ch; font-size: clamp(1.02rem, 1.8vw, 1.2rem); color: rgba(255,255,255,.9); }
 
-/* the line that lands the story — bigger type, no ornament */
-.turn {
-  margin: 1rem 0 3rem;
-  padding-left: 1.4rem;
-  border-left: 4px solid var(--accent);
-  font-family: var(--display);
-  font-size: clamp(1.3rem, 2.8vw, 1.85rem);
-  font-weight: 700;
-  line-height: 1.3;
+/* a full animated beat: picture first, one line of words */
+.card-scene { min-height: min(26rem, 62vh); display: grid; align-items: end; }
+.card-scene .scene-pad { padding: clamp(1.5rem, 4vw, 2.75rem); }
+.card-scene h2 { margin: 0 0 .5rem; font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; max-width: 20ch; }
+.card-scene p { margin: 0; max-width: 40ch; font-size: 1.05rem; color: rgba(255,255,255,.9); }
+
+/* short written beat, on white */
+.card-text {
+  background: var(--page); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: clamp(1.4rem, 3.4vw, 2.2rem);
 }
+.card-text h2 { margin: 0 0 .5rem; font-size: clamp(1.25rem, 2.5vw, 1.55rem); font-weight: 700; }
+.card-text p { margin: 0 0 .8rem; max-width: 58ch; }
+.card-text p:last-child { margin-bottom: 0; }
+.card-text strong { color: var(--accent); font-weight: 600; }
 
-/* ---------- interactive figure ---------- */
+/* the pivot. big type, full colour, nothing else on it */
+.card-turn {
+  border-radius: var(--r-lg);
+  background: linear-gradient(120deg, var(--g1), var(--g2) 55%, var(--g3));
+  color: #fff;
+  padding: clamp(2rem, 5vw, 3.4rem);
+  display: grid;
+  gap: .5rem;
+}
+.card-turn p { margin: 0; font-family: var(--display); font-size: clamp(1.5rem, 3.6vw, 2.3rem); font-weight: 800; line-height: 1.2; max-width: 20ch; }
 
-.figure { margin: 0 0 3.5rem; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--page); }
-.figure-stage { background: linear-gradient(135deg, var(--g1), var(--g2) 55%, var(--g3)); padding: 1.75rem; position: relative; }
+/* the checklist card — what a thing needs in order to work */
+.card-steps { background: var(--page); border: 1px solid var(--border); border-radius: var(--r-lg); padding: clamp(1.4rem, 3.4vw, 2.2rem); }
+.card-steps h2 { margin: 0 0 1.25rem; font-size: clamp(1.25rem, 2.5vw, 1.55rem); font-weight: 700; }
+.steps { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.step { display: grid; grid-template-columns: 3rem 1fr; gap: 1rem; align-items: start; }
+.step-n {
+  width: 3rem; height: 3rem; border-radius: 14px;
+  background: linear-gradient(135deg, var(--g2), var(--g3));
+  color: #fff; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: 1.1rem;
+}
+.step h3 { margin: .3rem 0 .2rem; font-size: 1.02rem; font-weight: 700; }
+.step p { margin: 0; color: var(--muted); font-size: .97rem; }
+
+/* interactive card */
+.card-figure { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--page); }
+.figure-stage { background: linear-gradient(135deg, var(--g1), var(--g2) 55%, var(--g3)); padding: 1.6rem; position: relative; }
 .figure-stage svg { display: block; width: 100%; height: auto; margin-inline: auto; }
 
-.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.75rem; padding: 1.15rem 1.4rem; border-top: 1px solid var(--border); }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; padding: 1.1rem 1.35rem; border-top: 1px solid var(--border); }
 .control { display: flex; align-items: center; gap: .65rem; flex: 1 1 15rem; }
-.control label { font-family: var(--display); font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.control label { font-family: var(--display); font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .readout { font-family: var(--display); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); white-space: nowrap; }
 
 input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); height: 1.5rem; }
@@ -300,33 +246,32 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
 .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .chip {
   border: 1px solid var(--border); background: var(--page); border-radius: 999px;
-  padding: .42rem .9rem; font: inherit; font-family: var(--display); font-size: .93rem; font-weight: 600;
+  padding: .42rem .9rem; font: inherit; font-family: var(--display); font-size: .92rem; font-weight: 600;
   color: var(--muted); cursor: pointer;
   transition: background 160ms var(--ease), color 160ms var(--ease), border-color 160ms var(--ease);
 }
 .chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-.caption { padding: 1rem 1.4rem 1.3rem; margin: 0; font-size: .95rem; color: var(--muted); border-top: 1px solid var(--border); }
+.caption { padding: .95rem 1.35rem 1.2rem; margin: 0; font-size: .93rem; color: var(--muted); border-top: 1px solid var(--border); }
 
-/* svg primitives inside a dark figure stage */
-.f-label { font-family: var(--body); font-size: 13px; font-weight: 600; fill: rgba(255,255,255,.72); }
+/* svg primitives, always on a dark stage */
+.f-label { font-family: var(--body); font-size: 13px; font-weight: 600; fill: rgba(255,255,255,.74); }
 .f-value { font-family: var(--display); font-size: 17px; font-weight: 800; fill: #fff; }
 .f-line  { stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
-.f-faint { stroke: rgba(255,255,255,.25); stroke-width: 1.5; fill: none; }
+.f-faint { stroke: rgba(255,255,255,.26); stroke-width: 1.5; fill: none; }
 
-/* ---------- closing + pager ---------- */
+/* the landing */
+.card-zoom { border-radius: var(--r-lg); background: var(--surface); padding: clamp(1.5rem, 4vw, 2.4rem); }
+.card-zoom h2 { margin: 0 0 .5rem; font-size: 1.3rem; font-weight: 700; }
+.card-zoom p { margin: 0; max-width: 58ch; }
 
-.zoomout { margin: 0 0 3rem; padding: clamp(1.6rem, 4vw, 2.6rem); border-radius: var(--r-lg); background: var(--surface); }
-.zoomout h2 { margin: 0 0 .6rem; font-size: 1.35rem; font-weight: 700; }
-.zoomout p { margin: 0; }
-
-.pager { display: flex; justify-content: space-between; gap: 1rem; padding: 1.75rem 0 3rem; border-top: 1px solid var(--border); font-family: var(--display); font-weight: 700; }
+.pager { display: flex; justify-content: space-between; gap: 1rem; padding: 1.5rem 0 2.5rem; border-top: 1px solid var(--border); font-family: var(--display); font-weight: 700; }
 .pager a { text-decoration: none; }
 .pager a:hover { text-decoration: underline; }
 
-.site-foot { padding: 2.5rem 0 3rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .95rem; display: flex; flex-wrap: wrap; gap: .5rem 2rem; justify-content: space-between; }
+.site-foot { padding: 2.25rem 0 3rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .94rem; display: flex; flex-wrap: wrap; gap: .5rem 2rem; justify-content: space-between; }
 
-/* ---------- motion: reveal on scroll ---------- */
+/* ---------- motion ---------- */
 
 [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 700ms var(--ease), transform 700ms var(--ease); }
 [data-reveal].is-in { opacity: 1; transform: none; }
@@ -341,4 +286,7 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
   .control { flex-basis: 100%; }
   .nav { gap: 1rem; }
   .site-foot { flex-direction: column; }
+  .step { grid-template-columns: 2.5rem 1fr; gap: .8rem; }
+  .step-n { width: 2.5rem; height: 2.5rem; border-radius: 12px; font-size: 1rem; }
+  .card-scene { min-height: 22rem; }
 }

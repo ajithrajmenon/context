@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why can you remember yesterday but not tomorrow? &#8212; Context</title>
+<meta name="description" content="Almost every rule in physics works just as well backwards. So why does time only go one way?">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-dusk">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-dusk">
+  <div class="scene" data-scene="entropy" data-seed="the-arrow-of-time">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Time</p>
+      <h1 data-reveal="80">Why can you remember yesterday but not tomorrow?</h1>
+      <p class="standfirst" data-reveal="160">Drop a cup and it shatters. No one has ever seen the pieces jump back up and become a cup. Nothing in the rules forbids it — and yet it never, ever happens.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The rules do not care which way time runs</h2>
+    <p>Film two billiard balls hitting each other, then play it backwards. Both versions look completely normal. Nothing is broken.</p><p>Now film the cup smashing and play <em>that</em> backwards. You know instantly that something is wrong.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="entropy" data-seed="b1">
+    <div class="scene-pad">
+      <h2>One way to be tidy. Billions of ways to be a mess.</h2>
+      <p>That is the whole secret. There is nothing else to it.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Think about a box of building blocks</h2>
+    <p>There is basically one way for them to be stacked in a perfect tower. There are an enormous number of ways for them to be scattered across the floor.</p><p>Shake the box. You will almost certainly get a mess — not because mess is special, but because <strong>there is so much more of it</strong>.</p>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>Time does not flow. Things just spread out, and we call that direction "forward".</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How many tidy arrangements there are compared to messy ones</title>
+  <g id="blocks"></g>
+  <text class="f-label" x="20" y="196">WAYS TO BE PERFECTLY TIDY</text>
+  <text class="f-value" id="tidyTxt" x="20" y="232" style="font-size:30px">1</text>
+  <text class="f-label" x="330" y="196">WAYS TO BE SOME KIND OF MESS</text>
+  <text class="f-value" id="messTxt" x="330" y="232" style="font-size:30px">&#8212;</text>
+  <text class="f-label" id="oddsTxt" x="20" y="278">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="n">How many blocks</label>
+  <input type="range" id="n" min="2" max="20" step="1" value="6">
+  <span class="readout" id="nOut">6</span>
+</div>
+    </div>
+    <figcaption class="caption">Add blocks and watch the odds collapse. At twenty blocks you would need to shake the box more times than there have been seconds since the Big Bang. That is why the cup never comes back together.</figcaption>
+  </figure>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="scene card-scene" data-scene="bloom" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Your memories point the same way</h2>
+      <p>Making a memory means putting something in order inside your head, and that always spills a little heat outward. You can only remember the direction the mess came from.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>So the past is not "gone"</h2>
+    <p>The past is simply the direction where things were more ordered. The future is the direction where they are more spread out.</p><p>You remember yesterday because yesterday was tidier. There is no memory of tomorrow because tomorrow has not made its mess yet.</p>
+  </div>
+</li>
+<li class="t-dusk" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Time turns out not to be a river carrying you along. It is just the fact that there are far more ways to be messy than tidy — repeated, everywhere, all at once, for fourteen billion years.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="how-big-is-the-universe.html">How big is the universe, really? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var n = document.getElementById('n'), box = document.getElementById('blocks');
+
+function fact(k) { var r = 1; for (var i = 2; i <= k; i++) r *= i; return r; }
+
+function draw() {
+  var k = +n.value;
+  document.getElementById('nOut').textContent = k;
+  box.textContent = '';
+  var w = Math.min(46, 600 / k);
+  for (var i = 0; i < k; i++) {
+    var r = document.createElementNS(NS, 'rect');
+    r.setAttribute('x', 20 + i * (w + 4));
+    r.setAttribute('y', 60);
+    r.setAttribute('width', w);
+    r.setAttribute('height', 76);
+    r.setAttribute('rx', 8);
+    r.setAttribute('fill', 'rgba(255,255,255,.9)');
+    box.appendChild(r);
+  }
+  // every ordering is equally likely; only one of them is "in order"
+  var total = fact(k);
+  document.getElementById('messTxt').textContent =
+    total > 1e6 ? total.toExponential(1).replace('e+', ' x 10^') : (total - 1).toLocaleString('en-GB');
+  document.getElementById('oddsTxt').textContent =
+    'SHAKE THE BOX AND YOUR ODDS OF PERFECT ORDER ARE 1 IN ' +
+    (total > 1e6 ? total.toExponential(1).replace('e+', ' x 10^') : total.toLocaleString('en-GB'));
+}
+n.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

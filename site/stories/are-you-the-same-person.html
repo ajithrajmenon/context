@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Are you the same person you were ten years ago? &#8212; Context</title>
+<meta name="description" content="Almost every piece of you has been swapped out. So what exactly kept going?">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-rose">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-rose">
+  <div class="scene" data-scene="replace" data-seed="are-you-the-same-person">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Mind</p>
+      <h1 data-reveal="80">Are you the same person you were ten years ago?</h1>
+      <p class="standfirst" data-reveal="160">The atoms that made you a decade ago are mostly gone — eaten, breathed out, worn away. Something is still here calling itself you. The question is what.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>You are a pattern, not a substance</h2>
+    <p>Your skin is weeks old. Your gut lining is days old. Even your bones swap themselves out over about ten years.</p><p>You are less like a statue and more like <strong>a wave</strong> — the water keeps changing, the shape keeps going.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="replace" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Swap every plank on a ship, one at a time</h2>
+      <p>At what point does it stop being the same ship? People have argued about this for two thousand years and never settled it.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Not everything gets replaced</h2>
+    <p>A few parts stay. Most of the neurons in your brain are as old as you are, and never get swapped.</p><p>The lens in your eye is original too. So is some of the enamel on your teeth. There is a thin thread of <em>original you</em> running through it.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-turn">
+    <p>What continues is not the stuff. It is the arrangement, copying itself forward, slightly imperfectly, every single day.</p>
+  </div>
+</li>
+<li class="t-rose" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How much of your body has been replaced over time</title>
+  <g id="body"></g>
+  <text class="f-label" x="360" y="70">REPLACED BY NOW</text>
+  <text class="f-value" id="pctTxt" x="360" y="108" style="font-size:32px">&#8212;</text>
+  <text class="f-label" x="360" y="158">STILL THE ORIGINAL</text>
+  <text class="f-value" id="keepTxt" x="360" y="192" style="font-size:20px">&#8212;</text>
+  <text class="f-label" id="noteTxt" x="360" y="244">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="yrs">Years that have passed</label>
+  <input type="range" id="yrs" min="0" max="30" step="1" value="10">
+  <span class="readout" id="yrsOut">10 years</span>
+</div>
+    </div>
+    <figcaption class="caption">Filled circles have been replaced. Drag far enough and nearly all of them fill in — and you still have every memory you started with.</figcaption>
+  </figure>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="scene card-scene" data-scene="bloom" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Your memories are not recordings</h2>
+      <p>Every time you remember something you rebuild it, and save the rebuilt copy. A memory you revisit often is the one furthest from what happened.</p>
+    </div>
+  </div>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>You are not a thing that persists. You are a process that keeps happening, made of borrowed material, holding its shape long enough to wonder whether it is still itself.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="if-the-sun-vanished.html">What if the Sun vanished right now? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var yrs = document.getElementById('yrs');
+var body = document.getElementById('body'), cells = [];
+for (var i = 0; i < 96; i++) {
+  var c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 30 + (i % 12) * 24);
+  c.setAttribute('cy', 50 + ((i / 12) | 0) * 26);
+  c.setAttribute('r', 8);
+  body.appendChild(c);
+  cells.push(c);
+}
+
+function draw() {
+  var y = +yrs.value;
+  document.getElementById('yrsOut').textContent = y + (y === 1 ? ' year' : ' years');
+  // most tissue turns over within a decade; a fixed remainder never does
+  var swapped = Math.min(0.9, 1 - Math.exp(-y / 4.2));
+  document.getElementById('pctTxt').textContent = Math.round(swapped * 100) + '%';
+  document.getElementById('keepTxt').textContent = 'brain, eye lens, tooth enamel';
+  document.getElementById('noteTxt').textContent =
+    y === 0 ? 'NOTHING HAS CHANGED YET' :
+    y < 5   ? 'SKIN, BLOOD AND GUT ARE NEW' :
+    y < 15  ? 'YOUR SKELETON HAS TURNED OVER' :
+              'ALMOST ALL OF IT REPLACED';
+  cells.forEach(function (c, i) {
+    var isNew = i / cells.length < swapped;
+    c.setAttribute('fill', isNew ? '#fff' : 'rgba(255,255,255,.2)');
+  });
+}
+yrs.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

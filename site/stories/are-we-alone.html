@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>If the universe is so big, where is everybody? &#8212; Context</title>
+<meta name="description" content="Hundreds of billions of stars in our galaxy alone. Billions of years of time. And silence.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-forest">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-forest">
+  <div class="scene" data-scene="stars" data-seed="are-we-alone">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Life</p>
+      <h1 data-reveal="80">If the universe is so big, where is everybody?</h1>
+      <p class="standfirst" data-reveal="160">Our galaxy has been around long enough for a civilisation to cross it many times over. By every reasonable estimate, someone should have arrived by now. Nobody has.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The numbers are absurd in our favour</h2>
+    <p>Our galaxy holds a few hundred billion stars. Most have planets. Many of those planets sit at a comfortable distance from their star.</p><p>And the galaxy is old. If even one species had started spreading a million years ago, they would already be <strong>everywhere</strong>.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="dying" data-seed="b1">
+    <div class="scene-pad">
+      <h2>So the sky should be busy. It is not.</h2>
+      <p>No signals. No probes. No evidence of anything, anywhere, ever. That gap between what we expect and what we find is the whole problem.</p>
+    </div>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-turn">
+    <p>Something stops civilisations from filling the galaxy. We do not know what, or whether we have passed it yet.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-steps">
+    <h2>Where the barrier could be</h2>
+    <ol class="steps"><li class="step">
+      <span class="step-n">1</span>
+      <div>
+        <h3>Behind us</h3>
+        <p>Starting life at all may be a fluke so rare it has happened once. If so, we are alone, and we are safe.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">2</span>
+      <div>
+        <h3>Also behind us</h3>
+        <p>Simple cells took billions of years to become complex ones. That step may almost never happen.</p>
+      </div>
+    </li><li class="step">
+      <span class="step-n">3</span>
+      <div>
+        <h3>Ahead of us</h3>
+        <p>Every civilisation might destroy itself shortly after learning how. This is the version worth worrying about.</p>
+      </div>
+    </li></ol>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">How many civilisations should be out there right now</title>
+  <g id="dots"></g>
+  <text class="f-label" x="20" y="230">CIVILISATIONS TALKING RIGHT NOW, IN OUR GALAXY</text>
+  <text class="f-value" id="nTxt" x="20" y="272" style="font-size:34px">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="life">Planets that get life</label>
+  <input type="range" id="life" min="0" max="100" step="1" value="30">
+  <span class="readout" id="lifeOut">&#8212;</span>
+</div>
+<div class="control">
+  <label for="last">How long they last</label>
+  <input type="range" id="last" min="0" max="100" step="1" value="30">
+  <span class="readout" id="lastOut">&#8212;</span>
+</div>
+    </div>
+    <figcaption class="caption">Nobody knows either number. That is the honest answer — slide them a little and the result swings from an empty galaxy to a crowded one, which is exactly why the question is still open.</figcaption>
+  </figure>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Silence is not comforting</h2>
+    <p>If we ever find simple life on Mars or under the ice of Europa, that means life is easy — and the hard step is probably still <strong>in front of us</strong>.</p><p>The best news would be finding nothing at all. An empty galaxy might mean we already got through the difficult part.</p>
+  </div>
+</li>
+<li class="t-forest" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Either we are alone in an unimaginably large place, or we are not. Both answers are enormous, and we are the first generation with instruments good enough to start ruling one of them out.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="mostly-empty-space.html">You are almost entirely empty space &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var life = document.getElementById('life'), last = document.getElementById('last');
+var dots = document.getElementById('dots'), nodes = [];
+for (var i = 0; i < 120; i++) {
+  var c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', 24 + (i % 30) * 21);
+  c.setAttribute('cy', 50 + ((i / 30) | 0) * 42);
+  c.setAttribute('r', 6);
+  dots.appendChild(c);
+  nodes.push(c);
+}
+
+function draw() {
+  // a deliberately crude Drake-style estimate: stars with planets, times the
+  // fraction that get life, times how long a civilisation stays detectable
+  var STARS = 100e9, HAB = 0.2;
+  var fLife = Math.pow(+life.value / 100, 3);       // life is the brutal filter
+  var fLast = Math.pow(+last.value / 100, 2);
+  var n = STARS * HAB * fLife * fLast * 1e-5;
+
+  document.getElementById('lifeOut').textContent =
+    (+life.value < 10 ? 'almost none' : +life.value > 80 ? 'most of them' : life.value + '%');
+  document.getElementById('lastOut').textContent =
+    (+last.value < 10 ? 'a blink' : +last.value > 80 ? 'forever' : last.value + '%');
+
+  document.getElementById('nTxt').textContent =
+    n < 1 ? 'probably just us' :
+    n > 1e6 ? Math.round(n).toExponential(1).replace('e+', ' x 10^') :
+    Math.round(n).toLocaleString('en-GB');
+
+  var lit = Math.max(0, Math.min(120, Math.round(Math.log10(Math.max(n, 1)) * 20)));
+  nodes.forEach(function (d, i) {
+    d.setAttribute('fill', i < lit ? '#fff' : 'rgba(255,255,255,.16)');
+  });
+}
+life.addEventListener('input', draw);
+last.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

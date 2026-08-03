@@ -28,6 +28,29 @@ Three kinds of page: a homepage, a `stories` index that filters in place, and on
 story. Adding a story means appending one dict to `STORIES` and re-running `build.py`.
 Set `featured: True` to surface it on the homepage.
 
+### A story is a stack of cards
+
+Every story is a list of blocks, rendered in order. Five kinds:
+
+| block | what it is |
+|-------|-----------|
+| `scene` | full animated panel, one short line of words over it |
+| `text` | white card, a heading and a couple of short paragraphs |
+| `steps` | a numbered checklist — what a thing needs in order to work |
+| `turn` | the pivot, one line, big type on full colour |
+| `figure` | the interactive |
+
+The shape follows how the best explainer video essays are built: an opening image you can
+see before you understand it, the question asked plainly, named chapters, a checklist where
+something has requirements, the blocker, the turn, something you operate yourself, and a
+landing that stays humble.
+
+Because a story is a list, it is also a shot list. Each block is roughly a beat of script
+plus the picture that goes with it, which is the point — these are meant to become videos.
+
+**Colour belongs to the card, not the story.** Each piece walks through four to six tones
+as it goes, the way a film relights between acts. Nothing is one colour all the way down.
+
 ## The identity
 
 The idea the whole thing hangs on: **context is what you get when you zoom out**. Every
@@ -47,8 +70,8 @@ default background.
 
 ### Tokens
 
-Six tones. Each sets a three-stop gradient for its scenes and an accent used for text and
-links on white, which is the one that has to clear 4.5:1 — all six do.
+Eight tones. Each sets a three-stop gradient for its scenes and an accent used for text
+and links on white, which is the one that has to clear 4.5:1 — they all do.
 
 | tone | gradient | accent |
 |------|----------|--------|
@@ -58,6 +81,8 @@ links on white, which is the one that has to clear 4.5:1 — all six do.
 | forest | pine → emerald | `#047857` |
 | dusk | indigo → violet | `#1D4ED8` |
 | solar | brown → amber | `#B45309` |
+| void | near-black → slate | `#334155` |
+| rose | plum → coral | `#A21CAF` |
 
 - Page `#FFFFFF` · surface `#F7F9FC` · ink `#101828` · muted `#5A6875`
 - Gabarito (display) · Source Sans 3 (body), both self-hosted — no font CDN
@@ -66,8 +91,23 @@ links on white, which is the one that has to clear 4.5:1 — all six do.
 
 ### Motion
 
-`assets/motion.js` handles scroll reveals and five canvas scenes — `stars`, `orbit`,
-`swarm`, `waves`, `bloom`. A story picks one with `scene`.
+`assets/motion.js` handles scroll reveals and eleven canvas scenes. Five are general —
+`stars`, `orbit`, `swarm`, `waves`, `bloom` — and six were written for particular ideas:
+
+| scene | what it shows |
+|-------|---------------|
+| `entropy` | a tidy grid falling apart and never tidying itself |
+| `expand` | everything moving away from everything else, with no centre |
+| `atom` | a speck of nucleus in an enormous amount of nothing |
+| `cells` | cells drifting; a few flaring as something finds them |
+| `beam` | rays crossing at a fixed speed |
+| `grid` | space dented by something heavy sitting on it |
+| `flicker` | pairs popping out of nothing and cancelling again |
+| `dying` | the lights going out, one at a time |
+| `replace` | every piece swapped out, and the shape still holding |
+
+Scenes draw in white only. The card's own gradient supplies the hue, which is what lets a
+single story walk through several tones without any scene knowing about colour.
 
 Rules the file keeps:
 
@@ -76,6 +116,8 @@ Rules the file keeps:
 - scenes are seeded from the slug, so a card looks identical on every load
 - anything scrolled past without intersecting still reveals — a jumped-over element must
   never stay invisible
+- point counts have a floor as well as a ceiling; a small card is a fraction of a hero's
+  area, and without one a sparse scene reads as a broken panel
 
 ## Running locally
 

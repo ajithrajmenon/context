@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why is there something instead of nothing? &#8212; Context</title>
+<meta name="description" content="Empty space is not empty. It cannot be. The rules do not allow it.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-nebula">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-nebula">
+  <div class="scene" data-scene="flicker" data-seed="why-is-there-anything">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Matter</p>
+      <h1 data-reveal="80">Why is there something instead of nothing?</h1>
+      <p class="standfirst" data-reveal="160">Take a box. Remove all the air, all the light, all the heat, every last particle. What is left is still not nothing — and that turns out to be one of the deepest facts we know.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Perfect emptiness is forbidden</h2>
+    <p>To be truly empty, a patch of space would have to hold exactly zero energy and stay exactly that way.</p><p>The rules of the very small do not permit anything to be that precisely pinned down. So <strong>space fidgets</strong>.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="flicker" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Pairs appear and cancel out constantly</h2>
+      <p>A particle and its opposite, borrowed from nothing, gone again before the universe notices the debt. Everywhere. Always.</p>
+    </div>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>We can measure it</h2>
+    <p>Put two metal plates extremely close together in a vacuum and they get pushed together by the fidgeting outside them.</p><p>That push has been measured. Empty space is doing something, and it is strong enough to move objects.</p>
+  </div>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="card-turn">
+    <p>Nothing may simply be an unstable state. Given the rules we have, something is what you get by default.</p>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Looking into an apparently empty box at increasing magnification</title>
+  <rect x="40" y="40" width="360" height="220" rx="16" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.4)"/>
+  <g id="pairs"></g>
+  <text class="f-label" x="440" y="80">THE BOX IS</text>
+  <text class="f-value" id="stateTxt" x="440" y="114" style="font-size:22px">empty</text>
+  <text class="f-label" x="440" y="164">PAIRS RIGHT NOW</text>
+  <text class="f-value" id="cntTxt" x="440" y="198" style="font-size:26px">0</text>
+  <text class="f-label" id="hintTxt" x="440" y="246">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="zoom">Look closer</label>
+  <input type="range" id="zoom" min="0" max="100" step="1" value="0">
+  <span class="readout" id="zoomOut">normal eyes</span>
+</div>
+    </div>
+    <figcaption class="caption">Nothing changes in the box as you look closer. The box was always doing this — you were simply never able to resolve it.</figcaption>
+  </figure>
+</li>
+<li class="t-rose" data-reveal="0">
+  <div class="scene card-scene" data-scene="flicker" data-seed="b5">
+    <div class="scene-pad">
+      <h2>It does not finish the job</h2>
+      <p>This tells us why there is not nothing. It still does not tell us where the rules came from. That question is entirely open, and may stay that way.</p>
+    </div>
+  </div>
+</li>
+<li class="t-nebula" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>We have moved the mystery rather than solved it. But moving it was real progress: "why is there anything" turned out to have a physical answer, and the leftover question is now sharper than the one we started with.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="what-light-experiences.html">For light, no time passes at all &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var NS = 'http://www.w3.org/2000/svg';
+var zoom = document.getElementById('zoom');
+var host = document.getElementById('pairs'), pairs = [];
+for (var i = 0; i < 40; i++) {
+  var g = document.createElementNS(NS, 'g');
+  var x = 60 + Math.random() * 320, y = 60 + Math.random() * 180;
+  g.innerHTML = '<circle cx="' + x + '" cy="' + y + '" r="3.5" fill="#fff"/>' +
+                '<circle cx="' + x + '" cy="' + y + '" r="3.5" fill="rgba(255,255,255,.45)"/>';
+  host.appendChild(g);
+  pairs.push({ g: g, a: g.children[0], b: g.children[1], x: x, y: y, ph: Math.random() * 6.28 });
+}
+
+var level = 0;
+function draw() {
+  level = +zoom.value / 100;
+  document.getElementById('zoomOut').textContent =
+    level < .2 ? 'normal eyes' : level < .5 ? 'a good microscope' :
+    level < .8 ? 'far beyond any microscope' : 'the smallest scale there is';
+  document.getElementById('stateTxt').textContent =
+    level < .2 ? 'empty' : level < .5 ? 'still looks empty' : 'boiling';
+  document.getElementById('hintTxt').textContent =
+    level < .5 ? 'NOTHING TO SEE, APPARENTLY' : 'BORROWED AND PAID BACK';
+}
+
+var t0 = null;
+function tick(ts) {
+  if (t0 === null) t0 = ts;
+  var t = (ts - t0) / 1000;
+  var shown = 0;
+  pairs.forEach(function (p, i) {
+    if (i / pairs.length > level) { p.g.setAttribute('opacity', 0); return; }
+    var f = ((t * 0.8 + p.ph) % 2) / 2;
+    if (f > .5) { p.g.setAttribute('opacity', 0); return; }
+    var k = Math.sin(f * 2 * Math.PI);
+    p.g.setAttribute('opacity', Math.abs(k));
+    p.a.setAttribute('cx', p.x - k * 9);
+    p.b.setAttribute('cx', p.x + k * 9);
+    shown++;
+  });
+  document.getElementById('cntTxt').textContent = shown;
+  requestAnimationFrame(tick);
+}
+zoom.addEventListener('input', draw);
+requestAnimationFrame(tick);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

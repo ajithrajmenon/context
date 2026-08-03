@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What if the Sun vanished right now? &#8212; Context</title>
+<meta name="description" content="For eight minutes, nothing would happen. Not the light, and not the gravity either.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-solar">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero t-solar">
+  <div class="scene" data-scene="beam" data-seed="if-the-sun-vanished">
+    <div class="hero-pad">
+      <p class="eyebrow" data-reveal="0">Space</p>
+      <h1 data-reveal="80">What if the Sun vanished right now?</h1>
+      <p class="standfirst" data-reveal="160">Suppose the Sun simply stopped existing this second. The surprise is not what happens. It is how long absolutely nothing happens for.</p>
+    </div>
+  </div>
+</section>
+
+<ol class="stack">
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>The light is old news</h2>
+    <p>Sunlight takes about eight minutes and twenty seconds to cross the gap to Earth. The light already in flight keeps coming.</p><p>For eight minutes the sky stays bright, the day stays warm, and nobody on Earth has any way of knowing.</p>
+  </div>
+</li>
+<li class="t-void" data-reveal="0">
+  <div class="scene card-scene" data-scene="beam" data-seed="b1">
+    <div class="scene-pad">
+      <h2>Gravity is not instant either</h2>
+      <p>This is the part that trips people up. Gravity travels at exactly the same speed as light. Not faster. Not instantly.</p>
+    </div>
+  </div>
+</li>
+<li class="t-ember" data-reveal="0">
+  <div class="card-turn">
+    <p>Earth would keep circling a Sun that was not there — for the same eight minutes, to the second.</p>
+  </div>
+</li>
+<li data-reveal="0">
+  <div class="card-text">
+    <h2>Then both arrive together</h2>
+    <p>At eight minutes twenty, the sky goes dark and Earth stops turning its corner at the same instant.</p><p>We would not fly outward, exactly. We would go <strong>straight</strong> — off along whatever direction we happened to be travelling, in a line, forever.</p>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <figure class="card-figure">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">What Earth experiences in the minutes after the Sun disappears</title>
+  <circle id="sun" cx="150" cy="150" r="42" fill="#FFD36E"/>
+  <path id="orbit" class="f-faint" d="M150 150 m -110 0 a 110 110 0 1 0 220 0 a 110 110 0 1 0 -220 0"/>
+  <path id="escape" class="f-line" d="" stroke-dasharray="6 6" opacity="0"/>
+  <circle id="earth" cx="260" cy="150" r="10" fill="#7FC7FF"/>
+  <text class="f-label" x="400" y="70">ON EARTH IT IS</text>
+  <text class="f-value" id="skyTxt" x="400" y="106" style="font-size:24px">&#8212;</text>
+  <text class="f-label" x="400" y="156">EARTH IS</text>
+  <text class="f-value" id="moveTxt" x="400" y="192" style="font-size:20px">&#8212;</text>
+  <text class="f-label" id="noteTxt" x="400" y="244">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="min">Minutes since the Sun vanished</label>
+  <input type="range" id="min" min="0" max="200" step="1" value="0">
+  <span class="readout" id="minOut">0:00</span>
+</div>
+    </div>
+    <figcaption class="caption">Nothing at all happens until 8:20. Then everything happens at once — and Earth leaves along a straight line, not outward from where the Sun used to be.</figcaption>
+  </figure>
+</li>
+<li class="t-deepsea" data-reveal="0">
+  <div class="scene card-scene" data-scene="grid" data-seed="b5">
+    <div class="scene-pad">
+      <h2>Why gravity has a speed at all</h2>
+      <p>Gravity is not a rope pulling you. It is a dent in space, and a dent has to spread outward like a ripple. Remove the weight and the ripple takes time to arrive.</p>
+    </div>
+  </div>
+</li>
+<li class="t-solar" data-reveal="0">
+  <div class="card-zoom">
+    <h2>Zoom out</h2>
+    <p>Nothing in the universe finds out about anything instantly. Every fact has to travel, and none of it travels faster than light. The present moment is strictly local, and everything else is news.</p>
+  </div>
+</li>
+</ol>
+
+<nav class="pager">
+  <a href="../stories.html">&#8592; All stories</a>
+  <a href="how-the-universe-ends.html">How does the universe end? &#8594;</a>
+</nav>
+</div>
+
+<script>
+
+var min = document.getElementById('min');
+var DELAY = 8.32;   // minutes for light, and for gravity, to cross the gap
+
+function draw() {
+  var m = +min.value / 10;
+  var mm = Math.floor(m), ss = Math.round((m - mm) * 60);
+  document.getElementById('minOut').textContent = mm + ':' + (ss < 10 ? '0' : '') + ss;
+
+  var before = m < DELAY;
+  document.getElementById('sun').setAttribute('opacity', before ? 1 : 0);
+  document.getElementById('skyTxt').textContent = before ? 'a perfectly normal day' : 'dark, and getting cold';
+  document.getElementById('moveTxt').textContent = before ? 'still curving in its orbit' : 'travelling in a straight line';
+  document.getElementById('noteTxt').textContent = before
+    ? 'NOBODY KNOWS YET'
+    : 'LIGHT AND PULL STOPPED TOGETHER';
+
+  if (before) {
+    var a = -m * 0.5;
+    document.getElementById('earth').setAttribute('cx', 150 + Math.cos(a) * 110);
+    document.getElementById('earth').setAttribute('cy', 150 + Math.sin(a) * 110);
+    document.getElementById('escape').setAttribute('opacity', 0);
+    document.getElementById('orbit').setAttribute('opacity', 1);
+  } else {
+    // released on a tangent at the moment the news arrived
+    var a0 = -DELAY * 0.5;
+    var x0 = 150 + Math.cos(a0) * 110, y0 = 150 + Math.sin(a0) * 110;
+    var tx = -Math.sin(a0), ty = Math.cos(a0);
+    var d = (m - DELAY) * 26;
+    document.getElementById('earth').setAttribute('cx', x0 + tx * d);
+    document.getElementById('earth').setAttribute('cy', y0 + ty * d);
+    document.getElementById('escape').setAttribute('d',
+      'M' + x0 + ' ' + y0 + ' L' + (x0 + tx * 300) + ' ' + (y0 + ty * 300));
+    document.getElementById('escape').setAttribute('opacity', .8);
+    document.getElementById('orbit').setAttribute('opacity', .25);
+  }
+}
+min.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

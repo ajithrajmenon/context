@@ -1,63 +1,81 @@
 # Context
 
-Everyday things, properly explained. Ten questions people actually ask, each with a
-short answer up front and something you can operate.
+A storytelling team. We take the things that are too large, too old or too strange to
+picture, put them next to something you already know, and then hand you the controls.
 
-## The questions
+## What this is
 
-| № | Question | Category |
-|---|----------|----------|
-| 01 | Why does a year feel faster every time? | Your head |
-| 02 | Why do onions make you cry? | Kitchen |
-| 03 | Is the big box actually cheaper? | Money |
-| 04 | Why does your phone die in the cold? | Tech |
-| 05 | Why is the fridge the worst place for bread? | Kitchen |
-| 06 | How does a little money turn into a lot? | Money |
-| 07 | Why does the shower curtain attack you? | Home |
-| 08 | Why are yawns contagious? | Your head |
-| 09 | Why does food taste like nothing with a cold? | Food |
-| 10 | Why is the wifi terrible in one room? | Tech |
+Not an encyclopedia and not a course. Every piece is built as a story — a hook, a build,
+a turn, and a landing — because people remember what happened to somebody, in what order,
+and why it mattered. The mechanism goes in only once you care about the answer.
 
-Every page follows the same shape: the question, the answer immediately, then a figure
-you can play with, then the explanation. Nobody has to read to the bottom to find out.
-
-## Design
-
-The palette is built on colour-preference research rather than taste. Blue leads, because
-it reliably tops adult preference. Six saturated hues span warm and cool so the page reads
-bright to children as well as considered to adults. The layout stays deliberately
-conventional and uncluttered — first impressions of a page form in well under 100ms, and
-visual complexity costs more than novelty gains.
-
-Every hue carries three tiers, because a saturated colour that looks right on white
-usually fails contrast on it:
-
-| tier | used for | requirement |
-|------|----------|-------------|
-| `wash` | card and panel grounds | decorative only |
-| `bright` | figures, fills, controls | ≥ 3:1 on white |
-| `ink` | text and labels | ≥ 4.5:1 on white |
-
-All six hues pass at every tier; the check lives in the commit history. Backgrounds were
-chosen first and text colours derived from them, not the other way round.
-
-- Page `#FFFFFF` · surface `#F6F8FB` · ink `#16202B` · muted `#5A6875`
-- Nunito (display) · Source Sans 3 (body), both self-hosted — no font CDN, no third-party
-  request, nothing to leak
-- The page commits to a light ground on purpose, so the tokens are theme-independent
+The library grows. Subjects are not fixed: space, bodies, time, Earth, the numbers that
+break intuition, and whatever else turns out to be worth being curious about. New
+categories cost nothing — the nav and the filters build themselves from the stories.
 
 ## Structure
 
 ```
-build.py         generates the site
-topics_data.py   all content and figures — one dict per topic
-assets/style.css the design system
-assets/fonts/    self-hosted woff2
-site/            build output, deploy this
+build.py          generates the site
+stories_data.py   every story — one dict each
+assets/style.css  the design system
+assets/motion.js  reveals and the canvas scenes
+assets/fonts/     self-hosted woff2
+site/             build output, deploy this
 ```
 
-Adding a question means appending one dict to `TOPICS` with `svg`, `controls`, `js` and
-`sections`, then re-running `python3 build.py`. Nothing else changes.
+Three kinds of page: a homepage, a `stories` index that filters in place, and one page per
+story. Adding a story means appending one dict to `STORIES` and re-running `build.py`.
+Set `featured: True` to surface it on the homepage.
+
+## The identity
+
+The idea the whole thing hangs on: **context is what you get when you zoom out**. Every
+story takes one thing and puts something bigger beside it, so the recurring motif is a
+small bright point inside a large field — which is also the wordmark, and also the `orbit`
+scene.
+
+On the influences: the obvious reference for this kind of work lives in the dark, in deep
+space, with everything glowing against black. Going there would have produced a copy with
+a different logo. So the split is deliberate — **we live in daylight and the dark is where
+the scenes happen.** White page, vivid glowing panel, a hard cut between the two. Same
+appetite for scale and wonder, different room.
+
+What carries over: saturated multi-hue colour, rounded geometry, ambient motion, and the
+zoom-out that reframes the subject. What does not: dark chrome, mascots, and the void as a
+default background.
+
+### Tokens
+
+Six tones. Each sets a three-stop gradient for its scenes and an accent used for text and
+links on white, which is the one that has to clear 4.5:1 — all six do.
+
+| tone | gradient | accent |
+|------|----------|--------|
+| nebula | violet → magenta | `#6D28D9` |
+| deepsea | navy → cyan | `#0E7490` |
+| ember | wine → orange | `#BE123C` |
+| forest | pine → emerald | `#047857` |
+| dusk | indigo → violet | `#1D4ED8` |
+| solar | brown → amber | `#B45309` |
+
+- Page `#FFFFFF` · surface `#F7F9FC` · ink `#101828` · muted `#5A6875`
+- Gabarito (display) · Source Sans 3 (body), both self-hosted — no font CDN
+- Text over a scene sits on a gradient scrim, so contrast never depends on where a
+  particle happens to drift
+
+### Motion
+
+`assets/motion.js` handles scroll reveals and five canvas scenes — `stars`, `orbit`,
+`swarm`, `waves`, `bloom`. A story picks one with `scene`.
+
+Rules the file keeps:
+
+- nothing animates off-screen; an `IntersectionObserver` parks each scene
+- `prefers-reduced-motion` gets one static frame, never a frozen blank panel
+- scenes are seeded from the slug, so a card looks identical on every load
+- anything scrolled past without intersecting still reveals — a jumped-over element must
+  never stay invisible
 
 ## Running locally
 
@@ -80,9 +98,9 @@ and the site goes live at https://ajithrajmenon.github.io/context/.
 ## Wiring it to Claude later
 
 The generator is deliberately data-driven so an MCP server has an obvious surface. Four
-tools, writing to `topics_data.py` via the GitHub API:
+tools, writing to `stories_data.py` via the GitHub API:
 
-- `create_draft` — append a topic dict with `status: draft`
+- `create_draft` — append a story dict with `status: draft`
 - `list_drafts`
 - `update_draft`
 - `publish` — flip status, commit, let the host rebuild

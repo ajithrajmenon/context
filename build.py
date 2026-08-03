@@ -1,46 +1,63 @@
 #!/usr/bin/env python3
 """Builds Context into site/.
 
-No dependencies and no framework — read topics_data.py, write HTML.
-Adding a topic means appending one dict to TOPICS and running this again.
+No dependencies and no framework — read stories_data.py, write HTML.
+
+    site/index.html          the homepage
+    site/stories.html        every story, filterable
+    site/stories/<slug>.html one story
+
+Adding a story means appending one dict to STORIES and running this again.
+Categories are derived from the stories themselves, so a new subject area
+needs no other change.
 """
 import os
 import shutil
 
-from topics_data import TOPICS
+from stories_data import STORIES
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
 ASSETS = os.path.join(ROOT, 'assets')
 
-TAGLINE = 'Everyday things, properly explained'
+TAGLINE = 'Big ideas, told as stories'
 
 
-def head(title, desc, css, hue):
+def head(title, desc, prefix, tone):
     return f'''<!DOCTYPE html>
-<html lang="en" class="hue-{hue}">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<link rel="stylesheet" href="{css}">
+<link rel="stylesheet" href="{prefix}assets/style.css">
+<script src="{prefix}assets/motion.js" defer></script>
 </head>
-<body>
-<div class="shell">
+<body class="t-{tone}">
 '''
 
 
-def masthead(home, note):
-    return f'''<header class="masthead">
-  <a class="wordmark" href="{home}">Context<span>.</span></a>
-  <p class="masthead-note">{note}</p>
+def masthead(prefix, current):
+    def mark(page):
+        return ' aria-current="page"' if page == current else ''
+    return f'''<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="{prefix}index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="{prefix}index.html"{mark('home')}>Home</a>
+    <a href="{prefix}stories.html"{mark('stories')}>Stories</a>
+  </nav>
 </header>
+</div>
 '''
 
 
-FOOT = '''<footer class="site-foot">
-  <p>Context &#183; questions from ordinary life, answered without the hand-waving.</p>
+def foot(prefix):
+    return f'''<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="{prefix}stories.html">All stories</a>
 </footer>
 </div>
 </body>
@@ -48,116 +65,232 @@ FOOT = '''<footer class="site-foot">
 '''
 
 
-def build_index():
-    cards = []
-    for t in TOPICS:
-        cards.append(f'''<li class="hue-{t['hue']}"><a class="card" href="topics/{t['slug']}.html">
-  <span class="card-art">{t['icon']}</span>
-  <span class="card-body">
-    <span class="card-kicker">{t['kicker']}</span>
-    <span class="card-title">{t['title']}</span>
-    <span class="card-teaser">{t['teaser']}</span>
-  </span>
-</a></li>''')
+def card(s, prefix, delay=0):
+    return f'''<li class="t-{s['tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
+  <a class="card" href="{prefix}stories/{s['slug']}.html">
+    <span class="card-art" data-scene="{s['scene']}" data-seed="{s['slug']}"></span>
+    <span class="card-body">
+      <span class="card-kicker">{s['kicker']}</span>
+      <span class="card-title">{s['title']}</span>
+      <span class="card-teaser">{s['teaser']}</span>
+    </span>
+  </a>
+</li>'''
+
+
+PILLARS = [
+    ('Start where curiosity does',
+     'Not with a syllabus. With the question you would actually ask out loud, '
+     'phrased the way you would actually ask it.'),
+    ('Show the thing, not a diagram of it',
+     'Every story hands you the controls at the point where words stop working. '
+     'You move it yourself and watch what happens.'),
+    ('Keep the numbers honest',
+     'The wonder has to survive being checked. Where a figure is contested or a '
+     'famous version is wrong, we say so.'),
+]
+
+
+def build_home():
+    featured = [s for s in STORIES if s.get('featured')][:3]
+    kickers = []
+    for s in STORIES:
+        if s['kicker'] not in kickers:
+            kickers.append(s['kicker'])
+
+    pillars = ''.join(f'''<li class="pillar" data-reveal="{i * 90}">
+  <span class="pillar-mark"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="{3 + i}" fill="#fff"/></svg></span>
+  <h3>{h}</h3>
+  <p>{p}</p>
+</li>''' for i, (h, p) in enumerate(PILLARS))
+
+    chips = ''.join(
+        f'<li><a class="filter" href="stories.html">{k}</a></li>' for k in kickers)
 
     return (
         head(f'Context &#8212; {TAGLINE}',
-             'Clear answers to the everyday questions people actually ask, '
-             'with something to play with in each one.',
-             'assets/style.css', 'blue')
-        + masthead('index.html', f'{len(TOPICS)} questions')
-        + f'''<div class="hero">
-  <h1>Everyday things, <em>properly</em> explained.</h1>
-  <p>Why the fridge ruins bread. Why your phone dies in the cold. Why the shower curtain
-  always comes for you. Short answers you can trust, and something to play with in each one.</p>
-</div>
+             'A storytelling team. We break big ideas down into stories anyone can '
+             'follow, with something to operate in every one.', '', 'nebula')
+        + masthead('', 'home')
+        + f'''<div class="shell">
+<section class="hero">
+  <div class="stage" data-scene="orbit" data-seed="home" data-focus="0.74,0.5">
+    <div class="stage-pad">
+      <p class="eyebrow" data-reveal="0">A storytelling team</p>
+      <h1 data-reveal="80">Big ideas, small enough to hold.</h1>
+      <p data-reveal="160">We take the things that are too large, too old or too strange to picture,
+      and put them next to something you already know. Then we hand you the controls.</p>
+      <a class="cta" href="stories.html" data-reveal="240">Read the stories &#8594;</a>
+    </div>
+  </div>
+</section>
 
-<ol class="grid">
-{chr(10).join(cards)}
-</ol>
+<section class="band">
+  <div class="band-head" data-reveal="0">
+    <h2>Understanding is a story problem</h2>
+    <p>Most explanations fail because they start with the mechanism. People remember what
+    happened to somebody, in what order, and why it mattered &#8212; so that is how we build them.</p>
+  </div>
+  <ul class="pillars">{pillars}</ul>
+</section>
+
+<section class="band">
+  <div class="band-head" data-reveal="0">
+    <h2>Start here</h2>
+    <p>A few we are proud of. There are more, and there will keep being more.</p>
+  </div>
+  <ul class="grid">
+{chr(10).join(card(s, '', i * 90) for i, s in enumerate(featured))}
+  </ul>
+</section>
+
+<section class="band">
+  <div class="band-head" data-reveal="0">
+    <h2>What we cover</h2>
+    <p>Anything worth being curious about. The list grows whenever something catches us.</p>
+  </div>
+  <ul class="filters" data-reveal="60">{chips}</ul>
+</section>
+</div>
 '''
-        + FOOT
+        + foot('')
     )
 
 
-def build_topic(t, prev_t, next_t):
-    secs = []
-    for s in t['sections']:
-        body = ''
-        if 'p' in s:
-            body += ''.join(f'<p>{p}</p>' for p in s['p'])
-        if 'tips' in s:
-            body += '<ul class="tips">' + ''.join(f'<li>{x}</li>' for x in s['tips']) + '</ul>'
-        secs.append(f'''<section class="section">
-  <h2>{s['h']}</h2>
-  {body}
-</section>''')
+def build_stories():
+    kickers = []
+    for s in STORIES:
+        if s['kicker'] not in kickers:
+            kickers.append(s['kicker'])
+    chips = ''.join(
+        f'<li><button class="filter" data-filter="{k}" aria-pressed="false">{k}</button></li>'
+        for k in kickers)
 
-    pager = [
-        '<a href="../index.html">&#8592; All questions</a>',
-        f'<a href="{next_t["slug"]}.html">{next_t["title"]} &#8594;</a>',
-    ]
-
-    n = TOPICS.index(t) + 1
     return (
-        head(f'{t["title"]} &#8212; Context', t['answer'], '../assets/style.css', t['hue'])
-        + masthead('../index.html', f'{n} of {len(TOPICS)}')
-        + f'''<article>
-  <div class="topic-head">
-    <p class="eyebrow">{t['kicker']}</p>
-    <h1>{t['title']}</h1>
+        head(f'Stories &#8212; Context',
+             'Every story we have told so far, across space, bodies, time, Earth and '
+             'the numbers that break intuition.', '', 'dusk')
+        + masthead('', 'stories')
+        + f'''<div class="shell">
+<section class="band">
+  <div class="band-head" data-reveal="0">
+    <h2>Stories</h2>
+    <p>Everything we have published, newest thinking first. Filter by subject, or just scroll.</p>
   </div>
-
-  <div class="answer">
-    <b>Short answer</b>
-    <p>{t['answer']}</p>
-  </div>
-
-  <figure class="figure">
-    <div class="figure-stage">
-{t['svg']}
-    </div>
-    <div class="controls">
-{t['controls']}
-    </div>
-    <figcaption class="caption">{t['caption']}</figcaption>
-  </figure>
-
-{chr(10).join(secs)}
-</article>
-
-<nav class="pager">
-{chr(10).join(pager)}
-</nav>
+  <ul class="filters" data-reveal="60">
+    <li><button class="filter" data-filter="" aria-pressed="true">Everything</button></li>
+    {chips}
+  </ul>
+  <ul class="grid" id="storyGrid">
+{chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(STORIES))}
+  </ul>
+</section>
+</div>
 
 <script>
-{t['js']}
+// filter the grid in place; no routing, no reload
+var grid = document.getElementById('storyGrid');
+var buttons = document.querySelectorAll('.filter[data-filter]');
+buttons.forEach(function (b) {{
+  b.addEventListener('click', function () {{
+    var want = b.getAttribute('data-filter');
+    buttons.forEach(function (o) {{
+      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+    }});
+    Array.prototype.forEach.call(grid.children, function (li) {{
+      var show = !want || li.getAttribute('data-kicker') === want;
+      li.hidden = !show;
+    }});
+  }});
+}});
 </script>
 '''
-        + FOOT
+        + foot('')
+    )
+
+
+def build_story(s, nxt):
+    def beats(items):
+        return ''.join(f'''<section class="beat" data-reveal="0">
+  <h2>{b['h']}</h2>
+  {''.join(f'<p>{p}</p>' for p in b['p'])}
+</section>''' for b in items)
+
+    f = s['figure']
+    return (
+        head(f"{s['title']} &#8212; Context", s['teaser'], '../', s['tone'])
+        + masthead('../', 'stories')
+        + f'''<div class="shell">
+<section class="story-hero">
+  <div class="stage" data-scene="{s['scene']}" data-seed="{s['slug']}">
+    <div class="stage-pad">
+      <p class="eyebrow" data-reveal="0">{s['kicker']}</p>
+      <h1 data-reveal="80">{s['title']}</h1>
+      <p class="standfirst" data-reveal="160">{s['standfirst']}</p>
+    </div>
+  </div>
+</section>
+
+<article class="narrow">
+{beats(s['beats'])}
+
+  <p class="turn" data-reveal="0">{s['turn']}</p>
+
+{beats(s['after'])}
+</article>
+
+<div class="wide">
+  <figure class="figure" data-reveal="0">
+    <div class="figure-stage">
+{f['svg']}
+    </div>
+    <div class="controls">
+{f['controls']}
+    </div>
+    <figcaption class="caption">{f['caption']}</figcaption>
+  </figure>
+</div>
+
+<div class="narrow">
+  <section class="zoomout" data-reveal="0">
+    <h2>Zoom out</h2>
+    <p>{s['zoomout']}</p>
+  </section>
+
+  <nav class="pager">
+    <a href="../stories.html">&#8592; All stories</a>
+    <a href="{nxt['slug']}.html">{nxt['title']} &#8594;</a>
+  </nav>
+</div>
+</div>
+
+<script>
+{f['js']}
+</script>
+'''
+        + foot('../')
     )
 
 
 def main():
     if os.path.isdir(SITE):
         shutil.rmtree(SITE)
-    os.makedirs(os.path.join(SITE, 'topics'))
+    os.makedirs(os.path.join(SITE, 'stories'))
 
     shutil.copytree(ASSETS, os.path.join(SITE, 'assets'))
-    # tells GitHub Pages to serve the directory verbatim
     open(os.path.join(SITE, '.nojekyll'), 'w').close()
 
-    with open(os.path.join(SITE, 'index.html'), 'w') as f:
-        f.write(build_index())
+    with open(os.path.join(SITE, 'index.html'), 'w') as fh:
+        fh.write(build_home())
+    with open(os.path.join(SITE, 'stories.html'), 'w') as fh:
+        fh.write(build_stories())
 
-    for i, t in enumerate(TOPICS):
-        # the last topic points back at the first, so "next" always goes forward
-        prev_t = TOPICS[i - 1]
-        next_t = TOPICS[(i + 1) % len(TOPICS)]
-        with open(os.path.join(SITE, 'topics', f'{t["slug"]}.html'), 'w') as f:
-            f.write(build_topic(t, prev_t, next_t))
+    for i, s in enumerate(STORIES):
+        nxt = STORIES[(i + 1) % len(STORIES)]
+        with open(os.path.join(SITE, 'stories', f"{s['slug']}.html"), 'w') as fh:
+            fh.write(build_story(s, nxt))
 
-    print(f'built {len(TOPICS)} topics + index into {SITE}')
+    print(f'built home + stories index + {len(STORIES)} stories into {SITE}')
 
 
 if __name__ == '__main__':

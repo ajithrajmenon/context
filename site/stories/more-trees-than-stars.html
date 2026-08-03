@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>There are more trees on Earth than stars in the galaxy &#8212; Context</title>
+<meta name="description" content="About three trillion trees. About two hundred billion stars. It is not close.">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/motion.js" defer></script>
+</head>
+<body class="t-deepsea">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="../index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="../index.html">Home</a>
+    <a href="../stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="story-hero">
+  <div class="stage" data-scene="swarm" data-seed="more-trees-than-stars">
+    <div class="stage-pad">
+      <p class="eyebrow" data-reveal="0">Earth</p>
+      <h1 data-reveal="80">There are more trees on Earth than stars in the galaxy</h1>
+      <p class="standfirst" data-reveal="160">For years the estimate was around 400 billion trees. Then somebody counted properly, and the number came back nearly eight times larger — and still far below what it used to be.</p>
+    </div>
+  </div>
+</section>
+
+<article class="narrow">
+<section class="beat" data-reveal="0">
+  <h2>The count nobody had actually done</h2>
+  <p>Estimating trees from satellites alone gives you canopy, not trunks. In 2015 a team combined half a million ground counts with satellite data and got a very different answer: about <strong>three trillion</strong> trees.</p><p>The Milky Way, for comparison, holds somewhere between 100 and 400 billion stars. Even at the generous end, Earth is winning by a factor of ten.</p>
+</section><section class="beat" data-reveal="0">
+  <h2>The same study found the other number</h2>
+  <p>Working backwards, they also estimated what the figure had been before humans started clearing land. It was roughly six trillion.</p><p>We are not looking at a big number. We are looking at what is left of a much bigger one, and about fifteen billion trees still come down each year.</p>
+</section>
+
+  <p class="turn" data-reveal="0">For every star in the Milky Way, Earth grows about ten trees. It used to grow twenty.</p>
+
+<section class="beat" data-reveal="0">
+  <h2>Why the comparison is worth making at all</h2>
+  <p>Stars feel like the standard unit of "too many to count", and trees feel countable — they are the things at the end of your road.</p><p>Getting it backwards is the useful part. Our sense of scale is built on how far away something is and how impressive it sounds, not on quantity, and it will mislead you in both directions.</p>
+</section>
+</article>
+
+<div class="wide">
+  <figure class="figure" data-reveal="0">
+    <div class="figure-stage">
+<svg viewBox="0 0 660 300" role="img" aria-labelledby="figTitle">
+  <title id="figTitle">Tree numbers over time against the stars in the Milky Way</title>
+  <text class="f-label" x="20" y="34">TREES ON EARTH</text>
+  <rect x="20" y="48" width="620" height="34" rx="17" fill="rgba(255,255,255,.16)"/>
+  <rect id="treeBar" x="20" y="48" width="0" height="34" rx="17" fill="#fff"/>
+  <text class="f-value" id="treeTxt" x="20" y="114" style="font-size:26px">&#8212;</text>
+
+  <text class="f-label" x="20" y="168">STARS IN THE MILKY WAY (HIGH ESTIMATE)</text>
+  <rect x="20" y="182" width="620" height="34" rx="17" fill="rgba(255,255,255,.16)"/>
+  <rect x="20" y="182" width="41" height="34" rx="17" fill="rgba(255,255,255,.75)"/>
+  <text class="f-value" x="20" y="248" style="font-size:26px">400 billion</text>
+  <text class="f-label" id="ratioTxt" x="330" y="290" text-anchor="middle">&#8212;</text>
+</svg>
+    </div>
+    <div class="controls">
+<div class="control">
+  <label for="yr">Year</label>
+  <input type="range" id="yr" min="-10000" max="2026" step="50" value="2026">
+  <span class="readout" id="yrOut">2026</span>
+</div>
+    </div>
+    <figcaption class="caption">The star bar never moves; the galaxy is not going anywhere on this timescale. Drag back to before farming and watch how much of the difference we made in the last stretch.</figcaption>
+  </figure>
+</div>
+
+<div class="narrow">
+  <section class="zoomout" data-reveal="0">
+    <h2>Zoom out</h2>
+    <p>Both numbers are past the point where they mean anything to us directly. The difference is that one of them is still ours to change, and we have already changed it once.</p>
+  </section>
+
+  <nav class="pager">
+    <a href="../stories.html">&#8592; All stories</a>
+    <a href="falling-into-a-black-hole.html">What it is like to fall into a black hole &#8594;</a>
+  </nav>
+</div>
+</div>
+
+<script>
+
+var yr = document.getElementById('yr');
+var STARS = 400e9;          // generous end of the Milky Way estimate
+var MAX = 6.2e12;           // bar is scaled to the pre-agriculture figure
+
+function draw() {
+  var y = +yr.value;
+  document.getElementById('yrOut').textContent =
+    y < 0 ? Math.abs(y).toLocaleString('en-GB') + ' BC' : y;
+
+  // ~6 trillion before farming, ~3.04 trillion now, most of the loss recent
+  var f = (y + 10000) / 12026;             // 0 at 10,000 BC, 1 today
+  var trees = 6e12 - (6e12 - 3.04e12) * Math.pow(f, 3.2);
+
+  document.getElementById('treeBar').setAttribute('width', 620 * trees / MAX);
+  document.getElementById('treeTxt').textContent = (trees / 1e12).toFixed(2) + ' trillion';
+  document.getElementById('ratioTxt').textContent =
+    'that is ' + (trees / STARS).toFixed(1) + ' trees for every star';
+}
+yr.addEventListener('input', draw);
+draw();
+
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="../stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

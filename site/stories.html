@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stories &#8212; Context</title>
+<meta name="description" content="Every story we have told so far, across space, bodies, time, Earth and the numbers that break intuition.">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/motion.js" defer></script>
+</head>
+<body class="t-dusk">
+<div class="shell">
+<header class="masthead">
+  <a class="wordmark" href="index.html">Context<i></i></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="stories.html" aria-current="page">Stories</a>
+  </nav>
+</header>
+</div>
+<div class="shell">
+<section class="band">
+  <div class="band-head" data-reveal="0">
+    <h2>Stories</h2>
+    <p>Everything we have published, newest thinking first. Filter by subject, or just scroll.</p>
+  </div>
+  <ul class="filters" data-reveal="60">
+    <li><button class="filter" data-filter="" aria-pressed="true">Everything</button></li>
+    <li><button class="filter" data-filter="Space" aria-pressed="false">Space</button></li><li><button class="filter" data-filter="Your body" aria-pressed="false">Your body</button></li><li><button class="filter" data-filter="Origins" aria-pressed="false">Origins</button></li><li><button class="filter" data-filter="Big numbers" aria-pressed="false">Big numbers</button></li><li><button class="filter" data-filter="Time" aria-pressed="false">Time</button></li><li><button class="filter" data-filter="Earth" aria-pressed="false">Earth</button></li>
+  </ul>
+  <ul class="grid" id="storyGrid">
+<li class="t-nebula" data-kicker="Space" data-reveal="0">
+  <a class="card" href="stories/falling-into-a-black-hole.html">
+    <span class="card-art" data-scene="orbit" data-seed="falling-into-a-black-hole"></span>
+    <span class="card-body">
+      <span class="card-kicker">Space</span>
+      <span class="card-title">What it is like to fall into a black hole</span>
+      <span class="card-teaser">You would not be crushed at the edge. For a while it would look like nothing was happening at all.</span>
+    </span>
+  </a>
+</li>
+<li class="t-forest" data-kicker="Your body" data-reveal="90">
+  <a class="card" href="stories/mostly-not-you.html">
+    <span class="card-art" data-scene="swarm" data-seed="mostly-not-you"></span>
+    <span class="card-body">
+      <span class="card-kicker">Your body</span>
+      <span class="card-title">You are mostly not you</span>
+      <span class="card-teaser">About half the cells you are carrying are not human. They are not passengers either.</span>
+    </span>
+  </a>
+</li>
+<li class="t-dusk" data-kicker="Origins" data-reveal="180">
+  <a class="card" href="stories/made-of-dead-stars.html">
+    <span class="card-art" data-scene="stars" data-seed="made-of-dead-stars"></span>
+    <span class="card-body">
+      <span class="card-kicker">Origins</span>
+      <span class="card-title">Everything you are was made inside a star</span>
+      <span class="card-teaser">The calcium in your bones and the iron in your blood could not exist until something enormous died.</span>
+    </span>
+  </a>
+</li>
+<li class="t-ember" data-kicker="Big numbers" data-reveal="0">
+  <a class="card" href="stories/if-everyone-jumped.html">
+    <span class="card-art" data-scene="waves" data-seed="if-everyone-jumped"></span>
+    <span class="card-body">
+      <span class="card-kicker">Big numbers</span>
+      <span class="card-title">What if everyone on Earth jumped at once?</span>
+      <span class="card-teaser">Eight billion people, one jump, the same instant. The planet would barely notice — and that is the interesting bit.</span>
+    </span>
+  </a>
+</li>
+<li class="t-solar" data-kicker="Time" data-reveal="90">
+  <a class="card" href="stories/the-suns-timetable.html">
+    <span class="card-art" data-scene="bloom" data-seed="the-suns-timetable"></span>
+    <span class="card-body">
+      <span class="card-kicker">Time</span>
+      <span class="card-title">The Sun has a schedule, and we are on it</span>
+      <span class="card-teaser">It will not explode. What it will actually do is slower, stranger, and already under way.</span>
+    </span>
+  </a>
+</li>
+<li class="t-deepsea" data-kicker="Earth" data-reveal="180">
+  <a class="card" href="stories/more-trees-than-stars.html">
+    <span class="card-art" data-scene="swarm" data-seed="more-trees-than-stars"></span>
+    <span class="card-body">
+      <span class="card-kicker">Earth</span>
+      <span class="card-title">There are more trees on Earth than stars in the galaxy</span>
+      <span class="card-teaser">About three trillion trees. About two hundred billion stars. It is not close.</span>
+    </span>
+  </a>
+</li>
+  </ul>
+</section>
+</div>
+
+<script>
+// filter the grid in place; no routing, no reload
+var grid = document.getElementById('storyGrid');
+var buttons = document.querySelectorAll('.filter[data-filter]');
+buttons.forEach(function (b) {
+  b.addEventListener('click', function () {
+    var want = b.getAttribute('data-filter');
+    buttons.forEach(function (o) {
+      o.setAttribute('aria-pressed', o === b ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(grid.children, function (li) {
+      var show = !want || li.getAttribute('data-kicker') === want;
+      li.hidden = !show;
+    });
+  });
+});
+</script>
+<div class="shell">
+<footer class="site-foot">
+  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <a href="stories.html">All stories</a>
+</footer>
+</div>
+</body>
+</html>

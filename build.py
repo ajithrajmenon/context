@@ -37,10 +37,35 @@ ART = {
 }
 
 
+def read_minutes(story):
+    """Cost of entry, stated up front. People decide whether to start something
+    on how long it will take, and an unstated length reads as unbounded."""
+    words = 0
+    words += len(story['hero']['standfirst'].split())
+    for b in story['blocks']:
+        for key in ('h', 'p', 'text', 'caption'):
+            v = b.get(key)
+            if isinstance(v, str):
+                words += len(v.split())
+            elif isinstance(v, list):
+                words += sum(len(x.split()) for x in v)
+        for it in b.get('items', []):
+            words += len(it['h'].split()) + len(it['p'].split())
+    words += len(story['zoomout']['text'].split())
+    return max(3, round(words / 200))
+
+
 def art(scene, seed, light=False):
     """Ambient artwork. Only the hero panels use it — everything that has to
-    teach something uses a labelled diagram instead, and holds still."""
-    return illustrate.render(ART.get(scene, 'cosmos'), seed, light=light)
+    teach something uses a labelled diagram instead, and holds still.
+
+    A story may name an illustration directly, or use one of the older aliases
+    in ART. Checking the real scene list first matters: without it, every
+    direct name fell through the alias lookup to the cosmos fallback, and all
+    four banners rendered the same starfield regardless of subject.
+    """
+    name = scene if scene in illustrate.SCENES else ART.get(scene, 'cosmos')
+    return illustrate.render(name, seed, light=light)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
@@ -61,6 +86,7 @@ def head(title, desc, prefix, tone):
 <script src="{prefix}assets/motion.js" defer></script>
 </head>
 <body class="t-{tone}">
+<div class="progress" aria-hidden="true"><span></span></div>
 '''
 
 
@@ -100,6 +126,8 @@ def card(s, prefix, delay=0):
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>
       <span class="card-teaser">{s['teaser']}</span>
+      <span class="card-takeaway">You will come away knowing: {s['takeaway']}</span>
+      <span class="card-meta">{read_minutes(s)} min read &#183; {sum(1 for b in s['blocks'] if b['type'] == 'diagram')} diagrams &#183; 1 thing to play with</span>
     </span>
   </a>
 </li>'''
@@ -239,9 +267,10 @@ def build_home():
   <div class="scene">{art("orbit", "home")}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">A storytelling team</p>
-      <h1 data-reveal="80">Big ideas, small enough to hold.</h1>
-      <p data-reveal="160">We take the things that are too large, too old or too strange to picture,
-      and turn them into stories you can walk through. Then we hand you the controls.</p>
+      <h1 data-reveal="80">Things worth understanding about your own body.</h1>
+      <p data-reveal="160">Each one takes about ten minutes, shows you the mechanism in labelled
+      pictures rather than jargon, and ends with what it actually changes. Every story has a
+      sourced paper behind it, so you can check us.</p>
       <a class="cta" href="stories.html" data-reveal="240">Read the stories &#8594;</a>
     </div>
   </div>
@@ -259,7 +288,7 @@ def build_home():
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>Start here</h2>
-    <p>A few we are proud of. There are more, and there will keep being more.</p>
+    <p>Four to begin with. Each says up front how long it takes and what you will come away knowing.</p>
   </div>
   <ul class="grid">
 {chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(featured))}
@@ -344,6 +373,7 @@ def build_story(s, nxt):
       <p class="eyebrow" data-reveal="0">{s['kicker']}</p>
       <h1 data-reveal="80">{s['title']}</h1>
       <p class="standfirst" data-reveal="160">{hero['standfirst']}</p>
+      <p class="hero-meta" data-reveal="200">{read_minutes(s)} min read &#183; you will come away knowing {s['takeaway'][0].lower() + s['takeaway'][1:]}</p>
     </div>
   </div>
 </section>

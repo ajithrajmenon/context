@@ -38,7 +38,8 @@ STORIES = [
  'featured': True,
  'title': 'Why do we sleep?',
  'teaser': 'A third of your life spent unconscious and defenceless. What you get back for it, and what it costs when you skip it.',
- 'hero': {'tone': 'dusk', 'scene': 'mind',
+ 'takeaway': 'Why you feel fine on six hours and are not fine on six hours.',
+ 'hero': {'tone': 'dusk', 'scene': 'night',
    'standfirst': 'Lying still and unaware for eight hours is close to the most dangerous '
                  'thing an animal can do. Every animal with a brain does it anyway. '
                  'Whatever sleep buys, it is worth being eaten over.'},
@@ -158,7 +159,8 @@ draw();
  'featured': True,
  'title': 'What actually happens when you die?',
  'teaser': 'Not a switch flicking off. A shutdown that runs in a specific order and takes hours — which is why transplants are possible at all.',
- 'hero': {'tone': 'ember', 'scene': 'cell',
+ 'takeaway': 'What the order of shutdown means for donation, and for how we define death.',
+ 'hero': {'tone': 'ember', 'scene': 'fading',
    'standfirst': 'We talk about death as a moment: a line crossed, a light going out. '
                  'Biologically there is no line. There is a sequence, it runs in a '
                  'fixed order, and it takes much longer than almost anyone expects.'},
@@ -276,6 +278,7 @@ draw();
  'featured': True,
  'title': 'The war going on inside you right now',
  'teaser': 'Everything you hate about being ill is your own body fighting. The infection does surprisingly little of it.',
+ 'takeaway': 'What a fever is doing, and why a sore arm after a jab is the point.',
  'hero': {'tone': 'deepsea', 'scene': 'cell',
    'standfirst': 'While you read this, something inside you is finding, identifying and '
                  'killing invaders — thousands of them — and you will not notice a '
@@ -391,7 +394,8 @@ draw();
  'featured': True,
  'title': 'Why do we get old?',
  'teaser': 'Not wear and tear — you are rebuilt constantly. Something else is going on, and some of it you can change.',
- 'hero': {'tone': 'nebula', 'scene': 'cell',
+ 'takeaway': 'Which interventions actually hold up, ranked by evidence rather than hype.',
+ 'hero': {'tone': 'nebula', 'scene': 'dividing',
    'standfirst': 'A car wears out because nothing repairs it. You are repaired every '
                  'day by trillions of cells whose entire job is maintenance. So the '
                  'obvious explanation cannot be the right one.'},

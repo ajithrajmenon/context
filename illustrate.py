@@ -455,8 +455,94 @@ def sc_sun(rr):
     return ''.join(out)
 
 
+
+def sc_night(rr):
+    """Sleep: a night sky over a sleeping figure, with the cycles as waves."""
+    out = [wash(rr, 5)]
+    # moon
+    out.append(f'<g {_anim("bob", 11)}><circle cx="{W*.8:.0f}" cy="{H*.24:.0f}" r="150" '
+               f'fill="{P["indigo"]}" opacity=".16"/>'
+               f'<circle cx="{W*.8:.0f}" cy="{H*.24:.0f}" r="78" fill="{P["gold"]}"/>'
+               f'<circle cx="{W*.83:.0f}" cy="{H*.21:.0f}" r="16" fill="{P["amber"]}" opacity=".45"/>'
+               f'<circle cx="{W*.77:.0f}" cy="{H*.28:.0f}" r="11" fill="{P["amber"]}" opacity=".35"/></g>')
+    for i in range(26):
+        out.append(star_burst(rr, rr.uniform(0, W), rr.uniform(0, H * .6), rr.uniform(2, 6),
+                              ['#fff', P['cyan'], P['gold'], P['violet']][i % 4]))
+    # the sleep cycles, drawn as stacked coloured waves across the lower half
+    COL = [P['cyan'], P['violet'], P['magenta'], P['indigo']]
+    for L in range(4):
+        d = f'M0 {H}'
+        for x in range(0, W + 20, 20):
+            y = H * (.58 + L * .07) + math.sin(x / W * math.tau * 3.2 + L) * (26 - L * 4)
+            d += f' L{x} {y:.0f}'
+        d += f' L{W} {H} Z'
+        out.append(f'<path d="{d}" fill="{COL[L]}" opacity="{.2 - L * .03:.2f}"/>')
+    # a figure at rest under it
+    out.append(f'<g {_anim("breathe", 7)}>'
+               f'<ellipse cx="{W*.3:.0f}" cy="{H*.84:.0f}" rx="180" ry="34" fill="{P["violet"]}" opacity=".3"/>'
+               f'<circle cx="{W*.19:.0f}" cy="{H*.79:.0f}" r="34" fill="{P["mint"]}"/></g>')
+    # dream motes rising from the sleeper
+    for i in range(9):
+        out.append(f'<circle {_anim("rise", rr.uniform(5, 9), rr.uniform(0, 5))} '
+                   f'cx="{W*.24 + rr.uniform(-40, 90):.0f}" cy="{H*.72 - i * 14:.0f}" '
+                   f'r="{4 + rr.uniform(0, 6):.0f}" fill="{SPREAD[i % len(SPREAD)]}" opacity=".75"/>')
+    out.append(motes(rr, 22))
+    return ''.join(out)
+
+
+def sc_fading(rr):
+    """Death: an ordered field where the warm end has gone out and the cool end has not."""
+    out = [wash(rr, 5)]
+    cols, rows = 13, 7
+    for r_ in range(rows):
+        for c_ in range(cols):
+            f = c_ / (cols - 1)
+            x = 70 + c_ * (W - 160) / (cols - 1)
+            y = 90 + r_ * (H - 200) / (rows - 1)
+            # warm and lit on the right, cold and gone on the left
+            lit = f > .34 + rr.uniform(-.12, .12)
+            col = [P['coral'], P['amber'], P['gold'], P['magenta']][(r_ + c_) % 4] if lit else P['indigo']
+            rad = 15 if lit else 10
+            if lit:
+                out.append(f'<g {_anim("pulse", rr.uniform(3, 7), rr.uniform(0, 4))}>'
+                           f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rad*2.4:.0f}" fill="{col}" opacity=".16"/>'
+                           f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rad:.0f}" fill="{col}"/></g>')
+            else:
+                out.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{rad:.0f}" fill="none" '
+                           f'stroke="{col}" stroke-width="2.5" opacity=".5"/>')
+    out.append(motes(rr, 18))
+    return ''.join(out)
+
+
+def sc_dividing(rr):
+    """Ageing: cells dividing, their protective caps visibly shorter each time."""
+    out = [wash(rr, 5)]
+    cols, rows = 6, 4
+    for r_ in range(rows):
+        for c_ in range(cols):
+            wear = c_ / (cols - 1)
+            x = 120 + c_ * (W - 260) / (cols - 1)
+            y = 110 + r_ * (H - 240) / (rows - 1)
+            col = SPREAD[(r_ * 3 + c_) % len(SPREAD)]
+            R = 44 - wear * 10
+            out.append(f'<g {_anim("breathe", rr.uniform(6, 11), rr.uniform(0, 5))}>'
+                       f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R*1.5:.0f}" fill="{col}" opacity=".12"/>'
+                       f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R:.0f}" fill="{col}" opacity="{.85-wear*.4:.2f}"/>'
+                       f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{R*.36:.0f}" fill="#fff" opacity=".5"/></g>')
+            # the cap, shortening left to right
+            cap = (1 - wear) * 30 + 6
+            out.append(f'<line x1="{x-cap/2:.0f}" y1="{y-R-16:.0f}" x2="{x+cap/2:.0f}" y2="{y-R-16:.0f}" '
+                       f'stroke="{P["coral"] if wear > .6 else P["lime"]}" stroke-width="7" '
+                       f'stroke-linecap="round"/>')
+    out.append(motes(rr, 20))
+    return ''.join(out)
+
+
 SCENES = {
     'cell': sc_cell,
+    'night': sc_night,
+    'fading': sc_fading,
+    'dividing': sc_dividing,
     'cosmos': sc_cosmos,
     'crowd': sc_crowd,
     'city': sc_city,

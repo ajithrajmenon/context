@@ -521,3 +521,44 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
 
 .pp-back { text-decoration: none; font-family: var(--display); font-weight: 700; }
 .pp-back:hover { text-decoration: underline; }
+
+/* ==================================================================
+   READER AFFORDANCES
+   Three things people need before and during a read: how long it will
+   take, what they get for it, and how much is left.
+   ================================================================== */
+
+/* Progress rail. A long page with no end in sight reads as unbounded,
+   and people leave rather than commit to an unknown. */
+.progress {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 50;
+  background: transparent; pointer-events: none;
+}
+.progress span {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), #22D3EE);
+  transition: width 90ms linear;
+}
+
+/* What you get, stated before you commit */
+.card-takeaway {
+  font-size: .92rem;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: 10px;
+  padding: .55rem .7rem;
+  margin-top: .35rem;
+}
+.card-meta {
+  font-family: var(--display); font-size: .74rem; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+  margin-top: .4rem;
+}
+.hero-meta {
+  margin: 1rem 0 0;
+  font-family: var(--display); font-size: .82rem; font-weight: 600;
+  letter-spacing: .04em; color: rgba(255,255,255,.72);
+}
+.row-meta + .row-meta { margin-top: 0; }
+
+@media (prefers-reduced-motion: reduce) { .progress span { transition: none; } }

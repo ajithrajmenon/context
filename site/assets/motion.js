@@ -63,7 +63,28 @@
     frame();
   }
 
-  function init() { reveals(); parallax(); }
+  // How far through the page you are. Cheap, passive, and the single
+  // clearest signal that a long read has an end.
+  function progress() {
+    var rail = document.querySelector('.progress span');
+    if (!rail) return;
+    var ticking = false;
+    function frame() {
+      ticking = false;
+      var max = document.documentElement.scrollHeight - innerHeight;
+      var pct = max > 40 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+      rail.style.width = (pct * 100).toFixed(2) + '%';
+    }
+    addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(frame);
+    }, { passive: true });
+    addEventListener('resize', frame, { passive: true });
+    frame();
+  }
+
+  function init() { reveals(); parallax(); progress(); }
 
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', init)

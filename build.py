@@ -16,7 +16,27 @@ change.
 import os
 import shutil
 
+import illustrate
 from stories_data import STORIES
+
+# The stories name scenes in the old vocabulary; each maps onto one of the
+# generated illustrations. Keeping the map here means story data never had
+# to be rewritten when the artwork changed medium.
+ART = {
+    'entropy': 'time',
+    'expand': 'cosmos', 'stars': 'cosmos', 'dying': 'cosmos', 'orbit': 'cosmos',
+    'atom': 'matter', 'flicker': 'matter', 'bloom': 'matter', 'grid': 'matter',
+    'beam': 'sun',
+    'waves': 'ocean', 'depths': 'ocean',
+    'cells': 'cell', 'swarm': 'cell', 'virus': 'cell',
+    'telomere': 'cell', 'replace': 'cell',
+    'crowd': 'crowd', 'overgrow': 'city', 'colony': 'colony',
+    'sleepcycle': 'mind', 'attention': 'mind', 'timewarp': 'mind', 'pulse': 'mind',
+}
+
+
+def art(scene, seed, light=False):
+    return illustrate.render(ART.get(scene, 'cosmos'), seed, light=light)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
@@ -70,7 +90,7 @@ def foot(prefix):
 def card(s, prefix, delay=0):
     return f'''<li class="t-{s['card_tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
-    <span class="card-art scene" data-scene="{s['card_scene']}" data-seed="{s['slug']}"></span>
+    <span class="card-art scene">{art(s['card_scene'], s['slug'], light=True)}</span>
     <span class="card-body">
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>
@@ -82,9 +102,9 @@ def card(s, prefix, delay=0):
 
 # ---------------------------------------------------------------- blocks
 
-def block_scene(b, i):
+def block_scene(b, i, story):
     return f'''<li class="t-{b['tone']}" data-reveal="0">
-  <div class="scene card-scene" data-scene="{b['scene']}" data-seed="b{i}">
+  <div class="scene card-scene">{art(b['scene'], story['slug'] + b['scene'] + str(i))}
     <div class="scene-pad">
       <h2>{b['h']}</h2>
       <p>{b['p']}</p>
@@ -93,7 +113,7 @@ def block_scene(b, i):
 </li>'''
 
 
-def block_text(b, i):
+def block_text(b, i, story):
     ps = ''.join(f'<p>{p}</p>' for p in b['p'])
     return f'''<li data-reveal="0">
   <div class="card-text">
@@ -103,7 +123,7 @@ def block_text(b, i):
 </li>'''
 
 
-def block_turn(b, i):
+def block_turn(b, i, story):
     return f'''<li class="t-{b['tone']}" data-reveal="0">
   <div class="card-turn">
     <p>{b['text']}</p>
@@ -111,7 +131,7 @@ def block_turn(b, i):
 </li>'''
 
 
-def block_steps(b, i):
+def block_steps(b, i, story):
     items = ''.join(f'''<li class="step">
       <span class="step-n">{n + 1}</span>
       <div>
@@ -127,10 +147,11 @@ def block_steps(b, i):
 </li>'''
 
 
-def block_figure(b, i):
+def block_figure(b, i, story):
     return f'''<li class="t-{b['tone']}" data-reveal="0">
   <figure class="card-figure">
     <div class="figure-stage">
+{art(story['hero']['scene'], story['slug'] + 'fig' + str(i))}
 {b['svg']}
     </div>
     <div class="controls">
@@ -187,7 +208,7 @@ def build_home():
         + masthead('', 'home')
         + f'''<div class="shell">
 <section class="hero">
-  <div class="scene" data-scene="orbit" data-seed="home" data-focus="0.74,0.5">
+  <div class="scene">{art("orbit", "home")}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">A storytelling team</p>
       <h1 data-reveal="80">Big ideas, small enough to hold.</h1>
@@ -281,7 +302,7 @@ buttons.forEach(function (b) {{
 
 def build_story(s, nxt):
     hero = s['hero']
-    stack = '\n'.join(BLOCKS[b['type']](b, i) for i, b in enumerate(s['blocks']))
+    stack = '\n'.join(BLOCKS[b['type']](b, i, s) for i, b in enumerate(s['blocks']))
     scripts = '\n'.join(b['js'] for b in s['blocks'] if b['type'] == 'figure')
     zoom = s['zoomout']
 
@@ -290,7 +311,7 @@ def build_story(s, nxt):
         + masthead('../', 'stories')
         + f'''<div class="shell">
 <section class="story-hero t-{hero['tone']}">
-  <div class="scene" data-scene="{hero['scene']}" data-seed="{s['slug']}">
+  <div class="scene">{art(hero['scene'], s['slug'])}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">{s['kicker']}</p>
       <h1 data-reveal="80">{s['title']}</h1>

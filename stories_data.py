@@ -64,6 +64,10 @@ STORIES = [
    'caption': 'Deep sleep repairs. REM files. Cut the night short and you lose the '
               'second one first, because dreaming loads the end of the night.'},
 
+  {'type': 'scene', 'tone': 'void', 'scene': 'mind',
+   'h': 'Nothing about the brain is idle at night',
+   'p': 'It is running a maintenance schedule it cannot run while you are using it — which is a very different thing from being switched off.'},
+
   {'type': 'turn', 'tone': 'deepsea',
    'text': 'Sleep is not the brain switching off. It is maintenance that cannot run while you are using the machine.'},
 
@@ -170,6 +174,10 @@ draw();
   {'type': 'diagram', 'name': 'death_sequence',
    'caption': 'The order matters more than the moment. Red is where nothing can be '
               'recovered; teal is where things still can.'},
+
+  {'type': 'scene', 'tone': 'void', 'scene': 'cell',
+   'h': 'Your cells never get the message',
+   'p': 'They have fuel and a job, and no way of knowing that the body they belong to has stopped. Most of them carry on for hours.'},
 
   {'type': 'turn', 'tone': 'solar',
    'text': 'You do not die all at once. Different parts of you stop at different times, over hours.'},
@@ -291,6 +299,10 @@ draw();
          'swelling is. The pain that follows is deliberate: it stops you using the part '
          'that needs to heal.']},
 
+  {'type': 'scene', 'tone': 'void', 'scene': 'cell',
+   'h': 'Thousands of these are settled every day without you',
+   'p': 'You are only ever aware of the exceptions — the handful that got far enough to need the expensive machinery.'},
+
   {'type': 'turn', 'tone': 'rose',
    'text': 'Every symptom you hate is your own body fighting. Winning is what feels awful.'},
 
@@ -404,6 +416,10 @@ draw();
   {'type': 'diagram', 'name': 'age_curves',
    'caption': 'Nothing dramatic happens at any particular birthday. Two curves simply '
               'cross, somewhere in mid-life, and after that the balance runs the other way.'},
+
+  {'type': 'scene', 'tone': 'void', 'scene': 'cell',
+   'h': 'Every copy is very slightly worse than the last',
+   'p': 'Not catastrophically. Just enough that the errors outrun the corrections, given long enough — and nothing is selecting against it.'},
 
   {'type': 'turn', 'tone': 'solar',
    'text': 'Evolution has no reason to keep you in good repair after you have had children. Ageing is where it stops paying.'},

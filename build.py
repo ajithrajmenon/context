@@ -18,6 +18,7 @@ import shutil
 
 import diagram
 import illustrate
+from papers_data import BY_SLUG, PAPERS
 from stories_data import STORIES
 
 # The stories name scenes in the old vocabulary; each maps onto one of the
@@ -72,6 +73,7 @@ def masthead(prefix, current):
   <nav class="nav">
     <a href="{prefix}index.html"{mark('home')}>Home</a>
     <a href="{prefix}stories.html"{mark('stories')}>Stories</a>
+    <a href="{prefix}papers.html"{mark('papers')}>Research</a>
   </nav>
 </header>
 </div>
@@ -106,7 +108,7 @@ def card(s, prefix, delay=0):
 # ---------------------------------------------------------------- blocks
 
 def block_scene(b, i, story):
-    return f'''<li class="t-{b['tone']}" data-reveal="0">
+    return f'''<li class="t-{b['tone']} bleed" data-reveal="0">
   <div class="scene card-scene">{art(b['scene'], story['slug'] + b['scene'] + str(i))}
     <div class="scene-pad">
       <h2>{b['h']}</h2>
@@ -170,6 +172,20 @@ def block_figure(b, i, story):
     </div>
     <figcaption class="caption">{b['caption']}</figcaption>
   </figure>
+</li>'''
+
+
+def block_paper(story):
+    paper = BY_SLUG.get(story['slug'])
+    if not paper:
+        return ''
+    return f'''<li data-reveal="0">
+  <a class="card-paper" href="../papers/{paper['slug']}.html">
+    <span class="paper-kicker">The research behind this</span>
+    <span class="paper-title">{paper['title']}</span>
+    <span class="paper-sub">{paper['subtitle']}</span>
+    <span class="paper-meta">{len(paper['findings'])} findings &#183; {len(paper['contested'])} open disputes &#183; about {paper['minutes']} minutes</span>
+  </a>
 </li>'''
 
 
@@ -340,6 +356,7 @@ def build_story(s, nxt):
     <p>{zoom['text']}</p>
   </div>
 </li>
+{block_paper(s)}
 </ol>
 
 <nav class="pager">
@@ -356,10 +373,144 @@ def build_story(s, nxt):
     )
 
 
+CONF = {
+    'established': ('Well established', 'conf-est'),
+    'best current explanation': ('Best current explanation', 'conf-best'),
+    'contested': ('Contested', 'conf-con'),
+}
+
+
+def build_paper(paper):
+    story = next((x for x in STORIES if x['slug'] == paper['slug']), None)
+
+    secs = ''.join(f'''<section class="pp-sec" data-reveal="0">
+  <h2>{sec['h']}</h2>
+  {''.join(f'<p>{p}</p>' for p in sec['p'])}
+</section>''' for sec in paper['sections'])
+
+    finds = ''.join(f'''<li class="finding">
+  <span class="finding-n">{n + 1}</span>
+  <div>
+    <p class="finding-claim">{claim}</p>
+    <span class="conf {CONF[conf][1]}">{CONF[conf][0]}</span>
+    <p class="finding-note">{note}</p>
+  </div>
+</li>''' for n, (claim, conf, note) in enumerate(paper['findings']))
+
+    disputes = ''.join(f'''<div class="dispute">
+  <h3>{q}</h3>
+  <p>{a}</p>
+</div>''' for q, a in paper['contested'])
+
+    unknowns = ''.join(f'<li>{u}</li>' for u in paper['unknowns'])
+
+    reading = ''.join(f'''<li class="ref">
+  <p class="ref-src">{src}</p>
+  <p class="ref-why">{why}</p>
+</li>''' for src, why in paper['reading'])
+
+    back = (f'<a class="pp-back" href="../stories/{story["slug"]}.html">'
+            f'&#8592; Back to the story: {story["title"]}</a>') if story else ''
+
+    return (
+        head(f"{paper['title']} &#8212; Context research", paper['subtitle'], '../', 'dusk')
+        + masthead('../', 'papers')
+        + f'''<div class="shell">
+<article class="paper">
+  <header class="pp-head" data-reveal="0">
+    <p class="eyebrow">Research paper</p>
+    <h1>{paper['title']}</h1>
+    <p class="pp-sub">{paper['subtitle']}</p>
+    <p class="pp-meta">{paper['date']} &#183; about {paper['minutes']} minutes &#183; the long layer behind the story</p>
+  </header>
+
+  <section class="pp-abstract" data-reveal="0">
+    <h2>Abstract</h2>
+    <p>{paper['abstract']}</p>
+  </section>
+
+{secs}
+
+  <section class="pp-sec" data-reveal="0">
+    <h2>Findings</h2>
+    <p class="pp-lede">Each one carries the confidence we are willing to defend it at. We use three levels only; more would be false precision.</p>
+    <ol class="findings">{finds}</ol>
+  </section>
+
+  <section class="pp-sec" data-reveal="0">
+    <h2>What is contested</h2>
+    <p class="pp-lede">Live disagreements, stated as disagreements rather than resolved for tidiness.</p>
+    {disputes}
+  </section>
+
+  <section class="pp-sec" data-reveal="0">
+    <h2>What we could not establish</h2>
+    <ul class="unknowns">{unknowns}</ul>
+  </section>
+
+  <section class="pp-sec" data-reveal="0">
+    <h2>Method, and its limits</h2>
+    <p>{paper['method']}</p>
+  </section>
+
+  <section class="pp-sec" data-reveal="0">
+    <h2>Further reading</h2>
+    <p class="pp-lede">Described so you know what each one is for, rather than listed to look thorough.</p>
+    <ol class="refs">{reading}</ol>
+  </section>
+
+  <nav class="pager">{back}</nav>
+</article>
+</div>
+'''
+        + foot('../')
+    )
+
+
+def build_papers_index():
+    rows = ''
+    for i, paper in enumerate(PAPERS):
+        story = next((x for x in STORIES if x['slug'] == paper['slug']), None)
+        rows += f'''<li class="t-{story["card_tone"] if story else "dusk"}" data-reveal="{(i % 3) * 80}">
+  <a class="row" href="papers/{paper['slug']}.html">
+    <span class="row-art">{diagram.thumb(story['thumb']) if story else ''}</span>
+    <span class="row-body">
+      <span class="row-kicker">{story['kicker'] if story else 'Research'} &#183; {paper['date']}</span>
+      <span class="row-title">{paper['title']}</span>
+      <span class="row-sub">{paper['subtitle']}</span>
+      <span class="row-meta">{len(paper['findings'])} findings &#183; {len(paper['contested'])} open disputes &#183; {len(paper['reading'])} sources &#183; about {paper['minutes']} min</span>
+    </span>
+  </a>
+</li>'''
+
+    return (
+        head('Research &#8212; Context',
+             'The long layer. Every story we publish has a sourced paper behind it, '
+             'with the findings, the disputes and what we could not establish.',
+             '', 'dusk')
+        + masthead('', 'papers')
+        + f'''<div class="shell">
+<section class="band">
+  <div class="band-head wide-head" data-reveal="0">
+    <p class="eyebrow">The long layer</p>
+    <h2>Every story has a paper behind it</h2>
+    <p>The story is built to be finished. The paper is built to be checked. It carries the
+    findings with their confidence levels, the disagreements we did not resolve, what we
+    could not establish, and where the popular version of the fact is wrong.</p>
+  </div>
+  <ul class="rows">{rows}</ul>
+</section>
+</div>
+'''
+        + foot('')
+    )
+
+
 def main():
     if os.path.isdir(SITE):
         shutil.rmtree(SITE)
     os.makedirs(os.path.join(SITE, 'stories'))
+    os.makedirs(os.path.join(SITE, 'papers'))
 
     shutil.copytree(ASSETS, os.path.join(SITE, 'assets'))
     open(os.path.join(SITE, '.nojekyll'), 'w').close()
@@ -368,6 +519,12 @@ def main():
         fh.write(build_home())
     with open(os.path.join(SITE, 'stories.html'), 'w') as fh:
         fh.write(build_stories())
+
+    with open(os.path.join(SITE, 'papers.html'), 'w') as fh:
+        fh.write(build_papers_index())
+    for paper in PAPERS:
+        with open(os.path.join(SITE, 'papers', f"{paper['slug']}.html"), 'w') as fh:
+            fh.write(build_paper(paper))
 
     for i, s in enumerate(STORIES):
         nxt = STORIES[(i + 1) % len(STORIES)]

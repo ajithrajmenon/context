@@ -357,3 +357,167 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
 /* thumbnails carry the topic, so they must not be cropped away */
 .card-art .dia { position: absolute; inset: 0; width: 100%; height: 100%; }
 .card-art { background: var(--surface); }
+
+/* ==================================================================
+   PROJECT-PAGE RHYTHM
+   Scene panels break the reading column and run wider than the text,
+   so a story alternates between a narrow column you read and a wide
+   panel you look at. That alternation is the page's pulse.
+   ================================================================== */
+
+.stack > li.bleed {
+  width: calc(100% + 2 * clamp(0rem, 6vw, 7rem));
+  margin-inline: calc(-1 * clamp(0rem, 6vw, 7rem));
+  max-width: 100vw;
+}
+.stack > li.bleed .card-scene { border-radius: var(--r-xl); }
+
+@media (max-width: 60rem) {
+  .stack > li.bleed { width: 100%; margin-inline: 0; }
+}
+
+/* ---------- the offer at the end of a story ---------- */
+
+.card-paper {
+  display: grid;
+  gap: .5rem;
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease);
+}
+.card-paper:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.paper-kicker {
+  font-family: var(--display); font-size: .76rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: #93C5FD;
+}
+.paper-title { font-family: var(--display); font-size: clamp(1.2rem, 2.6vw, 1.6rem); font-weight: 800; line-height: 1.2; }
+.paper-sub { color: rgba(255,255,255,.78); max-width: 52ch; }
+.paper-meta {
+  font-family: var(--display); font-size: .8rem; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.5);
+  margin-top: .3rem;
+}
+
+/* ==================================================================
+   RESEARCH INDEX — large rows rather than a card grid, so the listing
+   reads as a body of work instead of a feed.
+   ================================================================== */
+
+.wide-head { max-width: 46rem; }
+
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: center;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--page);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), border-color 220ms var(--ease);
+}
+.row:hover, .row:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+.row-art { border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+.row-art .dia { display: block; width: 100%; height: auto; }
+.row-body { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+.row-kicker {
+  font-family: var(--display); font-size: .74rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--accent);
+}
+.row-title { font-family: var(--display); font-size: clamp(1.15rem, 2.4vw, 1.5rem); font-weight: 800; line-height: 1.22; }
+.row-sub { color: var(--muted); max-width: 54ch; }
+.row-meta {
+  font-family: var(--display); font-size: .78rem; font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
+  margin-top: .2rem;
+}
+
+@media (max-width: 52rem) {
+  .row { grid-template-columns: 1fr; }
+}
+
+/* ==================================================================
+   PAPER PAGES — the long layer. Deliberately plainer than the stories:
+   this is a document, and it should look like one.
+   ================================================================== */
+
+.paper { width: min(46rem, 100%); margin-inline: auto; padding-bottom: 3rem; }
+
+.pp-head { padding: 2.5rem 0 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+.pp-head h1 { margin: 0 0 .8rem; font-size: clamp(1.9rem, 4.4vw, 2.9rem); font-weight: 800; }
+.pp-sub { margin: 0 0 1rem; font-size: 1.12rem; color: var(--muted); max-width: 52ch; }
+.pp-meta {
+  margin: 0; font-family: var(--display); font-size: .78rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+
+.pp-abstract {
+  background: var(--surface);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 2.5rem;
+}
+.pp-abstract h2 {
+  margin: 0 0 .5rem; font-size: .8rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent); font-weight: 700;
+}
+.pp-abstract p { margin: 0; }
+
+.pp-sec { margin-bottom: 2.75rem; }
+.pp-sec h2 { margin: 0 0 .9rem; font-size: clamp(1.3rem, 2.6vw, 1.65rem); font-weight: 800; }
+.pp-sec p { margin: 0 0 1rem; }
+.pp-lede { color: var(--muted); }
+
+/* findings, with their confidence levels */
+.findings { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 1.1rem; }
+.finding { display: grid; grid-template-columns: 2.4rem 1fr; gap: 1rem; align-items: start; }
+.finding-n {
+  width: 2.4rem; height: 2.4rem; border-radius: 10px;
+  background: var(--surface); color: var(--accent);
+  display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: .95rem;
+}
+.finding-claim { margin: 0 0 .4rem; font-weight: 600; }
+.finding-note { margin: .45rem 0 0; color: var(--muted); font-size: .95rem; }
+
+.conf {
+  display: inline-block; padding: .18rem .6rem; border-radius: 999px;
+  font-family: var(--display); font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.conf-est  { background: #DCFCE7; color: #166534; }
+.conf-best { background: #DBEAFE; color: #1E40AF; }
+.conf-con  { background: #FEF3C7; color: #92400E; }
+
+.dispute { border: 1px solid var(--border); border-radius: var(--r-md); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+.dispute h3 { margin: 0 0 .5rem; font-size: 1.05rem; font-weight: 700; }
+.dispute p { margin: 0; color: var(--muted); }
+
+.unknowns { margin: 0; padding: 0; list-style: none; display: grid; gap: .7rem; }
+.unknowns li { display: flex; gap: .8rem; }
+.unknowns li::before {
+  content: '?'; flex: 0 0 auto;
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: var(--surface); color: var(--accent);
+  display: grid; place-items: center;
+  font-family: var(--display); font-weight: 800; font-size: .85rem;
+}
+
+.refs { margin: 1.25rem 0 0; padding: 0 0 0 1.4rem; display: grid; gap: 1.1rem; }
+.ref-src { margin: 0 0 .25rem; font-weight: 600; }
+.ref-why { margin: 0; color: var(--muted); font-size: .96rem; }
+
+.pp-back { text-decoration: none; font-family: var(--display); font-weight: 700; }
+.pp-back:hover { text-decoration: underline; }

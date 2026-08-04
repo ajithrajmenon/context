@@ -38,11 +38,19 @@ ART = {
 
 
 def read_minutes(story):
-    """Cost of entry, stated up front. People decide whether to start something
-    on how long it will take, and an unstated length reads as unbounded."""
-    words = 0
-    words += len(story['hero']['standfirst'].split())
+    """Time on the page, not just words on it.
+
+    A story is prose plus diagrams you stop and decode plus one figure you
+    operate. Counting only the words gave every story the same floor value,
+    which reads as a template and undersells the page.
+    """
+    words = len(story['hero']['standfirst'].split())
+    diagrams = figures = 0
     for b in story['blocks']:
+        if b['type'] == 'diagram':
+            diagrams += 1
+        if b['type'] == 'figure':
+            figures += 1
         for key in ('h', 'p', 'text', 'caption'):
             v = b.get(key)
             if isinstance(v, str):
@@ -52,7 +60,9 @@ def read_minutes(story):
         for it in b.get('items', []):
             words += len(it['h'].split()) + len(it['p'].split())
     words += len(story['zoomout']['text'].split())
-    return max(3, round(words / 200))
+    # 200 wpm for prose, ~25s to read a labelled diagram, ~50s to play with a figure
+    seconds = (words / 200) * 60 + diagrams * 25 + figures * 50
+    return max(4, round(seconds / 60))
 
 
 def art(scene, seed, light=False):
@@ -121,7 +131,7 @@ def foot(prefix):
 def card(s, prefix, delay=0):
     return f'''<li class="t-{s['card_tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
-    <span class="card-art">{diagram.thumb(s['thumb'])}</span>
+    <span class="card-art scene">{art(s['hero']['scene'], s['slug'] + 'card', light=True)}</span>
     <span class="card-body">
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>

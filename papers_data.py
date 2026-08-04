@@ -2,7 +2,7 @@
 """The long layer.
 
 Every story links to one of these. The story is the public face; the paper is
-what earns it the right to be believed. See STYLE.md section 5 — nobody has to
+what earns it the right to be believed. See STYLE.md section 6 — nobody has to
 read the paper, everybody has to be able to.
 
 Each paper carries:

@@ -158,31 +158,26 @@ def foot(prefix):
 '''
 
 
-TOPICS = [
-    ('Your body', ('Your body', 'Sleep', 'Death', 'Immunity', 'Ageing', 'Senses')),
-    ('Mind', ('Mind', 'Emotion')),
-    ('Life & nature', ('Life', 'Nature', 'Earth')),
-    ('Everyday', ('Kitchen', 'Home', 'Tech', 'Time')),
-    ('Physics', ('Physics',)),
-    ('Numbers & money', ('Numbers', 'Money', 'People')),
-    ('Cosmos', ('Cosmos',)),
-]
-TOPIC_OF = {k: t for t, ks in TOPICS for k in ks}
+from library import LENSES, LENS_BLURB
 
 
-def topic(s):
-    """The filter grouping. The kicker stays specific — 'Sleep', 'Kitchen' — because
-    it reads better on the card. Twenty of those as filter chips does not, so cards
-    also carry a broader topic and the filter uses that."""
-    return TOPIC_OF.get(s['kicker'], 'Everyday')
+def lens_slug(name):
+    return name.lower().replace(' ', '-')
+
+
+def domain(s):
+    """The subject area. Separate from the lens on purpose: a story about the
+    body can be a What, a Why or a How, and a reader looking for one is not
+    looking for the other."""
+    return s['kicker']
 
 
 def card(s, prefix, delay=0):
-    return f'''<li class="t-{s['card_tone']}" data-kicker="{topic(s).replace('&', '&amp;')}" data-reveal="{delay}">
+    return f'''<li class="t-{s['card_tone']}" data-lens="{s['lens']}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
     <span class="card-art scene">{art(s['hero']['scene'], s['slug'] + 'card', light=True, variant=s['hero'].get('var', 0))}</span>
     <span class="card-body">
-      <span class="card-kicker">{s['kicker']}</span>
+      <span class="card-kicker"><b class="lens lens-{lens_slug(s['lens'])}">{s['lens']}</b>{domain(s)}</span>
       <span class="card-title">{s['title']}</span>
       <span class="card-teaser">{s['teaser']}</span>
       <span class="card-takeaway">You will come away knowing: {s['takeaway']}</span>
@@ -314,24 +309,34 @@ def build_home():
   <p>{p}</p>
 </li>''' for i, ((h, p), t) in enumerate(zip(PILLARS, ['nebula', 'deepsea', 'ember'])))
 
-    chips = ''.join(f'<li><a class="filter" href="stories.html">{t.replace("&", "&amp;")}</a></li>'
-                    for t, _ in TOPICS if any(topic(s) == t for s in STORIES))
+    counts = {}
+    for s in STORIES:
+        counts[s['lens']] = counts.get(s['lens'], 0) + 1
+    lens_cards = ''.join(f'''<li data-reveal="{i * 80}">
+  <a class="lens-card lens-{lens_slug(t)}" href="stories.html">
+    <span class="lens-mark">{t}</span>
+    <span class="lens-blurb">{LENS_BLURB[t]}</span>
+    <span class="lens-count">{counts.get(t, 0)} stories</span>
+  </a>
+</li>''' for i, t in enumerate(LENSES))
 
     return (
         head(f'[Context] &#8212; {TAGLINE}',
-             'A storytelling team. Fifty stories about your body, your mind and the '
-             'world, each with the research behind it published in full.', '', 'nebula')
+             'A storytelling team. Fifty stories about this planet and the people on '
+             'it, asked four ways, each with the research behind it published in full.',
+             '', 'nebula')
         + masthead('', 'home')
         + f'''<div class="shell">
 <section class="hero">
-  <div class="scene">{art("orbit", "home")}
+  <div class="scene">{art("earth", "home")}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">A storytelling team</p>
-      <h1 data-reveal="80">Fifty things worth actually understanding.</h1>
-      <p data-reveal="160">Your body, your mind, the world you live in and the one it sits in.
-      Every story turns on a reversal &#8212; the thing you thought was going on, and what is
-      going on instead &#8212; explained in labelled pictures rather than jargon, and ending with
-      what it changes. Every one has a sourced paper behind it, so you can check us.</p>
+      <h1 data-reveal="80">Four questions. Fifty answers. One planet.</h1>
+      <p data-reveal="160">Every story we tell asks one of four things &#8212; what it is, why it
+      happens, how it works, or what would happen if it stopped. All of it about this world:
+      your body, your mind, and the ground under both. Each one turns on a reversal, is
+      explained in labelled pictures rather than jargon, and has a sourced paper behind it so
+      you can check us.</p>
       <a class="cta" href="stories.html" data-reveal="240">Read the stories &#8594;</a>
     </div>
   </div>
@@ -359,10 +364,11 @@ def build_home():
 
 <section class="band">
   <div class="band-head" data-reveal="0">
-    <h2>What we cover</h2>
-    <p>Fifty stories across seven subjects, and the list grows whenever something catches us.</p>
+    <h2>The four questions</h2>
+    <p>Every story is one of these. Nothing beyond this planet &#8212; there is more than
+    enough here.</p>
   </div>
-  <ul class="filters" data-reveal="60">{chips}</ul>
+  <ul class="lenses">{lens_cards}</ul>
 </section>
 </div>
 '''
@@ -373,30 +379,34 @@ def build_home():
 def build_stories():
     counts = {}
     for s in STORIES:
-        counts[topic(s)] = counts.get(topic(s), 0) + 1
+        counts[s['lens']] = counts.get(s['lens'], 0) + 1
     chips = ''.join(
-        f'<li><button class="filter" data-filter="{t.replace("&", "&amp;")}" aria-pressed="false">'
-        f'{t.replace("&", "&amp;")} <b>{counts[t]}</b></button></li>'
-        for t, _ in TOPICS if t in counts)
+        f'<li><button class="filter filter-{lens_slug(t)}" data-filter="{t}" '
+        f'aria-pressed="false">{t} <b>{counts[t]}</b></button></li>'
+        for t in LENSES if t in counts)
+
+    # Grouped by lens rather than by when it was written, so the framework is
+    # visible in the grid itself and not only in the filter above it.
+    by_lens = sorted(STORIES, key=lambda s: LENSES.index(s['lens']))
 
     return (
         head('Stories &#8212; [Context]',
-             'All fifty stories, across the body, the mind, life, the everyday, '
-             'physics, numbers and the cosmos.', '', 'dusk')
+             'All fifty stories, sorted by the question they ask: what it is, why it '
+             'happens, how it works, or what would happen if.', '', 'dusk')
         + masthead('', 'stories')
         + f'''<div class="shell">
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>All fifty stories</h2>
-    <p>Everything we have published. Each card shows what you will come away knowing,
-    so you can pick on that rather than on the title. Filter by subject, or just scroll.</p>
+    <p>Everything we have published, sorted by the question it asks. Each card shows what
+    you will come away knowing, so you can pick on that rather than on the title.</p>
   </div>
   <ul class="filters" data-reveal="60">
     <li><button class="filter" data-filter="" aria-pressed="true">Everything <b>{len(STORIES)}</b></button></li>
     {chips}
   </ul>
   <ul class="grid" id="storyGrid">
-{chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(STORIES))}
+{chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(by_lens))}
   </ul>
 </section>
 </div>
@@ -410,7 +420,7 @@ buttons.forEach(function (b) {{
     var want = b.getAttribute('data-filter');
     buttons.forEach(function (o) {{ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); }});
     Array.prototype.forEach.call(grid.children, function (li) {{
-      li.hidden = !(!want || li.getAttribute('data-kicker') === want);
+      li.hidden = !(!want || li.getAttribute('data-lens') === want);
     }});
   }});
 }});

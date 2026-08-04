@@ -220,6 +220,91 @@ def sc_cell(rr):
     return ''.join(out)
 
 
+def sc_earth(rr):
+    """One planet, seen from just above the ground.
+
+    The homepage hero. It has to say Earth and only Earth — the site's scope is
+    this planet, and the old starfield hero said the opposite. So: a curved
+    horizon low in the frame, banded atmosphere above it, and along the curve
+    the things the fifty stories are actually about — trees, buildings, water,
+    people, weather — each carrying its own colour.
+    """
+    out = [wash(rr, 6)]
+    R = W * 1.35                      # a horizon curve, not a ball in space
+    cx, cy = W * .5, H + R - 150
+
+    # atmosphere: bands thinning as they rise, the way it actually looks
+    for i, (col, op, lift) in enumerate((
+            (P['indigo'], .30, 250), (P['sky'], .22, 170),
+            (P['cyan'], .16, 105), (P['teal'], .12, 56))):
+        out.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="{R + lift:.0f}" '
+                   f'fill="{col}" opacity="{op}"/>')
+
+    out.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="{R:.0f}" fill="#0E3B2E"/>')
+    out.append(f'<circle cx="{cx:.0f}" cy="{cy:.0f}" r="{R:.0f}" fill="none" '
+               f'stroke="{P["mint"]}" stroke-width="4" opacity=".8"/>')
+
+    def on_curve(t):
+        """A point on the horizon, t running left to right across the frame."""
+        a = -math.pi / 2 + (t - .5) * 0.92
+        return cx + math.cos(a) * R, cy + math.sin(a) * R
+
+    # water, sitting in a dip on the curve
+    wx0, wy0 = on_curve(.13)
+    out.append(f'<path d="M{wx0 - 150:.0f} {wy0 + 26:.0f} q 150 -46 300 0 '
+               f'l 0 200 l -300 0 Z" fill="{P["cyan"]}" opacity=".45"/>')
+    for i in range(4):
+        yy = wy0 + 44 + i * 26
+        out.append(f'<path d="M{wx0 - 120 + i * 14:.0f} {yy:.0f} q 60 -14 120 0 q 60 14 120 0" '
+                   f'fill="none" stroke="{P["mint"]}" stroke-width="3" opacity=".5"/>')
+
+    # a small skyline
+    for i in range(7):
+        bx, by = on_curve(.40 + i * .022)
+        bh = rr.uniform(70, 190)
+        col = [P['violet'], P['indigo'], P['sky']][i % 3]
+        out.append(f'<rect x="{bx:.0f}" y="{by - bh:.0f}" width="{rr.uniform(26, 42):.0f}" '
+                   f'height="{bh:.0f}" rx="6" fill="{col}" opacity=".92"/>')
+        out.append(f'<rect x="{bx + 7:.0f}" y="{by - bh + 14:.0f}" width="10" height="14" '
+                   f'rx="2" fill="{P["gold"]}" opacity=".85"/>')
+
+    # trees along the right of the curve
+    for i in range(14):
+        tx, ty = on_curve(.60 + i * .028)
+        h = rr.uniform(46, 96)
+        col = [P['lime'], P['emerald'], P['mint'], P['teal']][i % 4]
+        out.append(f'<g {_anim("sway", rr.uniform(6, 11), rr.uniform(0, 4))}>'
+                   f'<line x1="{tx:.0f}" y1="{ty:.0f}" x2="{tx:.0f}" y2="{ty - h:.0f}" '
+                   f'stroke="{P["amber"]}" stroke-width="5" stroke-linecap="round"/>'
+                   + blob(rr, tx, ty - h - h * .22, h * .46, col, .95) + '</g>')
+
+    # people, small, on the near side
+    for i in range(9):
+        px, py = on_curve(.24 + i * .034)
+        out.append(figure(px, py - 16, rr.uniform(11, 17),
+                          SPREAD[(i * 3) % len(SPREAD)], rr))
+
+    # weather above: clouds, and one flight of birds
+    for i in range(6):
+        gx, gy = rr.uniform(60, W - 60), rr.uniform(70, H * .42)
+        col = [P['sky'], P['orchid'], P['rose']][i % 3]
+        out.append(f'<g {_anim("drift", rr.uniform(14, 26), rr.uniform(0, 8))} opacity=".55">'
+                   + blob(rr, gx, gy, rr.uniform(46, 92), col, .8) + '</g>')
+    for i in range(7):
+        bx = W * .58 + i * 34
+        by = H * .26 + math.sin(i * .9) * 26
+        out.append(f'<path d="M{bx:.0f} {by:.0f} q 11 -9 22 0 q 11 -9 22 0" fill="none" '
+                   f'stroke="{P["gold"]}" stroke-width="3" stroke-linecap="round" opacity=".85"/>')
+
+    # a sun low on the left, the one thing off-planet allowed in shot
+    sx, sy = W * .16, H * .2
+    out.append(f'<circle cx="{sx:.0f}" cy="{sy:.0f}" r="120" fill="{P["amber"]}" opacity=".14"/>')
+    out.append(f'<circle cx="{sx:.0f}" cy="{sy:.0f}" r="52" fill="{P["gold"]}"/>')
+
+    out.append(motes(rr, 26))
+    return ''.join(out)
+
+
 def sc_cosmos(rr):
     """Planets, stars and nebulae, all different."""
     out = [wash(rr, 8)]
@@ -566,6 +651,7 @@ def sc_dividing(rr):
 
 
 SCENES = {
+    'earth': sc_earth,
     'cell': sc_cell,
     'night': sc_night,
     'fading': sc_fading,

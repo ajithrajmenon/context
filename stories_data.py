@@ -514,6 +514,14 @@ for _i, _br in enumerate(_BRIEFS):
     LIBRARY_STORIES.append(_s)
     LIBRARY_PAPERS.append(_p)
 
+# Every story sits under exactly one of the four lenses. The flagship four are
+# written by hand and do not carry the field, so it is filled in from the same
+# map the library uses — one classification, one place to change it.
+from library import LENS as _LENS
+
+for _s in LIBRARY_STORIES + STORIES:
+    _s.setdefault('lens', _LENS[_s['slug']])
+
 # Twelve stories share the `mind` scene and nine share `cell`, so the variant
 # picked by hand in a brief was never going to be unique. Assign it here
 # instead: every story gets its own index within its scene, which the

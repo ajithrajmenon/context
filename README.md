@@ -1,143 +1,134 @@
 # [Context]
 
-A storytelling team. We take the things that are too large, too old or too strange to
-picture, put them next to something you already know, and then hand you the controls.
+A storytelling team. We take something large and put it next to something you already
+know, then publish the research behind it so you can check us.
 
-## What this is
+Fifty stories. No dependencies, no framework, no build tooling beyond Python 3.
 
-Not an encyclopedia and not a course. Every piece is built as a story — a hook, a build,
-a turn, and a landing — because people remember what happened to somebody, in what order,
-and why it mattered. The mechanism goes in only once you care about the answer.
+## The framework
 
-The library grows. Subjects are not fixed: space, time, matter, life, minds, bodies,
-people, Earth, and whatever else turns out to be worth being curious about. New categories
-cost nothing — the nav and the filters build themselves from the stories.
+**Every story asks exactly one of four questions.** The lens is decided before the title
+is written, and the title obeys it.
+
+| Lens | The question | Stories |
+|---|---|---|
+| **What** | What is this, actually? | 10 |
+| **Why** | Why does it happen at all? | 23 |
+| **How** | How does it work? | 11 |
+| **What if** | What would happen? | 6 |
+
+The **domain** — body, mind, kitchen, money, physics — is a separate label. What a story
+is *about* and what it *asks* are two different things, and a reader looking for one is
+not looking for the other.
+
+**Scope is this planet.** Nothing beyond Earth. A story about a black hole ends in awe; a
+story about antibiotic resistance ends in a decision, and we are in the second business.
+
+Both rules, and the reasoning, live in `STYLE.md`. The full catalogue is `PIPELINE.md`.
+
+## Two layers
+
+Every story links to a paper. The **story** is short, illustrated and designed to be
+finished. The **paper** is long, sourced, and honest about what is not known — findings
+graded `established` / `best current explanation` / `contested`, the live disputes stated
+as disputes, and a section for what we could not establish.
+
+Nobody has to read the paper. Everybody has to be able to.
 
 ## Structure
 
 ```
-build.py          generates the site
-stories_data.py   every story — one dict each (imports the second shelf)
-stories_more.py   stories 11-20, same shape
-assets/style.css  the design system
-assets/motion.js  reveals and the canvas scenes
-assets/fonts/     self-hosted woff2
-site/             build output, deploy this
+build.py           generates site/ — the only thing you run
+stories_data.py    the four flagship stories, hand-built, plus the library merge
+papers_data.py     the four flagship papers, plus the library merge
+library.py         stories 5-50 as briefs, the expander, and the lens map
+diagram.py         labelled diagrams: 12 hand-composed, plus a 7-type grammar
+illustrate.py      generated SVG scenes — the banners
+bundle.py          folds site/ into one self-contained HTML file
+assets/style.css   the design system
+assets/motion.js   scroll reveals, parallax, the progress rail
+assets/fonts/      self-hosted woff2 — no font CDN
+site/              build output. Deploy this
 ```
 
-Three kinds of page: a homepage, a `stories` index that filters in place, and one page per
-story. Adding a story means appending one dict to `STORIES` and re-running `build.py`.
-Set `featured: True` to surface it on the homepage.
+Four kinds of page: a homepage, a `stories` index that filters in place, one page per
+story, and one per paper. Set `featured: True` to surface a story on the homepage.
 
 ### A story is a stack of cards
 
-Every story is a list of blocks, rendered in order. Five kinds:
+Every story is a list of blocks, rendered in order:
 
 | block | what it is |
 |-------|-----------|
-| `scene` | full animated panel, one short line of words over it |
 | `text` | white card, a heading and a couple of short paragraphs |
-| `steps` | a numbered checklist — what a thing needs in order to work |
+| `diagram` | a labelled explanatory picture. Static — you are reading it |
+| `scene` | full-bleed illustrated panel, one line over it |
 | `turn` | the pivot, one line, big type on full colour |
-| `figure` | the interactive |
+| `steps` | a numbered checklist |
+| `figure` | the one thing per story you operate yourself |
 
-The shape follows how the best explainer video essays are built: an opening image you can
-see before you understand it, the question asked plainly, named chapters, a checklist where
-something has requirements, the blocker, the turn, something you operate yourself, and a
-landing that stays humble.
+Because a story is a list, it is also a shot list: each block is roughly a beat of script
+plus the picture that goes with it. These are meant to become videos.
 
-Because a story is a list, it is also a shot list. Each block is roughly a beat of script
-plus the picture that goes with it, which is the point — these are meant to become videos.
+### Six beats, in this order
 
-**Colour belongs to the card, not the story.** Each piece walks through four to six tones
-as it goes, the way a film relights between acts. Nothing is one colour all the way down.
+Wrong Picture → Crack → Turn → Machinery → Cost → Long View. When a piece feels wrong it
+is almost always because one of these is missing. `STYLE.md` section 3 has each of them.
+
+### Flagship and library
+
+Four stories are flagship builds: diagrams composed by hand for that story alone, plus an
+interactive figure. The other 46 are library builds — same beats, same research standard,
+same one-sentence Turn, at about a third the length, with diagrams built from a
+parameterised grammar fed different data by every story.
+
+What never varies: every story has its own banner, its own diagram data, its own numbers
+and its own paper. Recycling artwork across stories is the failure this project corrected
+twice; `illustrate.render()` takes a variant that reframes the composition — mirror, tilt,
+zoom, offset — and every story is assigned its own variant within its scene, so no two
+banners on the site are the same picture.
 
 ## The identity
 
-The idea the whole thing hangs on: **context is what you get when you zoom out**. Every
-story takes one thing and puts something bigger beside it, so the recurring motif is a
-small bright point inside a large field — which is also the wordmark, and also the `orbit`
-scene.
+**Context is what you get when you zoom out.** Every story takes one thing and puts
+something bigger beside it, so the recurring motif is a small bright point in a large
+field.
+
+The name is written **[Context]**, brackets included, everywhere. Brackets are what an
+editor puts around the thing they had to add so a quotation makes sense on its own. That
+is the job. The wordmark animates the two brackets and nothing else.
 
 On the influences: the obvious reference for this kind of work lives in the dark, in deep
-space, with everything glowing against black. Going there would have produced a copy with
-a different logo. So the split is deliberate — **we live in daylight and the dark is where
-the scenes happen.** White page, vivid glowing panel, a hard cut between the two. Same
-appetite for scale and wonder, different room.
+space, everything glowing against black. Going there would have produced a copy with a
+different logo. So the split is deliberate — **we live in daylight and the dark is where
+the scenes happen.** White page, vivid glowing panel, a hard cut between the two.
 
-What carries over: saturated multi-hue colour, rounded geometry, ambient motion, and the
-zoom-out that reframes the subject. What does not: dark chrome, mascots, and the void as a
-default background.
+### Three surfaces
 
-### Tokens
+| surface | job |
+|---|---|
+| white page | where you read |
+| dark panel | atmosphere, and the only place anything moves |
+| light card | where things are explained. Holds perfectly still |
 
-Eight tones. Each sets a three-stop gradient for its scenes and an accent used for text
-and links on white, which is the one that has to clear 4.5:1 — they all do.
+Eight tones set a three-stop gradient for scenes and an accent for text on white — all
+clear 4.5:1. Colour belongs to the card, not the story: a piece walks through several
+tones as it goes, the way a film relights between acts.
 
-| tone | gradient | accent |
-|------|----------|--------|
-| nebula | violet → magenta | `#6D28D9` |
-| deepsea | navy → cyan | `#0E7490` |
-| ember | wine → orange | `#BE123C` |
-| forest | pine → emerald | `#047857` |
-| dusk | indigo → violet | `#1D4ED8` |
-| solar | brown → amber | `#B45309` |
-| void | near-black → slate | `#334155` |
-| rose | plum → coral | `#A21CAF` |
-
-- Page `#FFFFFF` · surface `#F7F9FC` · ink `#101828` · muted `#5A6875`
-- Gabarito (display) · Source Sans 3 (body), both self-hosted — no font CDN
-- Text over a scene sits on a gradient scrim, so contrast never depends on where a
-  particle happens to drift
+Four lens colours sit on top of that, one per question, used on the chip, the card eyebrow
+and the home grid so the same question always looks the same.
 
 ### Motion
 
-`assets/motion.js` handles scroll reveals and the canvas scenes. Two rules govern all of
-them:
+Only the hero panel moves. Everything that explains something holds still — you cannot
+read a diagram that is drifting.
 
-**Multicolour.** A scene carries many hues at once, from a shared palette — cyan, lime,
-magenta, violet, amber, emerald, coral, sky, orchid, teal. The card's gradient is the
-lighting; the scene is the life on top of it. One flat hue per panel reads as decoration,
-which is why the tones above stay dark: they exist so the scene's colours can glow.
-
-**Literal.** Every scene draws its own subject. No scene is picked because it looks nice.
-
-| scene | what it draws |
-|-------|---------------|
-| `stars` | a star field in real stellar colours, blue giants through red dwarfs |
-| `orbit` | a star with planets, each its own world |
-| `expand` | galaxies drifting apart, with no centre |
-| `dying` | stars going out; the cool red ones outlast the rest |
-| `grid` | space as a sheet, dented by something heavy |
-| `beam` | light split into the colours it is made of |
-| `entropy` | coloured blocks in a tidy row, scattering and never returning |
-| `atom` | a speck of nucleus in an enormous gap, electrons far out |
-| `flicker` | matter and antimatter, borrowed from nothing and paid back |
-| `bloom` | rings pushing outward, each a different colour |
-| `waves` | layered bands, motion without particles |
-| `swarm` | a crowd of microbes, no two the same |
-| `cells` | immune cells hunting invaders and swallowing them |
-| `virus` | virus particles docking onto a cell |
-| `colony` | ant trails between nests, traffic both ways |
-| `telomere` | cells dividing, their protective caps shortening |
-| `replace` | every piece swapped out, the shape still holding |
-| `depths` | the ocean in zones, bioluminescence below the light |
-| `crowd` | a crowd where most of the figures are the people already gone |
-| `overgrow` | plants taking a city back |
-| `sleepcycle` | a night of sleep, cycling through its stages |
-| `attention` | focus sliding off the thing it is meant to be on |
-| `pulse` | a rhythm slowing, and the pieces drifting free |
-| `timewarp` | the same stretch of time, felt at two speeds |
-
-Rules the file keeps:
-
-- nothing animates off-screen; an `IntersectionObserver` parks each scene
-- `prefers-reduced-motion` gets one composed static frame, never a frozen blank panel
-- scenes are seeded from the slug, so a card looks identical on every load
-- anything scrolled past without intersecting still reveals — a jumped-over element must
-  never stay invisible
-- point counts have a floor as well as a ceiling; a small card is a fraction of a hero's
-  area, and without one a sparse scene reads as a broken panel
+- reveals use an `IntersectionObserver`; anything scrolled past without intersecting still
+  reveals, or a jumped-over element stays invisible for good
+- `prefers-reduced-motion` is honoured throughout
+- scenes are seeded from the slug, so a page looks identical on every load
+- animation timings are classes, not inline styles — a nonce-based `style-src` blocks
+  inline style attributes, and the site must survive being embedded somewhere strict
 
 ## Running locally
 
@@ -146,26 +137,33 @@ python3 build.py
 python3 -m http.server 8000 --directory site
 ```
 
+## One file, no server
+
+```bash
+python3 bundle.py
+```
+
+Writes `context-site.html` — every page, fonts and all, in a single file you can open by
+double-clicking or send to someone. It also writes `context-artifact.html`, the same
+payload without the outer document, for hosts that supply their own `<head>`.
+
 ## Deploying
 
-No build tooling, no dependencies, no framework. Any static host works.
+Any static host works.
 
-**GitHub Pages** — already wired up. `.github/workflows/deploy.yml` runs `build.py` and
-publishes `site/` on every push. Set Settings → Pages → Source to **GitHub Actions** once,
-and the site goes live at https://ajithrajmenon.github.io/context/.
+**GitHub Pages** — `.github/workflows/deploy.yml` runs `build.py` and publishes `site/` on
+every push. Set Settings → Pages → Source to **GitHub Actions** once, and the site is live
+at https://ajithrajmenon.github.io/context/.
 
 **Cloudflare Pages / Netlify / Vercel** — publish directory `site`, build command
-`python3 build.py`. Or drag `site/` onto Netlify Drop for an instant URL.
+`python3 build.py`.
 
-## Wiring it to Claude later
+## Adding a story
 
-The generator is deliberately data-driven so an MCP server has an obvious surface. Four
-tools, writing to `stories_data.py` via the GitHub API:
+1. Pick the lens first. If you cannot say which of the four it is, it is not ready.
+2. Write the paper. The story is what survives the research, not the other way round.
+3. Add a brief to `library.py` — `q(...)` for the compact form — and its slug to `LENS`.
+4. `python3 build.py`.
 
-- `create_draft` — append a story dict with `status: draft`
-- `list_drafts`
-- `update_draft`
-- `publish` — flip status, commit, let the host rebuild
-
-Keep `publish` as a separate human-triggered call. Accuracy is the product here, and a
-wrong explanation costs more trust than a right one earns.
+Then run the checklist at the end of `STYLE.md`. Every number in a story has to be
+traceable to the paper, with its error bar.

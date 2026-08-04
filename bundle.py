@@ -144,7 +144,7 @@ addEventListener('hashchange', function () {
 });
 """
 
-    # The site commits to one visual world by the rule in STYLE.md section 4 —
+    # The site commits to one visual world by the rule in STYLE.md section 5 —
     # white page, dark panels — so the shell holds that ground in either viewer
     # theme rather than inverting into a mismatched band around the page.
     shell_css = (

@@ -37,9 +37,50 @@ brackets and nothing else, because the mark is the punctuation, not the word.
 
 The only exception is a URL or a filename, where brackets are not usable.
 
+### Scope: this planet
+
+Nothing beyond Earth. Not because space is uninteresting — because the further a
+story travels from the reader, the more it becomes spectacle and the less it can
+change anything they do. A story about a black hole ends in awe. A story about
+antibiotic resistance ends in a decision. We are in the second business.
+
+That rules out cosmology, astrophysics and deep time as subjects in their own
+right. It does not rule out using them: the Sun can appear in a story about
+seasons. The test is whether the reader is still standing on the ground at the end.
+
 ---
 
-## 2. The storytelling language
+## 2. The four questions
+
+**Every story asks exactly one of four questions.** Not as a filing convenience —
+as a discipline. A piece that cannot say which of the four it is asking has not
+decided what it is for, and it always shows.
+
+| Lens | The question | What the reader gets |
+|---|---|---|
+| **What** | What is this, actually? | A definition, an inventory or a scale — where the surprise is in the plain answer |
+| **Why** | Why does it happen at all? | Cause and purpose. Usually evolutionary, sometimes economic |
+| **How** | How does it work? | The machinery, step by step, in the order it runs |
+| **What if** | What would happen? | A counterfactual worked honestly, to find which parts are load-bearing |
+
+**The lens is decided before the title, and the title obeys it.** Where the two
+fight, rewrite the title — a story called "Why does a hangover hurt?" whose Turn is
+a mechanism is a How wearing the wrong coat, and it becomes "How does a hangover
+work?". This is not pedantry: readers arrive with a question already formed, and
+the title is the only place we can meet it.
+
+**The distribution is uneven and that is honest.** Why is the largest lens because
+most curiosity is causal. What if is the smallest because a counterfactual only
+earns its place when working it out reveals something a direct question would not
+— otherwise it is a party trick. Do not pad a lens to balance a grid.
+
+**The domain is separate.** Body, mind, kitchen, money, physics: that is what the
+story is about. The lens is what it asks. A reader looking for one is not looking
+for the other, so they are two labels, never merged into one.
+
+---
+
+## 3. The storytelling language
 
 Every story is built from six named beats, in this order. They are the grammar.
 When a piece feels wrong, it is almost always because one of these is missing or
@@ -83,7 +124,7 @@ just get them to the vantage point.
 
 ---
 
-## 3. Voice
+## 4. Voice
 
 **Register: a well-read adult explaining something they know cold to another
 adult over a drink.** Not a lecture, not a children's book, not a press release.
@@ -121,7 +162,7 @@ land it. That alternation is the sound of the house.
 
 ---
 
-## 4. Design language
+## 5. Design language
 
 ### The split
 
@@ -192,7 +233,7 @@ stops in the middle of one, it was doing two things.
 
 ---
 
-## 5. Research standard
+## 6. Research standard
 
 The story is downstream of the paper. Never write the story first and source it
 afterwards — that produces confident prose around a hollow middle, and it shows.
@@ -220,7 +261,7 @@ right one earns.
 
 ---
 
-## 6. Structure of a story page
+## 7. Structure of a story page
 
 ```
 hero            dark, animated, the Wrong Picture stated in the standfirst
@@ -241,7 +282,7 @@ Not every story needs every block. Every story needs the six beats.
 
 ---
 
-## 7. Structure of a paper
+## 8. Structure of a paper
 
 ```
 title, subtitle, date, reading time
@@ -259,8 +300,11 @@ five pages. Longer means it should have been two papers.
 
 ---
 
-## 8. Checklist before anything ships
+## 9. Checklist before anything ships
 
+- [ ] Which of the four questions is this? If you cannot say, it is not ready.
+- [ ] Does the title ask that question, in those words?
+- [ ] Is the reader still standing on this planet at the end?
 - [ ] Can you state the Turn in one sentence?
 - [ ] Does the Wrong Picture describe what a thoughtful person actually believes?
 - [ ] Is the Crack an observation, not an argument?

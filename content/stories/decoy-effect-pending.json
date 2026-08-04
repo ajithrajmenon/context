@@ -1,0 +1,152 @@
+{
+ "story": {
+  "slug": "decoy-effect-pending",
+  "kicker": "mind",
+  "lens": "What",
+  "card_tone": "dusk",
+  "thumb": null,
+  "featured": false,
+  "title": "What Is This Record?",
+  "teaser": "Not every research request comes back with a story in it. Here is what showed up instead.",
+  "takeaway": "Nothing here is a claim about the decoy effect — fact-checking returned only placeholders, so this page records that gap instead of papering over it.",
+  "hero": {
+   "tone": "dusk",
+   "scene": "mind",
+   "var": 2,
+   "standfirst": "You're here because a story about the decoy effect was requested. What came back from fact-checking was a verdict of \"revise\" and a findings package where the claim, the basis, the turn, the contested question and the unknown all read the literal word \"test.\" [Context] does not publish a story ahead of its paper, and it does not write a paper around findings that were never actually checked. So this page exists instead of both."
+  },
+  "blocks": [
+   {
+    "type": "text",
+    "h": "What you'd expect to find here",
+    "p": [
+     "Click through to a page named after a psychology term and you expect the usual: a founding study, a number, a mechanism, maybe a menu or a subscription tier used as the working example. The research plan behind this topic sketches exactly that shape — a study from 1982 that named the effect, a pricing experiment, a later argument about how well it replicates outside the lab. None of that is a bad plan. It just never came back as a checked finding."
+    ]
+   },
+   {
+    "type": "scene",
+    "tone": "void",
+    "scene": "mind",
+    "var": 9,
+    "h": "Not every research request comes back with a story in it. Here is what showed up instead."
+   },
+   {
+    "type": "diagram",
+    "spec": {
+     "kind": "parts",
+     "title": "What arrived",
+     "sub": "the graded-findings package",
+     "centre": "Findings",
+     "callouts": [
+      [
+       "Claim",
+       "test claim"
+      ],
+      [
+       "Basis",
+       "test basis"
+      ],
+      [
+       "Turn",
+       "test turn"
+      ],
+      [
+       "Verdict",
+       "revise"
+      ]
+     ]
+    },
+    "caption": "Every field in the package that was supposed to carry evidence carries the word \"test\" instead."
+   },
+   {
+    "type": "text",
+    "h": "The one thing actually in the package",
+    "p": [
+     "Every field meant to carry a fact — the claim, its basis, the turn, the contested question, the unknown — carries the word \"test\" instead. Not a thin finding about the decoy effect. A placeholder that never got swapped for one."
+    ]
+   },
+   {
+    "type": "turn",
+    "tone": "nebula",
+    "text": "A paper cannot be earned by a story that was never checked."
+   },
+   {
+    "type": "diagram",
+    "spec": {
+     "kind": "compare",
+     "title": "Plan vs. package",
+     "sub": "what was proposed is not what was graded",
+     "left": [
+      "Proposed",
+      "the research plan",
+      [
+       "1982 study named",
+       "pricing experiment named",
+       "replication debate named"
+      ]
+     ],
+     "right": [
+      "Delivered",
+      "the graded findings",
+      [
+       "claim: test",
+       "basis: test",
+       "turn: test"
+      ]
+     ]
+    },
+    "caption": "The left column is what the plan proposed. The right is all that's approved to build on — and it's empty."
+   },
+   {
+    "type": "text",
+    "h": "The number that's real here",
+    "p": [
+     "One finding came back, and it read \"test.\" So did the one contested question and the one unknown attached to it — three fields, three placeholders, zero usable. The action isn't to guess at a plausible-sounding number for the decoy effect; it's to send this topic back through fact-checking and hold the page until a real finding, with a source and an error bar, comes back in its place."
+    ]
+   }
+  ],
+  "zoomout": {
+   "tone": "dusk",
+   "text": "Every other page here carries a paper with named sources behind the story. This one carries a findings file where every field reads \"test\" — the trace a pipeline leaves when one stage gets skipped and the next one won't guess on its behalf."
+  }
+ },
+ "paper": {
+  "slug": "decoy-effect-pending",
+  "title": "What Is This Record: the research",
+  "subtitle": "A paper with nothing yet to report",
+  "date": "August 2026",
+  "minutes": 4,
+  "abstract": "This paper cannot make any claims about the decoy effect. The graded-findings package received for this topic returned a verdict of \"revise\" and consisted entirely of placeholder values: one finding, one contested question, and one unknown, each literally recorded as \"test.\" No real source, number, or mechanism was fact-checked and approved for use. Per house rules, only fact-checker-approved findings may appear in [Context] work, and nothing is stated more confidently in a story than in its paper. This document records that gap rather than filling it with content drawn from the research plan's unverified background notes.",
+  "sections": [
+   {
+    "h": "What we looked at",
+    "p": [
+     "This paper cannot make any claims about the decoy effect. The graded-findings package received for this topic returned a verdict of \"revise\" and consisted entirely of placeholder values: one finding, one contested question, and one unknown, each literally recorded as \"test.\" No real source, number, or mechanism was fact-checked and approved for use. Per house rules, only fact-checker-approved findings may appear in [Context] work, and nothing is stated more confidently in a story than in its paper. This document records that gap rather than filling it with content drawn from the research plan's unverified background notes."
+    ]
+   }
+  ],
+  "findings": [
+   [
+    "test claim",
+    "established",
+    "test basis"
+   ]
+  ],
+  "contested": [
+   [
+    "test q",
+    "test d"
+   ]
+  ],
+  "unknowns": [
+   "test unknown"
+  ],
+  "method": "No writing method was applied beyond transcription, because there was no verified content to write from. The research plan for this topic named real-sounding sources — a 1982 paper on asymmetric dominance, a subscription-pricing experiment, later meta-analyses and failed replications — but those appeared only in the plan's own rationale, before fact-checking, and were not present in the graded findings handed to the writer. The bias risk this avoids is the most common failure mode in this pipeline: treating a promising plan as if it were an approved finding and writing confident prose around it. The correct next step is to send this topic back through fact-checking and re-run the writing step once real findings, claims, and sources come back graded.",
+  "reading": [
+   [
+    "Graded-findings package (this run)",
+    "The only input the writer is authorized to draw from; every field in it is a placeholder rather than a checked fact."
+   ]
+  ]
+ }
+}

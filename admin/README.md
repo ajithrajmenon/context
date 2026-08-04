@@ -24,20 +24,39 @@ the backoffice is switched off, the site is unaffected.
 
 ## Running it
 
+On your own machine, in a clone of this repository:
+
 ```bash
-pip install -r admin/requirements.txt
-
-export CONTEXT_ADMIN_PASSWORD='a long random passphrase'   # required
-export CONTEXT_ADMIN_PREFIX='/b-9f3a71c2e0'                # required, unguessable
-export ANTHROPIC_API_KEY='sk-ant-...'                      # required to generate
-
-uvicorn admin.app:app --host 127.0.0.1 --port 8800
+./admin/serve.sh
 ```
 
-Then open `http://127.0.0.1:8800/b-9f3a71c2e0/`.
+First run: it generates a secret URL prefix, asks for an admin password and an
+API key, writes `admin/.env` (mode 600, gitignored), installs dependencies, and
+prints your login link. Every run after that just starts and prints the link.
+
+The long way, if you would rather set it up by hand:
+
+```bash
+pip install -r admin/requirements.txt
+cp admin/.env.example admin/.env      # then fill it in
+python3 -m uvicorn admin.app:app --host 127.0.0.1 --port 8800
+```
+
+**Where is the login link?** There is no fixed one — it is
+`http://127.0.0.1:8800` plus whatever `CONTEXT_ADMIN_PREFIX` you chose.
+`serve.sh` prints it. If you lose it: `grep PREFIX admin/.env`.
 
 The app refuses to serve anything without `CONTEXT_ADMIN_PASSWORD`. It will not
 run open, even locally.
+
+### Getting an API key
+
+<https://platform.claude.com/settings/keys> -> **Create key**. It needs API
+credit on the Console account, which is **billed separately from a Claude Pro
+or Max subscription** — a subscription does not include API usage.
+
+Everything except **Generate** works without a key: story CRUD, visibility,
+publishing, and the approval queue.
 
 | Variable | Purpose |
 |---|---|
@@ -108,9 +127,16 @@ and a live run — do that before trusting the first draft.
 
 ## Deploying
 
-Anywhere that runs Python and holds a git checkout with push rights: a small VM,
-Fly.io, Railway, Render. The app shells out to `git` in the repository root, so
-the checkout must be writable and its credentials must work non-interactively.
+**Start on your own laptop.** It already has your GitHub credentials, there is
+nothing to provision, and the loop is complete: approve a story here, it pushes,
+Actions rebuilds, the public site updates. Only move it to a host when you want
+to reach it from a phone or from away from your desk.
+
+When you do, it needs three things a static host cannot give you: a writable git
+checkout, non-interactive push credentials (a deploy key), and a persistent disk
+for `admin/context.db`. A small VM, Fly.io with a volume, Railway, or Render all
+work. Put it behind HTTPS — a password over plain HTTP is a password in the
+clear, and that is also when you drop `CONTEXT_ADMIN_INSECURE_COOKIE`.
 
 Do not put it on GitHub Pages. It cannot go there — that is the whole point of
 the first section.
@@ -123,6 +149,8 @@ admin/research.py        the six agents, their prompts and schemas
 admin/publish.py         draft -> content/*.json -> build -> commit -> push
 admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions
 admin/test_pipeline.py   offline orchestration test
+admin/serve.sh           first-run setup, then starts and prints the login link
+admin/.env.example       the settings, documented
 content/stories/*.json   published generated stories, read by build.py
 content/visibility.json  slug -> false hides a story
 ```

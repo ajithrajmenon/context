@@ -32,6 +32,29 @@ from . import publish, research, store
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def _load_env():
+    """Read admin/.env if it exists, so settings survive closing the terminal.
+
+    Real environment variables always win — a value already exported is a
+    deliberate act and should not be silently overridden by a checked-in file.
+    """
+    path = os.path.join(ROOT, 'admin', '.env')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            lines = fh.readlines()
+    except OSError:
+        return
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, _, value = line.partition('=')
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+_load_env()
+
 PREFIX = os.environ.get('CONTEXT_ADMIN_PREFIX', '/backoffice').rstrip('/')
 PASSWORD = os.environ.get('CONTEXT_ADMIN_PASSWORD', '')
 SECURE_COOKIE = os.environ.get('CONTEXT_ADMIN_INSECURE_COOKIE', '') != '1'

@@ -49,20 +49,53 @@ python3 -m uvicorn admin.app:app --host 127.0.0.1 --port 8800
 The app refuses to serve anything without `CONTEXT_ADMIN_PASSWORD`. It will not
 run open, even locally.
 
-### Getting an API key
+### Reaching Claude: two backends
 
-<https://platform.claude.com/settings/keys> -> **Create key**. It needs API
-credit on the Console account, which is **billed separately from a Claude Pro
-or Max subscription** — a subscription does not include API usage.
+The research team can run either way, and the six agents cannot tell the
+difference.
 
-Everything except **Generate** works without a key: story CRUD, visibility,
-publishing, and the approval queue.
+| Backend | Auth | Cost |
+|---|---|---|
+| **`cli`** (default) | The Claude Code login you already have | Draws on your subscription's usage allowance |
+| **`api`** | `ANTHROPIC_API_KEY` | Billed per token |
+
+**Use the CLI if you have a Claude subscription.** Install Claude Code, run
+`claude` once and sign in, and that is the whole setup — no key, no separate
+credit to buy:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+claude          # sign in, then quit with /exit
+```
+
+`serve.sh` detects it and checks the login before starting, so a missing sign-in
+shows up immediately rather than four minutes into a research run.
+
+Set `CONTEXT_LLM_BACKEND` to `cli` or `api` to force one. Left blank it prefers
+the CLI, because the CLI costs nothing extra.
+
+**Two honest caveats about the CLI backend.** A six-agent run with web search is
+heavy, so on a Pro plan a couple of runs in an afternoon may hit your usage
+window — the backoffice reports that as a usage-limit error rather than failing
+oddly. And this is your own subscription driving your own tool with a human
+approving every output; if this ever became an always-on service generating for
+other people, the API is the right home for it.
+
+Everything except **Generate** works with neither backend: story CRUD,
+visibility, publishing, and the approval queue.
+
+An API key, if you want one: <https://platform.claude.com/settings/keys>. Note
+it is billed separately from a Pro or Max subscription — a subscription does not
+include API usage, which is the surprise this whole section exists to avoid.
 
 | Variable | Purpose |
 |---|---|
 | `CONTEXT_ADMIN_PASSWORD` | The password. Required. |
 | `CONTEXT_ADMIN_PREFIX` | Secret URL prefix. Every route lives under it. |
-| `ANTHROPIC_API_KEY` | Server-side only. Never sent to a browser. |
+| `CONTEXT_LLM_BACKEND` | `cli`, `api`, or blank to auto-detect (CLI first). |
+| `ANTHROPIC_API_KEY` | Only for the `api` backend. Server-side; never sent to a browser. |
+| `CONTEXT_CLI_MODEL` | Model for the CLI backend, e.g. `opus`. Blank uses your default. |
+| `CONTEXT_CLI_CWD` | Where the CLI runs. Defaults to `~`, away from this repo's CLAUDE.md. |
 | `CONTEXT_DB` | SQLite path. Defaults to `admin/context.db`. |
 | `CONTEXT_ADMIN_INSECURE_COOKIE` | Set to `1` **only** for local HTTP testing. |
 
@@ -83,8 +116,8 @@ Six agents, in order, each a separate Claude call with its own system prompt:
 | Agent | Job | Tools |
 |---|---|---|
 | **Planner** | Decides the lens, title, candidate Turn, and the research questions. Can reject a goal here. | — |
-| **Search** | Runs web search against those questions; reports sources and numbers. | `web_search` |
-| **Reader** | Fetches the best sources in full; pulls exact figures and stated limitations. | `web_fetch` |
+| **Search** | Runs web search against those questions; reports sources and numbers. | web search |
+| **Reader** | Fetches the best sources in full; pulls exact figures and stated limitations. | web fetch |
 | **Fact checker** | Grades every claim `established` / `best current explanation` / `contested`. Discards what it cannot trace. Can drop the story. | — |
 | **Writer** | Turns surviving findings into the six beats plus the paper. | — |
 | **Editor** | Runs the `STYLE.md` checklist and fixes what fails. | — |
@@ -118,12 +151,13 @@ the work; hiding keeps the file and its history.
 ## What is tested, and what is not
 
 `python3 -m admin.test_pipeline` runs the whole orchestration against a stub
-client: stage order, token accounting, `pause_turn` resumption, refusal
-handling, draft expansion, and that both generated diagrams actually render. No
-API key needed, nothing spent.
+backend: stage order, token accounting, refusal handling, draft expansion, that
+both generated diagrams render, and that the CLI backend builds the right argv —
+including that it never passes `--bare`, which would bypass the subscription
+login and demand an API key. Nothing needed, nothing spent.
 
-It does **not** test the quality of what the real agents write. That needs a key
-and a live run — do that before trusting the first draft.
+It does **not** test the quality of what the real agents write. That needs a live
+run through either backend — do that before trusting the first draft.
 
 ## Deploying
 
@@ -145,6 +179,7 @@ the first section.
 
 ```
 admin/app.py             FastAPI: auth, CRUD, generation, queue, publish
+admin/backend.py         two ways to reach Claude — CLI or API — one interface
 admin/research.py        the six agents, their prompts and schemas
 admin/publish.py         draft -> content/*.json -> build -> commit -> push
 admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions

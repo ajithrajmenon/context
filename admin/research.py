@@ -25,9 +25,7 @@ import json
 import os
 import time
 
-import anthropic
-
-MODEL = 'claude-opus-5'
+from .backend import BackendError, Refused, get as get_backend
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,59 +40,21 @@ def _house_rules():
         return ''
 
 
-class Refused(RuntimeError):
-    """Claude's safety classifiers declined the request."""
-
-
 class Stage:
-    """One agent. Wraps the call so every stage handles refusals, server-tool
-    pauses, and token accounting the same way."""
+    """One agent. The backend decides whether this becomes a CLI subprocess or
+    an API call; the agent does not care and must not."""
 
-    def __init__(self, client, on_tokens=None):
-        self.client = client
+    def __init__(self, backend, on_tokens=None):
+        self.backend = backend
         self.on_tokens = on_tokens or (lambda a, b: None)
 
-    def _account(self, response):
-        u = response.usage
-        self.on_tokens(
-            (u.input_tokens or 0) + (getattr(u, 'cache_read_input_tokens', 0) or 0)
-            + (getattr(u, 'cache_creation_input_tokens', 0) or 0),
-            u.output_tokens or 0)
-
-    def call(self, system, prompt, schema=None, tools=None, effort='high',
+    def call(self, system, prompt, schema=None, web=False, effort='high',
              max_tokens=16000):
-        messages = [{'role': 'user', 'content': prompt}]
-        kwargs = {
-            'model': MODEL,
-            'max_tokens': max_tokens,
-            'system': system,
-            'thinking': {'type': 'adaptive'},
-            'output_config': {'effort': effort},
-        }
-        if schema:
-            kwargs['output_config']['format'] = {'type': 'json_schema', 'schema': schema}
-        if tools:
-            kwargs['tools'] = tools
-
-        # A server-side tool loop can hit its iteration limit and come back with
-        # stop_reason "pause_turn". Re-sending the same conversation resumes it;
-        # the cap stops a runaway from billing forever.
-        for _ in range(6):
-            response = self.client.messages.create(messages=messages, **kwargs)
-            self._account(response)
-            if response.stop_reason == 'refusal':
-                detail = getattr(response.stop_details, 'category', None)
-                raise Refused(f'Claude declined this request ({detail or "no category"}).')
-            if response.stop_reason != 'pause_turn':
-                break
-            messages = [messages[0], {'role': 'assistant', 'content': response.content}]
-        else:
-            raise RuntimeError('Server tool loop did not settle after 6 continuations.')
-
-        text = '\n'.join(b.text for b in response.content if b.type == 'text')
-        if schema:
-            return json.loads(text)
-        return text
+        out, (tin, tout) = self.backend.complete(
+            system, prompt, schema=schema, web=web, effort=effort,
+            max_tokens=max_tokens)
+        self.on_tokens(tin, tout)
+        return out
 
 
 # ---------------------------------------------------------------- schemas
@@ -246,12 +206,6 @@ EDIT_SCHEMA = {
     'additionalProperties': False,
 }
 
-WEB_TOOLS = [
-    {'type': 'web_search_20260209', 'name': 'web_search', 'max_uses': 12},
-    {'type': 'web_fetch_20260209', 'name': 'web_fetch', 'max_uses': 10},
-]
-
-
 # ---------------------------------------------------------------- the agents
 
 PLANNER = """You are the Planner on the [Context] research team.
@@ -395,11 +349,10 @@ cannot fix from the material you were given."""
 STAGES = ['plan', 'search', 'read', 'check', 'write', 'edit']
 
 
-def run(goal, lens_hint, on_stage, on_tokens, client=None):
+def run(goal, lens_hint, on_stage, on_tokens, backend=None):
     """Run the whole team. `on_stage(name, output, seconds)` is called after
     each agent so the caller can persist progress; the UI polls that."""
-    client = client or anthropic.Anthropic()
-    agent = Stage(client, on_tokens)
+    agent = Stage(backend or get_backend(), on_tokens)
     rules = _house_rules()
 
     def timed(name, fn):
@@ -421,13 +374,13 @@ def run(goal, lens_hint, on_stage, on_tokens, client=None):
         SEARCHER,
         f'Subject: {plan["title"]}\nCandidate Turn: {plan["candidate_turn"]}\n\n'
         f'Research questions:\n{questions}\n\nSearch, and report what you find.',
-        tools=WEB_TOOLS, max_tokens=20000))
+        web=True, max_tokens=20000))
 
     read = timed('read', lambda: agent.call(
         READER,
         f'Subject: {plan["title"]}\n\nSearch notes:\n\n{search}\n\n'
         'Fetch and read the sources most worth reading in full.',
-        tools=WEB_TOOLS, max_tokens=20000))
+        web=True, max_tokens=20000))
 
     check = timed('check', lambda: agent.call(
         CHECKER,
@@ -471,9 +424,9 @@ claim the paper does not support — apply what you can, and say so in `changes`
 Diagram label limit is 26 characters, as before."""
 
 
-def revise(story, instruction, on_tokens=None, client=None):
+def revise(story, instruction, on_tokens=None, backend=None):
     """Prompt-based edit from the approval screen."""
-    agent = Stage(client or anthropic.Anthropic(), on_tokens)
+    agent = Stage(backend or get_backend(), on_tokens)
     out = agent.call(
         REVISE,
         f'CURRENT DRAFT\n\n{json.dumps(story, indent=1)}\n\n'

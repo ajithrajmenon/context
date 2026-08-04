@@ -28,7 +28,7 @@ import traceback
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 
-from . import publish, research, store
+from . import backend, publish, research, store
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -221,7 +221,10 @@ def dashboard(request: Request, m: str = ''):
         f'{e(r["state"])}</span></td><td class="muted">{e(r["stage"])}</td></tr>'
         for r in runs)
 
-    return page('Dashboard', f"""
+    kind, label = backend.describe()
+    badge = (f'<div class="card"><span class="pill {"ok" if kind != "none" else "bad"}">'
+             f'{e(kind)}</span> {e(label)}</div>')
+    return page('Dashboard', f"""{badge}
 <div class="row" style="gap:1rem">
   <div class="card" style="flex:1"><b style="font-size:1.8rem">{live}</b>
     <div class="muted">live on the site</div></div>
@@ -313,10 +316,13 @@ RUNNING = {}
 def generate_form(request: Request, m: str = ''):
     if not authed(request):
         return login_redirect()
-    key = 'set' if os.environ.get('ANTHROPIC_API_KEY') else 'MISSING'
-    warn = ('' if key == 'set' else
-            '<div class="card"><b>ANTHROPIC_API_KEY is not set.</b> '
-            'The research team cannot run without it.</div>')
+    kind, label = backend.describe()
+    if kind == 'none':
+        warn = (f'<div class="card"><b>No way to reach Claude.</b>'
+                f'<p class="muted">{e(label)}</p></div>')
+    else:
+        warn = (f'<div class="card"><span class="pill ok">{e(kind)}</span> '
+                f'{e(label)}</div>')
     return page('Generate', f"""{warn}
 <p class="sub">Give the team a research goal. Six agents work it in order —
 Planner, Search, Reader, Fact Checker, Writer, Editor — and the result lands in
@@ -330,8 +336,9 @@ the approval queue. Nothing publishes without you.</p>
 <option>What</option><option>Why</option><option>How</option><option>What if</option>
 </select>
 <p></p><button type="submit">Send it to the team</button></form>
-<p class="muted">A run takes several minutes and costs real API tokens. It runs in
-the background — you can leave this page.</p>""", '/generate', m)
+<p class="muted">A run takes several minutes. On the CLI backend it draws on your
+Claude subscription's usage allowance; on the API backend it bills tokens. It runs
+in the background — you can leave this page.</p>""", '/generate', m)
 
 
 def _worker(run_id, goal, lens_hint):

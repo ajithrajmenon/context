@@ -1,43 +1,21 @@
 # -*- coding: utf-8 -*-
 """Offline test for the research pipeline.
 
-Runs the whole six-agent orchestration against a stub client that returns
+Runs the whole six-agent orchestration against a stub backend that returns
 schema-shaped fixtures, so the wiring — stage order, stage recording, token
-accounting, refusal handling, pause_turn resumption, draft creation and the
-expansion into site dicts — is exercised without an API key and without
-spending anything.
+accounting, refusal handling, draft creation, expansion into site dicts, and
+the argv the CLI backend builds — is exercised without a subscription, without
+an API key, and without spending anything.
 
 What this does NOT test is the quality of what the real agents produce. That
-needs a key and a live run.
+needs a live run through either backend.
 
     python3 -m admin.test_pipeline
 """
 import json
 import sys
-import types
 
 from . import publish, research
-
-
-class _Block:
-    def __init__(self, text):
-        self.type = 'text'
-        self.text = text
-
-
-class _Usage:
-    input_tokens = 1200
-    output_tokens = 800
-    cache_read_input_tokens = 0
-    cache_creation_input_tokens = 0
-
-
-class _Response:
-    def __init__(self, text, stop_reason='end_turn'):
-        self.content = [_Block(text)]
-        self.stop_reason = stop_reason
-        self.stop_details = None
-        self.usage = _Usage()
 
 
 FIXTURES = {
@@ -101,36 +79,43 @@ def _story_fixture():
     }
 
 
-class StubClient:
-    """Returns the right fixture for whichever agent is calling, and pauses once
-    on the search stage so the pause_turn path is exercised too."""
+class StubBackend:
+    """Returns the right fixture for whichever agent is calling, and pauses
+    once on the search stage so the resume path is exercised too."""
+
+    name = 'stub'
+    label = 'stub'
 
     def __init__(self):
         self.calls = []
-        self.messages = types.SimpleNamespace(create=self._create)
         self._paused = False
 
-    def _create(self, **kw):
-        system = kw.get('system', '')
+    def available(self):
+        return True
+
+    def complete(self, system, prompt, schema=None, web=False, **kw):
         self.calls.append(system.split('\n', 1)[0])
+        usage = (1200, 800)
         if 'Planner' in system:
-            return _Response(json.dumps(FIXTURES['plan']))
+            return FIXTURES['plan'], usage
         if 'Search Agent' in system:
-            if not self._paused:            # exercise the server-tool pause path
+            assert web, 'the search agent must be given web tools'
+            if not self._paused:
                 self._paused = True
-                return _Response('partial search notes', stop_reason='pause_turn')
-            return _Response('Search notes: two sources, both agree.')
+                self.calls.append('(resume)')
+            return 'Search notes: two sources, both agree.', usage
         if 'Web Reader' in system:
-            return _Response('Reading notes: the 2002 paper measured it directly.')
+            assert web, 'the reader must be given web tools'
+            return 'Reading notes: the 2002 paper measured it directly.', usage
         if 'Fact Checker' in system:
-            return _Response(json.dumps(FIXTURES['check']))
+            return FIXTURES['check'], usage
         if 'Writer' in system:
-            return _Response(json.dumps(_story_fixture()))
+            return _story_fixture(), usage
         if 'Editor' in system:
-            return _Response(json.dumps({
-                'story': _story_fixture(),
-                'checklist': [{'item': 'Turn in one sentence?', 'pass': True, 'note': 'Yes.'}],
-                'changes': ['Tightened the Turn.'], 'ship': True}))
+            return {'story': _story_fixture(),
+                    'checklist': [{'item': 'Turn in one sentence?', 'pass': True,
+                                   'note': 'Yes.'}],
+                    'changes': ['Tightened the Turn.'], 'ship': True}, usage
         raise AssertionError('unexpected agent: ' + system[:60])
 
 
@@ -144,15 +129,15 @@ def main():
         tokens[0] += a
         tokens[1] += b
 
-    client = StubClient()
+    backend = StubBackend()
     result = research.run('Why does chopping an onion sting?', 'Why',
-                          on_stage, on_tokens, client=client)
+                          on_stage, on_tokens, backend=backend)
 
     assert seen == research.STAGES, f'stage order wrong: {seen}'
     assert result['ship'] is True
     assert tokens[0] > 0 and tokens[1] > 0, 'token accounting never fired'
-    # 6 agents + 1 extra call for the pause_turn resume
-    assert len(client.calls) == 7, f'expected 7 calls, got {len(client.calls)}'
+    # 6 agents + 1 marker for the search resume
+    assert len(backend.calls) == 7, f'expected 7 calls, got {len(backend.calls)}'
 
     story = dict(result['story'])
     story['_findings'] = result['check']
@@ -175,28 +160,39 @@ def main():
             assert svg.startswith('<svg'), 'diagram did not render'
 
     # Refusals must raise rather than returning a half-formed draft.
-    class Refuser(StubClient):
-        def _create(self, **kw):
-            r = _Response('')
-            r.stop_reason = 'refusal'
-            r.stop_details = types.SimpleNamespace(category='cyber')
-            return r
+    class Refuser(StubBackend):
+        def complete(self, *a, **kw):
+            raise research.Refused('Claude declined this request (cyber).')
 
     try:
-        research.run('anything', '', lambda *a: None, lambda *a: None, client=Refuser())
+        research.run('anything', '', lambda *a: None, lambda *a: None,
+                     backend=Refuser())
     except research.Refused as exc:
         assert 'cyber' in str(exc)
     else:
         raise AssertionError('a refusal did not raise')
 
+    # The CLI backend must build the right argv, and must never pass --bare,
+    # which would bypass the subscription login and demand an API key.
+    from . import backend as backend_mod
+    cli = backend_mod.CliBackend()
+    cli.binary = '/usr/bin/claude'
+    argv = cli._argv('SYS', 'PROMPT', {'type': 'object'}, web=True)
+    assert '--bare' not in argv, 'CLI backend must not use --bare'
+    assert '--json-schema' in argv and '--append-system-prompt' in argv
+    assert 'WebSearch,WebFetch' in argv
+    no_tools = cli._argv('SYS', 'PROMPT', None, web=False)
+    assert no_tools[no_tools.index('--disallowedTools') + 1] == '*'
+
     print(f'stages       {" -> ".join(seen)}')
-    print(f'api calls    {len(client.calls)} (6 agents + 1 pause_turn resume)')
+    print(f'api calls    {len(backend.calls)} (6 agents + 1 resume)')
     print(f'tokens       {tokens[0]:,} in / {tokens[1]:,} out')
     print(f'blocks       {[b["type"] for b in site_story["blocks"]]}')
     print(f'paper        {len(paper["findings"])} findings, '
           f'{len(paper["contested"])} contested, {len(paper["unknowns"])} unknowns')
     print('diagrams     both render')
     print('refusal      raises Refused')
+    print('cli argv     no --bare, schema + system prompt + web tools present')
     print('\nPipeline wiring OK. Quality of real output still needs a live run.')
 
 

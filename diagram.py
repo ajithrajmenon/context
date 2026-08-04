@@ -549,3 +549,224 @@ def render(name):
 
 def thumb(name):
     return THUMBS[name]()
+
+
+# ==================================================================
+# PARAMETERISED DIAGRAM GRAMMAR
+#
+# The twelve diagrams above are hand-composed one-offs for the four
+# flagship stories. That does not scale to fifty.
+#
+# These seven types take their content as data — every title, label,
+# number and colour comes from the story. The visual language is shared
+# (that is the point: a reader learns to read one and can read them all)
+# while the content is entirely per-story. Same principle as any
+# infographic desk: a chart vocabulary, bespoke content inside it.
+# ==================================================================
+
+SEQ = ['blue', 'rose', 'amber', 'green', 'violet', 'cyan', 'orange', 'teal', 'pink', 'indigo']
+
+
+def _col(i):
+    return C[SEQ[i % len(SEQ)]]
+
+
+def _wrap(text, width):
+    words, line, lines = text.split(), '', []
+    for w in words:
+        if len(line) + len(w) > width:
+            lines.append(line.rstrip())
+            line = ''
+        line += w + ' '
+    if line.strip():
+        lines.append(line.rstrip())
+    return lines
+
+
+def _head(title, sub):
+    out = [label(40, 46, title, 22)]
+    if sub:
+        for i, ln in enumerate(_wrap(sub, 96)[:2]):
+            out.append(note(40, 70 + i * 20, ln, 13.5))
+    return out
+
+
+def d_timeline(title, sub, events, footer=''):
+    """Ordered events on a line. events: [(frac, name, note)]"""
+    out = _head(title, sub)
+    x0, x1, y = 70, 880, 250
+    out.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke="{C["line"]}" '
+               f'stroke-width="4" stroke-linecap="round"/>')
+    for i, (f, name, desc) in enumerate(events):
+        x = x0 + f * (x1 - x0)
+        up = i % 2 == 0
+        ty = y - 44 if up else y + 48
+        col = _col(i)
+        out.append(f'<circle cx="{x:.0f}" cy="{y}" r="19" fill="{col}" opacity=".2"/>')
+        out.append(f'<circle cx="{x:.0f}" cy="{y}" r="10" fill="{col}"/>')
+        out.append(f'<line x1="{x:.0f}" y1="{y + (-19 if up else 19)}" x2="{x:.0f}" '
+                   f'y2="{ty + (14 if up else -14)}" stroke="{col}" stroke-width="2"/>')
+        # Labels at the ends of the line would run past the viewBox if they
+        # stayed centred on their dot, so the outer ones anchor inward instead.
+        if x > VB_W - 160:
+            anc, tx = 'end', VB_W - 24
+        elif x < 160:
+            anc, tx = 'start', 24
+        else:
+            anc, tx = 'middle', x
+        out.append(label(tx, ty, name, 15, col, anc))
+        for j, ln in enumerate(_wrap(desc, 24)[:2]):
+            oy = ty - 42 + j * 18 if up else ty + 24 + j * 18
+            out.append(note(tx, oy, ln, 12.5, anchor=anc))
+    if footer:
+        out.append(note(x0, 500, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_ranked(title, sub, rows, footer=''):
+    """Bars, ranked. rows: [(label, 0..1, note)]"""
+    out = _head(title, sub)
+    x0, w = 270, 470
+    top = 120
+    for i, (name, frac, desc) in enumerate(rows):
+        y = top + i * (330 // max(len(rows), 1) + 22)
+        col = _col(i)
+        out.append(label(40, y + 20, name, 15))
+        out.append(bar(x0, y, w, 27, max(0.02, min(1, frac)), col))
+        if desc:
+            out.append(note(x0 + w + 16, y + 19, desc[:26], 12.5, col))
+    if footer:
+        out.append(note(40, 520, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_curves(title, sub, series, marks=(), footer='', axis=('', '')):
+    """Two or more lines. series: [(name, [(0..1, 0..1)...])]"""
+    out = _head(title, sub)
+    x0, x1, y0, y1 = 90, 880, 150, 400
+    out.append(f'<line x1="{x0}" y1="{y1}" x2="{x1}" y2="{y1}" stroke="{C["line"]}" stroke-width="2"/>')
+    for i, (name, pts) in enumerate(series):
+        col = _col(i)
+        d = 'M' + ' L'.join(f'{x0 + px * (x1 - x0):.0f} {y1 - py * (y1 - y0):.0f}' for px, py in pts)
+        dash = ' stroke-dasharray="8 6"' if i else ''
+        out.append(f'<path d="{d}" fill="none" stroke="{col}" stroke-width="4" '
+                   f'stroke-linecap="round"{dash}/>')
+        out.append(tag(x0 + 16 + i * 168, y0 - 16, name, col))
+    for f, txt in marks:
+        x = x0 + f * (x1 - x0)
+        out.append(f'<line x1="{x:.0f}" y1="{y0 - 4}" x2="{x:.0f}" y2="{y1}" '
+                   f'stroke="{C["line"]}" stroke-width="1.5" stroke-dasharray="4 4"/>')
+        out.append(note(x, y1 + 26, txt, 13, anchor='middle'))
+    if axis[0]:
+        out.append(note(x0, y1 + 50, axis[0], 13))
+    if axis[1]:
+        out.append(note(x1, y1 + 50, axis[1], 13, anchor='end'))
+    if footer:
+        out.append(note(40, 520, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_layers(title, sub, rows, footer=''):
+    """Stacked bands. rows: [(name, what, meta)]"""
+    out = _head(title, sub)
+    top = 120
+    h = min(104, (400 - 0) // max(len(rows), 1))
+    for i, (name, what, meta) in enumerate(rows):
+        y = top + i * (h + 16)
+        col = _col(i)
+        out.append(f'<rect x="40" y="{y}" width="860" height="{h}" rx="18" fill="{col}" opacity=".1"/>')
+        out.append(f'<rect x="40" y="{y}" width="12" height="{h}" rx="6" fill="{col}"/>')
+        out.append(tag(78, y + 32, name, col))
+        out.append(label(78, y + 70, what, 16))
+        if meta:
+            out.append(note(876, y + 38, meta, 13, col, 'end'))
+    if footer:
+        out.append(note(40, 530, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_compare(title, sub, left, right, footer=''):
+    """Two panels. left/right: (kicker, head, [lines])"""
+    out = _head(title, sub)
+    for k, (side, x) in enumerate(((left, 40), (right, 500))):
+        kicker, head, lines = side
+        col = _col(k * 4)
+        out.append(panel(x, 130, 400, 290, col, .08))
+        out.append(tag(x + 26, 174, kicker, col))
+        out.append(label(x + 26, 226, head, 19))
+        for j, ln in enumerate(lines[:5]):
+            out.append(note(x + 26, 262 + j * 24, ln, 14))
+    out.append(arrow(452, 275, 488, 275, C['ink'], 3))
+    if footer:
+        out.append(note(40, 480, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_parts(title, sub, centre, callouts, footer=''):
+    """A labelled thing with leader lines. callouts: [(name, note)]
+
+    Anchors run top to bottom in the same order as the labels, because
+    crossed leaders read as a mistake.
+    """
+    import math
+    out = _head(title, sub)
+    cx, cy, r = 250, 300, 145
+    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{_col(0)}" opacity=".18"/>')
+    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{_col(0)}" stroke-width="4"/>')
+    out.append(f'<circle cx="{cx}" cy="{cy}" r="{r*.45:.0f}" fill="{_col(0)}" opacity=".5"/>')
+    for j, ln in enumerate(_wrap(centre, 14)[:2]):
+        out.append(label(cx, cy + 6 + j * 20, ln, 15, '#fff', 'middle'))
+    n = max(len(callouts), 1)
+    for i, (name, desc) in enumerate(callouts):
+        ang = -0.95 + (1.9 * i / max(n - 1, 1))
+        px, py = cx + math.cos(ang) * (r + 6), cy + math.sin(ang) * (r + 6)
+        lx, ly = 570, 150 + i * (300 // n if n > 1 else 1)
+        col = _col(i + 1)
+        out.append(leader(px, py, lx - 14, ly - 4, col))
+        out.append(tag(lx, ly, name, col))
+        for j, line in enumerate(_wrap(desc, 32)[:2]):
+            out.append(note(lx, ly + 30 + j * 18, line, 13))
+    if footer:
+        out.append(note(40, 530, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+def d_field(title, sub, share, lit_label, dim_label, footer=''):
+    """A grid of dots showing a proportion, with both parts named."""
+    out = _head(title, sub)
+    cols, rows = 24, 8
+    total = cols * rows
+    lit = round(total * max(0, min(1, share)))
+    for i in range(total):
+        x = 60 + (i % cols) * 34
+        y = 130 + (i // cols) * 34
+        if i < lit:
+            out.append(f'<circle cx="{x}" cy="{y}" r="11" fill="{_col(0)}"/>')
+        else:
+            out.append(f'<circle cx="{x}" cy="{y}" r="8" fill="{C["shade"]}" '
+                       f'stroke="{C["line"]}" stroke-width="1.5"/>')
+    out.append(f'<circle cx="72" cy="442" r="10" fill="{_col(0)}"/>')
+    out.append(note(92, 448, lit_label + ' \u2014 ' + format(share * 100, '.0f') + '%', 14, C['ink']))
+    out.append(f'<circle cx="72" cy="482" r="8" fill="{C["shade"]}" stroke="{C["line"]}" stroke-width="1.5"/>')
+    out.append(note(92, 488, dim_label + ' \u2014 ' + format((1 - share) * 100, '.0f') + '%', 14, C['muted']))
+    if footer:
+        out.append(note(40, 534, footer, 14, C['ink']))
+    return _svg(''.join(out), title=title)
+
+
+KINDS = {
+    'timeline': d_timeline,
+    'ranked': d_ranked,
+    'curves': d_curves,
+    'layers': d_layers,
+    'compare': d_compare,
+    'parts': d_parts,
+    'field': d_field,
+}
+
+
+def build(spec):
+    """spec: {'kind': ..., plus that kind's arguments}"""
+    s = dict(spec)
+    kind = s.pop('kind')
+    return KINDS[kind](**s)

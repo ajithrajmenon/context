@@ -80,9 +80,13 @@ img, svg, canvas { max-width: 100%; }
 
 .masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem 0; }
 
-.wordmark { display: inline-flex; align-items: baseline; gap: .12em; font-size: 1.5rem; font-weight: 800; color: var(--ink); text-decoration: none; }
-.wordmark i { width: .34em; height: .34em; border-radius: 50%; background: var(--accent); display: inline-block; animation: orbit 5s var(--ease) infinite; }
-@keyframes orbit { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-.42em); } }
+.wordmark { display: inline-flex; align-items: baseline; gap: .04em; font-size: 1.5rem; font-weight: 800; color: var(--ink); text-decoration: none; }
+/* The brackets are the mark. They breathe apart and back, slowly, which is
+   the only motion in the masthead. */
+.wordmark i { font-style: normal; color: var(--accent); display: inline-block; animation: brackets 5s var(--ease) infinite; }
+.wordmark i:last-child { animation-delay: 2.5s; }
+@keyframes brackets { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-.14em); } }
+@media (prefers-reduced-motion: reduce) { .wordmark i { animation: none; } }
 
 .nav { display: flex; gap: 1.5rem; align-items: center; font-weight: 600; }
 .nav a { color: var(--muted); text-decoration: none; }
@@ -429,6 +433,8 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
 }
 .row-art { border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
 .row-art .dia { display: block; width: 100%; height: auto; }
+.row-scene { display: block; aspect-ratio: 16 / 10; border-radius: inherit; }
+.row-scene .art { display: block; width: 100%; height: 100%; }
 .row-body { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
 .row-kicker {
   font-family: var(--display); font-size: .74rem; font-weight: 700;

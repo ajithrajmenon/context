@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds Context into site/.
+"""Builds [Context] into site/.
 
 No dependencies and no framework — read stories_data.py, write HTML.
 
@@ -14,6 +14,7 @@ Categories are derived from the stories, so a new subject needs no other
 change.
 """
 import os
+import re
 import shutil
 
 import diagram
@@ -37,20 +38,39 @@ ART = {
 }
 
 
+_DIA_WORDS = {}
+
+
+def _svg_words(svg):
+    """Words a reader actually reads off a picture."""
+    return sum(len(t.split()) for t in re.findall(r'<text[^>]*>(.*?)</text>', svg, re.S))
+
+
+def diagram_words(b):
+    key = repr(b.get('spec') or b.get('name'))
+    if key not in _DIA_WORDS:
+        svg = diagram.build(b['spec']) if 'spec' in b else diagram.render(b['name'])
+        _DIA_WORDS[key] = _svg_words(svg)
+    return _DIA_WORDS[key]
+
+
 def read_minutes(story):
     """Time on the page, not just words on it.
 
-    A story is prose plus diagrams you stop and decode plus one figure you
-    operate. Counting only the words gave every story the same floor value,
-    which reads as a template and undersells the page.
+    These stories are picture-led, so counting prose alone put every one of the
+    fifty at the same four minutes — which is both wrong and reads as a
+    template. A labelled diagram is text: its rows and callouts are the
+    explanation, not decoration, so the words inside it count, at the slower
+    rate you read something you have to look at while reading.
     """
     words = len(story['hero']['standfirst'].split())
-    diagrams = figures = 0
+    dia_words = figures = 0
     for b in story['blocks']:
         if b['type'] == 'diagram':
-            diagrams += 1
+            dia_words += diagram_words(b)
         if b['type'] == 'figure':
             figures += 1
+            dia_words += _svg_words(b.get('svg', ''))
         for key in ('h', 'p', 'text', 'caption'):
             v = b.get(key)
             if isinstance(v, str):
@@ -60,12 +80,22 @@ def read_minutes(story):
         for it in b.get('items', []):
             words += len(it['h'].split()) + len(it['p'].split())
     words += len(story['zoomout']['text'].split())
-    # 200 wpm for prose, ~25s to read a labelled diagram, ~50s to play with a figure
-    seconds = (words / 200) * 60 + diagrams * 25 + figures * 50
-    return max(4, round(seconds / 60))
+    # 200 wpm for prose, 90 wpm for diagram text, ~40s to work a figure
+    seconds = (words / 200) * 60 + (dia_words / 90) * 60 + figures * 40
+    return max(3, round(seconds / 60))
 
 
-def art(scene, seed, light=False):
+def card_meta(s):
+    """What the card promises. Only claim a figure if the story actually has one."""
+    d = sum(1 for b in s['blocks'] if b['type'] == 'diagram')
+    f = sum(1 for b in s['blocks'] if b['type'] == 'figure')
+    bits = [f'{read_minutes(s)} min read', f'{d} diagram' + ('s' if d != 1 else '')]
+    if f:
+        bits.append('1 thing to play with' if f == 1 else f'{f} things to play with')
+    return ' &#183; '.join(bits)
+
+
+def art(scene, seed, light=False, variant=0):
     """Ambient artwork. Only the hero panels use it — everything that has to
     teach something uses a labelled diagram instead, and holds still.
 
@@ -75,7 +105,7 @@ def art(scene, seed, light=False):
     four banners rendered the same starfield regardless of subject.
     """
     name = scene if scene in illustrate.SCENES else ART.get(scene, 'cosmos')
-    return illustrate.render(name, seed, light=light)
+    return illustrate.render(name, seed, light=light, variant=variant)
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(ROOT, 'site')
@@ -105,7 +135,7 @@ def masthead(prefix, current):
         return ' aria-current="page"' if p == current else ''
     return f'''<div class="shell">
 <header class="masthead">
-  <a class="wordmark" href="{prefix}index.html">Context<i></i></a>
+  <a class="wordmark" href="{prefix}index.html"><i>[</i>Context<i>]</i></a>
   <nav class="nav">
     <a href="{prefix}index.html"{mark('home')}>Home</a>
     <a href="{prefix}stories.html"{mark('stories')}>Stories</a>
@@ -119,7 +149,7 @@ def masthead(prefix, current):
 def foot(prefix):
     return f'''<div class="shell">
 <footer class="site-foot">
-  <span>Context &#183; a storytelling team. We take something large and put it next to something you already know.</span>
+  <span>[Context] &#183; a storytelling team. We take something large and put it next to something you already know.</span>
   <a href="{prefix}stories.html">All stories</a>
 </footer>
 </div>
@@ -128,16 +158,35 @@ def foot(prefix):
 '''
 
 
+TOPICS = [
+    ('Your body', ('Your body', 'Sleep', 'Death', 'Immunity', 'Ageing', 'Senses')),
+    ('Mind', ('Mind', 'Emotion')),
+    ('Life & nature', ('Life', 'Nature', 'Earth')),
+    ('Everyday', ('Kitchen', 'Home', 'Tech', 'Time')),
+    ('Physics', ('Physics',)),
+    ('Numbers & money', ('Numbers', 'Money', 'People')),
+    ('Cosmos', ('Cosmos',)),
+]
+TOPIC_OF = {k: t for t, ks in TOPICS for k in ks}
+
+
+def topic(s):
+    """The filter grouping. The kicker stays specific — 'Sleep', 'Kitchen' — because
+    it reads better on the card. Twenty of those as filter chips does not, so cards
+    also carry a broader topic and the filter uses that."""
+    return TOPIC_OF.get(s['kicker'], 'Everyday')
+
+
 def card(s, prefix, delay=0):
-    return f'''<li class="t-{s['card_tone']}" data-kicker="{s['kicker']}" data-reveal="{delay}">
+    return f'''<li class="t-{s['card_tone']}" data-kicker="{topic(s).replace('&', '&amp;')}" data-reveal="{delay}">
   <a class="card" href="{prefix}stories/{s['slug']}.html">
-    <span class="card-art scene">{art(s['hero']['scene'], s['slug'] + 'card', light=True)}</span>
+    <span class="card-art scene">{art(s['hero']['scene'], s['slug'] + 'card', light=True, variant=s['hero'].get('var', 0))}</span>
     <span class="card-body">
       <span class="card-kicker">{s['kicker']}</span>
       <span class="card-title">{s['title']}</span>
       <span class="card-teaser">{s['teaser']}</span>
       <span class="card-takeaway">You will come away knowing: {s['takeaway']}</span>
-      <span class="card-meta">{read_minutes(s)} min read &#183; {sum(1 for b in s['blocks'] if b['type'] == 'diagram')} diagrams &#183; 1 thing to play with</span>
+      <span class="card-meta">{card_meta(s)}</span>
     </span>
   </a>
 </li>'''
@@ -147,10 +196,10 @@ def card(s, prefix, delay=0):
 
 def block_scene(b, i, story):
     return f'''<li class="t-{b['tone']} bleed" data-reveal="0">
-  <div class="scene card-scene">{art(b['scene'], story['slug'] + b['scene'] + str(i))}
+  <div class="scene card-scene">{art(b['scene'], story['slug'] + b['scene'] + str(i), variant=b.get('var', 0))}
     <div class="scene-pad">
       <h2>{b['h']}</h2>
-      <p>{b['p']}</p>
+      {f"<p>{b['p']}</p>" if b.get('p') else ''}
     </div>
   </div>
 </li>'''
@@ -159,7 +208,7 @@ def block_scene(b, i, story):
 def block_diagram(b, i, story):
     return f'''<li data-reveal="0">
   <figure class="card-dia">
-    <div class="dia-stage">{diagram.render(b['name'])}</div>
+    <div class="dia-stage">{diagram.build(b['spec']) if 'spec' in b else diagram.render(b['name'])}</div>
     <figcaption class="caption">{b['caption']}</figcaption>
   </figure>
 </li>'''
@@ -265,22 +314,24 @@ def build_home():
   <p>{p}</p>
 </li>''' for i, ((h, p), t) in enumerate(zip(PILLARS, ['nebula', 'deepsea', 'ember'])))
 
-    chips = ''.join(f'<li><a class="filter" href="stories.html">{k}</a></li>' for k in kickers)
+    chips = ''.join(f'<li><a class="filter" href="stories.html">{t.replace("&", "&amp;")}</a></li>'
+                    for t, _ in TOPICS if any(topic(s) == t for s in STORIES))
 
     return (
-        head(f'Context &#8212; {TAGLINE}',
-             'A storytelling team. We break the biggest ideas down into stories '
-             'anyone can follow, with something to operate in every one.', '', 'nebula')
+        head(f'[Context] &#8212; {TAGLINE}',
+             'A storytelling team. Fifty stories about your body, your mind and the '
+             'world, each with the research behind it published in full.', '', 'nebula')
         + masthead('', 'home')
         + f'''<div class="shell">
 <section class="hero">
   <div class="scene">{art("orbit", "home")}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">A storytelling team</p>
-      <h1 data-reveal="80">Things worth understanding about your own body.</h1>
-      <p data-reveal="160">Each one takes about ten minutes, shows you the mechanism in labelled
-      pictures rather than jargon, and ends with what it actually changes. Every story has a
-      sourced paper behind it, so you can check us.</p>
+      <h1 data-reveal="80">Fifty things worth actually understanding.</h1>
+      <p data-reveal="160">Your body, your mind, the world you live in and the one it sits in.
+      Every story turns on a reversal &#8212; the thing you thought was going on, and what is
+      going on instead &#8212; explained in labelled pictures rather than jargon, and ending with
+      what it changes. Every one has a sourced paper behind it, so you can check us.</p>
       <a class="cta" href="stories.html" data-reveal="240">Read the stories &#8594;</a>
     </div>
   </div>
@@ -298,7 +349,8 @@ def build_home():
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>Start here</h2>
-    <p>Four to begin with. Each says up front how long it takes and what you will come away knowing.</p>
+    <p>Four of the fifty, built long. Each says up front how long it takes and what you
+    will come away knowing.</p>
   </div>
   <ul class="grid">
 {chr(10).join(card(s, '', (i % 3) * 90) for i, s in enumerate(featured))}
@@ -308,7 +360,7 @@ def build_home():
 <section class="band">
   <div class="band-head" data-reveal="0">
     <h2>What we cover</h2>
-    <p>Anything worth being curious about. The list grows whenever something catches us.</p>
+    <p>Fifty stories across seven subjects, and the list grows whenever something catches us.</p>
   </div>
   <ul class="filters" data-reveal="60">{chips}</ul>
 </section>
@@ -319,27 +371,28 @@ def build_home():
 
 
 def build_stories():
-    kickers = []
+    counts = {}
     for s in STORIES:
-        if s['kicker'] not in kickers:
-            kickers.append(s['kicker'])
+        counts[topic(s)] = counts.get(topic(s), 0) + 1
     chips = ''.join(
-        f'<li><button class="filter" data-filter="{k}" aria-pressed="false">{k}</button></li>'
-        for k in kickers)
+        f'<li><button class="filter" data-filter="{t.replace("&", "&amp;")}" aria-pressed="false">'
+        f'{t.replace("&", "&amp;")} <b>{counts[t]}</b></button></li>'
+        for t, _ in TOPICS if t in counts)
 
     return (
-        head('Stories &#8212; Context',
-             'Every story we have told so far, across space, time, matter, life and mind.',
-             '', 'dusk')
+        head('Stories &#8212; [Context]',
+             'All fifty stories, across the body, the mind, life, the everyday, '
+             'physics, numbers and the cosmos.', '', 'dusk')
         + masthead('', 'stories')
         + f'''<div class="shell">
 <section class="band">
   <div class="band-head" data-reveal="0">
-    <h2>Stories</h2>
-    <p>Everything we have published. Filter by subject, or just scroll.</p>
+    <h2>All fifty stories</h2>
+    <p>Everything we have published. Each card shows what you will come away knowing,
+    so you can pick on that rather than on the title. Filter by subject, or just scroll.</p>
   </div>
   <ul class="filters" data-reveal="60">
-    <li><button class="filter" data-filter="" aria-pressed="true">Everything</button></li>
+    <li><button class="filter" data-filter="" aria-pressed="true">Everything <b>{len(STORIES)}</b></button></li>
     {chips}
   </ul>
   <ul class="grid" id="storyGrid">
@@ -374,11 +427,11 @@ def build_story(s, nxt):
     zoom = s['zoomout']
 
     return (
-        head(f"{s['title']} &#8212; Context", s['teaser'], '../', hero['tone'])
+        head(f"{s['title']} &#8212; [Context]", s['teaser'], '../', hero['tone'])
         + masthead('../', 'stories')
         + f'''<div class="shell">
 <section class="story-hero t-{hero['tone']}">
-  <div class="scene">{art(hero['scene'], s['slug'])}
+  <div class="scene">{art(hero['scene'], s['slug'], variant=hero.get('var', 0))}
     <div class="hero-pad">
       <p class="eyebrow" data-reveal="0">{s['kicker']}</p>
       <h1 data-reveal="80">{s['title']}</h1>
@@ -453,7 +506,7 @@ def build_paper(paper):
             f'&#8592; Back to the story: {story["title"]}</a>') if story else ''
 
     return (
-        head(f"{paper['title']} &#8212; Context research", paper['subtitle'], '../', 'dusk')
+        head(f"{paper['title']} &#8212; [Context] research", paper['subtitle'], '../', 'dusk')
         + masthead('../', 'papers')
         + f'''<div class="shell">
 <article class="paper">
@@ -507,13 +560,24 @@ def build_paper(paper):
     )
 
 
+def row_art(story):
+    """The paper row's picture. Hand-drawn thumbnail where one exists; otherwise
+    the story's own banner, so the row still says what the paper is about."""
+    if not story:
+        return ''
+    if story.get('thumb'):
+        return diagram.thumb(story['thumb'])
+    h = story['hero']
+    return f'<span class="scene row-scene">{art(h["scene"], story["slug"] + "row", light=True, variant=h.get("var", 0))}</span>'
+
+
 def build_papers_index():
     rows = ''
     for i, paper in enumerate(PAPERS):
         story = next((x for x in STORIES if x['slug'] == paper['slug']), None)
         rows += f'''<li class="t-{story["card_tone"] if story else "dusk"}" data-reveal="{(i % 3) * 80}">
   <a class="row" href="papers/{paper['slug']}.html">
-    <span class="row-art">{diagram.thumb(story['thumb']) if story else ''}</span>
+    <span class="row-art">{row_art(story)}</span>
     <span class="row-body">
       <span class="row-kicker">{story['kicker'] if story else 'Research'} &#183; {paper['date']}</span>
       <span class="row-title">{paper['title']}</span>
@@ -524,7 +588,7 @@ def build_papers_index():
 </li>'''
 
     return (
-        head('Research &#8212; Context',
+        head('Research &#8212; [Context]',
              'The long layer. Every story we publish has a sourced paper behind it, '
              'with the findings, the disputes and what we could not establish.',
              '', 'dusk')

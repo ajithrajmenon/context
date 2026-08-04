@@ -1,4 +1,4 @@
-# The Context Bible
+# The [Context] Bible
 
 The house rules. Everything we publish follows this, and anything that does not is
 either wrong or a deliberate exception someone can justify out loud.
@@ -7,7 +7,7 @@ either wrong or a deliberate exception someone can justify out loud.
 
 ## 1. What we are
 
-**Context is a research house that publishes in two layers.**
+**[Context] is a research house that publishes in two layers.**
 
 - The **story** is the public face. It is short, illustrated, and designed to be
   finished. Its job is to make one idea land and stay landed.
@@ -23,6 +23,19 @@ in public, because being checkable is the product.
 **We are not simplifiers.** Simplifying means removing until it is easy.
 We do the harder thing: find the one framing under which the real thing is
 already easy, and hand the reader that.
+
+### The name
+
+The name is written **[Context]**, brackets included, everywhere it appears —
+in the wordmark, in page titles, in prose, in this document. Not *Context*, not
+*context*, not *CONTEXT*.
+
+The brackets are load-bearing. In writing, brackets are what an editor puts
+around the thing they had to add so a quotation would make sense on its own.
+That is the job: we are the bracketed part. The wordmark animates the two
+brackets and nothing else, because the mark is the punctuation, not the word.
+
+The only exception is a URL or a filename, where brackets are not usable.
 
 ---
 

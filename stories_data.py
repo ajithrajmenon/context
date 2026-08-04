@@ -498,3 +498,34 @@ draw();
 },
 
 ]
+
+# ------------------------------------------------------------------ the library
+# Stories 5-50 live in library.py as briefs and are expanded here. They are
+# shorter than the flagship four by design; the four above carry hand-composed
+# diagrams and interactive figures, the rest carry the same six beats at a
+# tighter length. Both are held to the standard in STYLE.md.
+
+from library import BRIEFS as _BRIEFS, expand as _expand
+
+LIBRARY_STORIES = []
+LIBRARY_PAPERS = []
+for _i, _br in enumerate(_BRIEFS):
+    _s, _p = _expand(_br, _i)
+    LIBRARY_STORIES.append(_s)
+    LIBRARY_PAPERS.append(_p)
+
+# Twelve stories share the `mind` scene and nine share `cell`, so the variant
+# picked by hand in a brief was never going to be unique. Assign it here
+# instead: every story gets its own index within its scene, which the
+# illustrator turns into its own palette rotation and its own framing. No two
+# banners on the site are the same picture.
+_used = {}
+for _s in LIBRARY_STORIES:
+    _sc = _s['hero']['scene']
+    _used[_sc] = _used.get(_sc, 0) + 1
+    _s['hero']['var'] = _used[_sc]
+    for _b in _s['blocks']:
+        if _b['type'] == 'scene':
+            _b['var'] = _used[_sc] + 7
+
+STORIES = STORIES + LIBRARY_STORIES

@@ -522,4 +522,8 @@ PAPERS = [
 
 ]
 
+from stories_data import LIBRARY_PAPERS as _LP
+
+PAPERS = PAPERS + _LP
+
 BY_SLUG = {p['slug']: p for p in PAPERS}

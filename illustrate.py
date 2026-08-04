@@ -555,7 +555,7 @@ SCENES = {
 }
 
 
-def render(name, seed, cls='art', light=False):
+def render(name, seed, cls='art', light=False, variant=0):
     """The full <svg> for a scene. Slice so it fills whatever box it is in.
 
     `light` trims the scene for card-sized panels: a card is a fraction of a
@@ -563,27 +563,70 @@ def render(name, seed, cls='art', light=False):
     Twenty full scenes on one index page is a third of a megabyte.
     """
     fn = SCENES.get(name, sc_cosmos)
-    body = fn(_r(seed))
+    # A variant rotates the palette, reseeds, and reframes. Rotation and
+    # reseeding alone were not enough: twelve stories share the `mind` scene,
+    # and twelve recolourings of one composition still read as one picture.
+    # Reframing changes what is in shot and what is cropped away, which is
+    # what actually makes two pictures look different.
+    global SPREAD
+    keep = SPREAD
+    if variant:
+        k = variant % len(SPREAD)
+        SPREAD = SPREAD[k:] + SPREAD[:k]
+    try:
+        body = fn(_r(str(seed) + '|' + str(variant)))
+    finally:
+        SPREAD = keep
+    # Thin first, then frame. _thin rebuilds the body from matched fragments,
+    # so it has to see the raw scene — wrapping it first loses the outer group.
     if light:
         body = _thin(body)
+    body = _frame(body, variant)
     return (f'<svg class="{cls}" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid slice" '
             f'aria-hidden="true" focusable="false">{body}</svg>')
 
 
-def _thin(body):
-    """Drop every other small element. Keeps the composition, halves the bytes."""
-    import re as _re
-    parts = _re.findall(r'<(?:g|path|circle|rect|ellipse|line)\b.*?(?:</g>|/>)', body, _re.S)
-    if not parts:
+def _frame(body, variant):
+    """Reframe the whole composition: mirror, tilt, zoom, offset.
+
+    The zoom floor is what keeps the corners covered. A 6 degree tilt plus an
+    8% offset needs about 1.26x to guarantee the artwork still reaches every
+    edge, so nothing below that is allowed — an exposed corner shows the bare
+    panel gradient and looks like a bug.
+    """
+    if not variant:
         return body
-    keep, n = [], 0
-    for part in parts:
-        # always keep the big structural shapes, thin out the confetti
-        small = ('r="' in part and _re.search(r'r="(\d+(?:\.\d+)?)"', part)
-                 and float(_re.search(r'r="(\d+(?:\.\d+)?)"', part).group(1)) < 12)
-        if small:
+    rr = _r('frame|%d' % variant)
+    flip = -1 if variant % 2 else 1
+    tilt = rr.uniform(-6, 6)
+    zoom = rr.uniform(1.28, 1.5)
+    dx = rr.uniform(-.08, .08) * W
+    dy = rr.uniform(-.08, .08) * H
+    cx, cy = W / 2, H / 2
+    return (f'<g transform="translate({cx + dx:.0f} {cy + dy:.0f}) rotate({tilt:.1f}) '
+            f'scale({flip * zoom:.3f} {zoom:.3f}) translate({-cx:.0f} {-cy:.0f})">'
+            f'{body}</g>')
+
+
+def _thin(body):
+    """Drop every other small element. Keeps the composition, halves the bytes.
+
+    Card art is a fraction of a hero's area, so the confetti is invisible there
+    and only costs bytes. Group tags are always kept: the old version matched
+    each element with one non-greedy pattern, which stopped at the first `/>`
+    inside a group and silently discarded the matching `</g>`, so every
+    card-sized render shipped unbalanced markup.
+    """
+    import re as _re
+    out, n = [], 0
+    for tok in _re.findall(r'</?[a-zA-Z][^>]*>', body):
+        if tok.startswith('</') or tok.startswith('<g'):
+            out.append(tok)               # structure, never dropped
+            continue
+        m = _re.search(r'\br="(\d+(?:\.\d+)?)"', tok)
+        if m and float(m.group(1)) < 12:  # confetti
             n += 1
             if n % 2:
                 continue
-        keep.append(part)
-    return ''.join(keep)
+        out.append(tok)
+    return ''.join(out)

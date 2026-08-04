@@ -301,6 +301,11 @@ input[type=range] { flex: 1; min-width: 6rem; accent-color: var(--accent); heigh
 /* svg primitives, always on a dark stage */
 .f-label { font-family: var(--body); font-size: 13px; font-weight: 600; fill: rgba(255,255,255,.74); }
 .f-value { font-family: var(--display); font-size: 17px; font-weight: 800; fill: #fff; }
+/* Sizes live here rather than on a style attribute: a nonce-based style-src
+   blocks inline styles, and a readout that silently drops to 17px is a bug
+   you only notice in the one place you cannot debug. */
+.f-value-md { font-size: 19px; }
+.f-value-lg { font-size: 28px; }
 .f-line  { stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
 .f-faint { stroke: rgba(255,255,255,.26); stroke-width: 1.5; fill: none; }
 

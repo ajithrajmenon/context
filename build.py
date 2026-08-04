@@ -617,6 +617,13 @@ def main():
     os.makedirs(os.path.join(SITE, 'papers'))
 
     shutil.copytree(ASSETS, os.path.join(SITE, 'assets'))
+
+    # The illustrator's animation timings live in classes rather than style
+    # attributes, so the classes have to exist. Appending them to the copy
+    # keeps the source stylesheet hand-written and the generated part obvious.
+    css_out = os.path.join(SITE, 'assets', 'style.css')
+    with open(css_out, 'a', encoding='utf-8') as fh:
+        fh.write('\n\n' + illustrate.anim_css() + '\n')
     open(os.path.join(SITE, '.nojekyll'), 'w').close()
 
     with open(os.path.join(SITE, 'index.html'), 'w') as fh:

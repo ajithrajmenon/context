@@ -90,7 +90,7 @@ STORIES = [
   <text class="f-label" x="60" y="256">MON</text>
   <text class="f-label" x="620" y="256" text-anchor="end">SUN</text>
   <text class="f-label" x="60" y="40">SLEEP DEBT BY THE END OF THE WEEK</text>
-  <text class="f-value" id="debtTxt" x="60" y="76" style="font-size:28px">&#8212;</text>
+  <text class="f-value f-value-lg" id="debtTxt" x="60" y="76">&#8212;</text>
   <text class="f-label" id="noteTxt" x="60" y="288">&#8212;</text>
 </svg>''',
    'controls': '''<div class="control">
@@ -334,7 +334,7 @@ draw();
   <text class="f-label" x="50" y="42">INVADERS (DASHED) &#183; YOUR DEFENCES (SOLID)</text>
   <text class="f-label" x="50" y="254">INFECTED</text>
   <text class="f-label" x="620" y="254" text-anchor="end">DAY 10</text>
-  <text class="f-value" id="feelTxt" x="50" y="288" style="font-size:19px">&#8212;</text>
+  <text class="f-value f-value-md" id="feelTxt" x="50" y="288">&#8212;</text>
 </svg>''',
    'controls': '''<div class="control">
   <label for="day">Day</label>
@@ -444,7 +444,7 @@ draw();
   <text class="f-label" x="50" y="40">DAMAGE (PINK) &#183; REPAIR (GREEN)</text>
   <text class="f-label" x="50" y="254">BIRTH</text>
   <text class="f-label" x="620" y="254" text-anchor="end">100</text>
-  <text class="f-value" id="stateTxt" x="50" y="288" style="font-size:19px">&#8212;</text>
+  <text class="f-value f-value-md" id="stateTxt" x="50" y="288">&#8212;</text>
 </svg>''',
    'controls': '''<div class="control">
   <label for="age">Age</label>

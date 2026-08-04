@@ -11,7 +11,8 @@
   var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function reveals() {
-    var els = document.querySelectorAll('[data-reveal]');
+    var els = [].slice.call(document.querySelectorAll('[data-reveal]'))
+      .filter(function (e) { return !e.classList.contains('is-in'); });
     if (!els.length) return;
     if (REDUCED || !('IntersectionObserver' in window)) {
       els.forEach(function (e) { e.classList.add('is-in'); });
@@ -38,15 +39,26 @@
     });
   }
 
+  // Scroll work binds to the window, so it must bind once however many times
+  // init runs. The frame functions re-query the DOM instead of capturing it,
+  // which is what lets the same handlers serve a page swapped in later.
+  var bound = false;
+
+  function onScroll(frame) {
+    var ticking = false;
+    return function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; frame(); });
+    };
+  }
+
   // The artwork drifts a little slower than the page it sits in.
-  function parallax() {
+  function parallaxFrame() {
     if (REDUCED) return;
     var arts = [].slice.call(document.querySelectorAll('.scene > .art'));
     if (!arts.length) return;
-    var ticking = false;
-
-    function frame() {
-      ticking = false;
+    (function () {
       var vh = innerHeight;
       arts.forEach(function (art) {
         var r = art.parentNode.getBoundingClientRect();
@@ -54,37 +66,35 @@
         var mid = (r.top + r.height / 2 - vh / 2) / vh;   // -1 .. 1 through view
         art.style.transform = 'translate3d(0,' + (mid * 26).toFixed(1) + 'px,0) scale(1.08)';
       });
-    }
-    addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(frame);
-    }, { passive: true });
-    frame();
+    }());
   }
 
   // How far through the page you are. Cheap, passive, and the single
   // clearest signal that a long read has an end.
-  function progress() {
+  function progressFrame() {
     var rail = document.querySelector('.progress span');
     if (!rail) return;
-    var ticking = false;
-    function frame() {
-      ticking = false;
-      var max = document.documentElement.scrollHeight - innerHeight;
-      var pct = max > 40 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
-      rail.style.width = (pct * 100).toFixed(2) + '%';
-    }
-    addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(frame);
-    }, { passive: true });
-    addEventListener('resize', frame, { passive: true });
-    frame();
+    var max = document.documentElement.scrollHeight - innerHeight;
+    var pct = max > 40 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    rail.style.width = (pct * 100).toFixed(2) + '%';
   }
 
-  function init() { reveals(); parallax(); progress(); }
+  function scrollFrame() { parallaxFrame(); progressFrame(); }
+
+  function init() {
+    reveals();
+    if (!bound) {
+      bound = true;
+      var handler = onScroll(scrollFrame);
+      addEventListener('scroll', handler, { passive: true });
+      addEventListener('resize', handler, { passive: true });
+    }
+    scrollFrame();
+  }
+
+  // Exposed so a host that swaps page content in place — the single-file
+  // bundle — can re-run it without reloading the script or stacking listeners.
+  window.contextInit = init;
 
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', init)

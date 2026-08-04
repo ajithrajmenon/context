@@ -50,6 +50,19 @@ def _spec(d):
     return spec
 
 
+def _paras(value):
+    """A beat's body as a list of paragraphs.
+
+    The writer returns a list — two or three short paragraphs, which is the
+    rhythm the hand-written stories have. Older drafts hold one long string,
+    and a string that has been split on blank lines is closer to the intent
+    than a wall of text, so accept both rather than breaking the queue.
+    """
+    if isinstance(value, (list, tuple)):
+        return [p.strip() for p in value if p and p.strip()]
+    return [p.strip() for p in re.split(r'\n\s*\n', value or '') if p.strip()]
+
+
 def expand(s):
     """One writer output -> (story dict, paper dict), in the same shape the
     hand-written stories use. This is library.expand() for generated content."""
@@ -58,16 +71,16 @@ def expand(s):
     slug = s.get('slug') or slugify(s.get('title'))
 
     blocks = [
-        {'type': 'text', 'h': s['wrong_head'], 'p': [s['wrong_body']]},
+        {'type': 'text', 'h': s['wrong_head'], 'p': _paras(s['wrong_body'])},
         {'type': 'scene', 'tone': 'void', 'scene': s['scene'], 'var': 9,
          'h': s['teaser']},
         {'type': 'diagram', 'spec': _spec(s['diagram_one']),
          'caption': s['diagram_one'].get('caption', '')},
-        {'type': 'text', 'h': s['crack_head'], 'p': [s['crack_body']]},
+        {'type': 'text', 'h': s['crack_head'], 'p': _paras(s['crack_body'])},
         {'type': 'turn', 'tone': alt, 'text': s['turn']},
         {'type': 'diagram', 'spec': _spec(s['diagram_two']),
          'caption': s['diagram_two'].get('caption', '')},
-        {'type': 'text', 'h': s['cost_head'], 'p': [s['cost_body']]},
+        {'type': 'text', 'h': s['cost_head'], 'p': _paras(s['cost_body'])},
     ]
 
     story = {
@@ -88,7 +101,11 @@ def expand(s):
         'date': s.get('_date', ''),
         'minutes': max(4, 3 + len(findings.get('findings', []))),
         'abstract': s['paper_abstract'],
-        'sections': [{'h': 'What we looked at', 'p': [s['paper_abstract']]}],
+        # A paper whose only section restates its own abstract is not a paper.
+        # The writer supplies real sections; the fallback is for older drafts.
+        'sections': ([{'h': sec['h'], 'p': _paras(sec['p'])}
+                      for sec in s.get('paper_sections') or []]
+                     or [{'h': 'What we looked at', 'p': [s['paper_abstract']]}]),
         'findings': [(f['claim'], f['confidence'], f['basis'])
                      for f in findings.get('findings', [])],
         'contested': [(c['question'], c['dispute'])

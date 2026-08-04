@@ -132,9 +132,26 @@ read a diagram that is drifting.
 
 ## Running locally
 
-```bash
-python3 build.py
-python3 -m http.server 8000 --directory site
+To see the site — just the site, no login and no backoffice:
+
+```
+python preview.py
+```
+
+That builds `site/` and serves it at <http://127.0.0.1:8000/>, opening your
+browser. Change a story, run it again, reload. `--port 9000` moves it;
+`--no-build` serves what is already there.
+
+Do not open `site/index.html` from the file manager. Pages link to each other
+with paths like `../assets/style.css`, and a `file://` page is its own origin —
+some of it works, some of it quietly does not. A local HTTP server behaves the
+way GitHub Pages will, which is the only reason to look in the first place.
+
+The long way is the same two steps:
+
+```
+python build.py
+python -m http.server 8000 --directory site
 ```
 
 ## One file, no server

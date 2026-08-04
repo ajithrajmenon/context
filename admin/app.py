@@ -26,7 +26,8 @@ import time
 import traceback
 
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import (HTMLResponse, JSONResponse, RedirectResponse,
+                               Response)
 
 from . import backend, publish, research, store
 
@@ -108,6 +109,38 @@ border-bottom:1px solid var(--border)}
 .dot.done{background:#16A34A}.dot.live{background:var(--accent);
 animation:p 1.1s ease-in-out infinite}
 @keyframes p{50%{opacity:.3}}
+
+/* The run rail. Six agents hand work to each other in one direction, so the
+   progress reads left to right along a single line — the connector between
+   two steps is the handover, and it fills in only once the earlier agent has
+   actually delivered. A vertical list of dots showed the same facts and none
+   of the movement. */
+.rail{display:flex;align-items:flex-start;overflow-x:auto;padding:.4rem 0 .2rem}
+.step{flex:1 1 0;min-width:5.6rem;text-align:center;position:relative}
+.step .mark{width:1.6rem;height:1.6rem;border-radius:50%;margin:0 auto .45rem;
+border:2px solid var(--border);background:var(--page);color:var(--muted);
+font-size:.72rem;font-weight:700;line-height:1.35rem;position:relative;z-index:1}
+.step .name{font-size:.78rem;font-weight:600;letter-spacing:.02em}
+.step .t{font-size:.7rem;color:var(--muted);display:block;min-height:1em}
+/* The connector is drawn from each step back to the one before it, so the
+   first step has nothing to its left and the line never overhangs the rail. */
+.step+.step:before{content:"";position:absolute;top:.8rem;right:50%;left:-50%;
+height:2px;background:var(--border)}
+.step.done+.step:before,.step.done+.step.live:before{background:#16A34A}
+.step.done .mark{border-color:#16A34A;background:#16A34A;color:#fff}
+.step.live .mark{border-color:var(--accent);color:var(--accent);
+animation:p 1.1s ease-in-out infinite}
+.step.live .name{color:var(--accent)}
+.step.todo .name{color:var(--muted)}
+.step.fail .mark{border-color:#B91C1C;background:#B91C1C;color:#fff}
+
+/* The draft preview is the live page in a frame, so give it room and a phone
+   width to switch to — most readers will arrive on one. */
+.frame{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+background:var(--surface);margin-bottom:.6rem}
+.frame iframe{display:block;width:100%;height:min(78vh,54rem);border:0;
+background:var(--page)}
+.frame.phone{max-width:26rem;margin-inline:auto}
 """
 
 
@@ -402,6 +435,33 @@ def runs(request: Request, m: str = ''):
                 f'<th class="right">Tokens</th></tr>{rows or ""}</table>', '/runs', m)
 
 
+# The six agents pass work along in one direction, so the run reads as one
+# line left to right rather than a column of dots. Each step carries the name
+# of the agent doing the work and, once it has delivered, how long it took —
+# the two things you want while waiting.
+RAIL = {'plan': 'Planner', 'search': 'Search', 'read': 'Reader',
+        'check': 'Fact check', 'write': 'Writer', 'edit': 'Editor'}
+
+
+def _rail(stages, seconds, current, state):
+    steps = ''
+    for i, name in enumerate(stages):
+        if name in seconds:
+            cls, mark = 'done', '&#10003;'
+        elif name == current and state == 'running':
+            cls, mark = 'live', str(i + 1)
+        elif name == current and state == 'failed':
+            cls, mark = 'fail', '!'
+        else:
+            cls, mark = 'todo', str(i + 1)
+        took = f'{seconds[name]:.0f}s' if name in seconds else (
+            'working' if cls == 'live' else '')
+        steps += (f'<div class="step {cls}"><div class="mark">{mark}</div>'
+                  f'<div class="name">{RAIL.get(name, name.title())}</div>'
+                  f'<span class="t">{took}</span></div>')
+    return f'<div class="card"><div class="rail">{steps}</div></div>'
+
+
 @app.get(PREFIX + '/run/{run_id}')
 def run_detail(request: Request, run_id: int, m: str = ''):
     if not authed(request):
@@ -409,13 +469,8 @@ def run_detail(request: Request, run_id: int, m: str = ''):
     r = store.get_run(run_id)
     if not r:
         return page('Not found', '<div class="card">No such run.</div>')
-    done = {s['name'] for s in store.run_stages(run_id)}
-    rows = ''
-    for name in research.STAGES:
-        state = 'done' if name in done else ('live' if r['stage'] == name
-                                             and r['state'] == 'running' else '')
-        rows += (f'<div class="stage"><span class="dot {state}"></span>'
-                 f'<b>{name.title()}</b><span class="sp"></span></div>')
+    seconds = {s['name']: s['seconds'] for s in store.run_stages(run_id)}
+    rail = _rail(research.STAGES, seconds, r['stage'], r['state'])
 
     stages = ''.join(
         f'<h2>{s["name"].title()} <span class="muted" style="font-weight:400">'
@@ -427,9 +482,12 @@ def run_detail(request: Request, run_id: int, m: str = ''):
             f'Open the draft</a></p>' if r['draft_id'] else '')
     poll = ('<script>setTimeout(function(){location.reload()},5000)</script>'
             if r['state'] == 'running' else '')
+    total = sum(seconds.values())
+    elapsed = (f' &#183; {total / 60:.0f} min so far' if total >= 90
+               else f' &#183; {total:.0f}s so far' if total else '')
     return page(r['goal'][:70], f"""
-<p class="sub">{e(r['cost_in'] + r['cost_out']):} tokens so far.</p>
-<div class="card">{rows}</div>{err}{link}{stages}{poll}""", '/runs', m)
+<p class="sub">{e(r['cost_in'] + r['cost_out']):} tokens{elapsed}.</p>
+{rail}{err}{link}{stages}{poll}""", '/runs', m)
 
 
 # ---------------------------------------------------------------- queue
@@ -455,34 +513,108 @@ something is off, then approve — approving publishes and pushes.</p>
 {rows or '<tr><td colspan="4" class="muted">Empty.</td></tr>'}</table>""", '/queue', m)
 
 
-def _preview(s):
-    d1, d2 = s.get('diagram_one', {}), s.get('diagram_two', {})
-    return f"""
-<div class="card"><span class="pill go">{e(s.get('lens'))}</span>
-<span class="pill">{e(s.get('domain'))}</span>
-<h2 style="margin-top:.6rem">{e(s.get('title'))}</h2>
-<p>{e(s.get('teaser'))}</p>
-<p class="muted"><b>You will come away knowing:</b> {e(s.get('takeaway'))}</p>
-<p class="muted"><b>Standfirst:</b> {e(s.get('standfirst'))}</p></div>
+# ---------------------------------------------------------------- preview
+#
+# The point of the approval screen is to answer one question: is this good
+# enough to publish? A bulleted outline of the beats cannot answer it. Banners,
+# illustrations, diagrams and typography are most of what a reader meets, and
+# they are exactly what an outline leaves out.
+#
+# So the preview is the real page, rendered by build.py — the same function
+# that writes site/stories/*.html. Not a mock-up of it, and not a second
+# renderer that can drift away from it: if the preview looks right, the
+# published page looks right, because they are the same code.
 
-<div class="card"><b>1 · Wrong picture — {e(s.get('wrong_head'))}</b>
-<p>{e(s.get('wrong_body'))}</p></div>
-<div class="card"><b>2 · Diagram — {e(d1.get('kind'))}: {e(d1.get('title'))}</b>
-<p class="muted">{e(d1.get('sub'))}</p><pre>{e(d1.get('data'))}</pre>
-<p class="muted">{e(d1.get('caption'))}</p></div>
-<div class="card"><b>3 · Crack — {e(s.get('crack_head'))}</b>
-<p>{e(s.get('crack_body'))}</p></div>
-<div class="card" style="background:var(--surface)"><b>4 · The Turn</b>
-<p style="font-size:1.15rem"><b>{e(s.get('turn'))}</b></p></div>
-<div class="card"><b>5 · Diagram — {e(d2.get('kind'))}: {e(d2.get('title'))}</b>
-<p class="muted">{e(d2.get('sub'))}</p><pre>{e(d2.get('data'))}</pre>
-<p class="muted">{e(d2.get('caption'))}</p></div>
-<div class="card"><b>6 · Cost — {e(s.get('cost_head'))}</b>
-<p>{e(s.get('cost_body'))}</p></div>
-<div class="card"><b>7 · Long view</b><p>{e(s.get('zoomout'))}</p></div>
-<div class="card"><b>Paper</b><p class="muted">{e(s.get('paper_subtitle'))}</p>
-<p>{e(s.get('paper_abstract'))}</p>
-<p class="muted"><b>Method:</b> {e(s.get('method'))}</p></div>"""
+def _site():
+    """build.py and its friends, imported lazily.
+
+    Importing at module scope would read content/ once when the server starts
+    and hold it for the life of the process. Doing it on demand keeps the
+    admin app startable even if a data module is briefly broken.
+    """
+    import sys
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    import build, illustrate
+    return build, illustrate
+
+
+def _draft_pages(draft_id):
+    """The draft as (story page, paper page) — real HTML, not an outline."""
+    d = store.get_draft(draft_id)
+    if not d:
+        return None, None
+    story, paper = publish.expand(json.loads(d['story_json']))
+    build, _ = _site()
+    # build_story looks the paper up by slug to draw the "research behind this"
+    # card. An unpublished draft is not in that index yet, so lend it one.
+    build.BY_SLUG[story['slug']] = paper
+    try:
+        # Its own "next story" — the pager has nowhere else to point yet.
+        return build.build_story(story, story), build.build_paper(paper)
+    finally:
+        build.BY_SLUG.pop(story['slug'], None)
+
+
+@app.get(PREFIX + '/preview/assets/style.css')
+def preview_css():
+    build, illustrate = _site()
+    with open(os.path.join(ROOT, 'assets', 'style.css'), encoding='utf-8') as fh:
+        css = fh.read()
+    # build.py appends these when it writes the site; without them every
+    # animation runs at its default duration and the page moves wrong.
+    return Response(css + '\n\n' + illustrate.anim_css() + '\n',
+                    media_type='text/css')
+
+
+@app.get(PREFIX + '/preview/assets/{name:path}')
+def preview_asset(name: str):
+    path = os.path.normpath(os.path.join(ROOT, 'assets', name))
+    if not path.startswith(os.path.join(ROOT, 'assets')) or not os.path.isfile(path):
+        return Response('not found', status_code=404)
+    kind = ('text/javascript' if name.endswith('.js') else
+            'font/woff2' if name.endswith('.woff2') else
+            'application/octet-stream')
+    with open(path, 'rb') as fh:
+        return Response(fh.read(), media_type=kind)
+
+
+@app.get(PREFIX + '/preview/papers/{draft_id}.html')
+def preview_paper(request: Request, draft_id: int):
+    if not authed(request):
+        return login_redirect()
+    _, paper_html = _draft_pages(draft_id)
+    return HTMLResponse(paper_html or 'No such draft.')
+
+
+@app.get(PREFIX + '/preview/{draft_id}/story.html')
+def preview_story(request: Request, draft_id: int):
+    if not authed(request):
+        return login_redirect()
+    story_html, _ = _draft_pages(draft_id)
+    if not story_html:
+        return HTMLResponse('No such draft.')
+    # The page is written for a directory two deep in site/, so '../assets/'
+    # and '../papers/' land on the routes above without touching build.py.
+    return HTMLResponse(story_html.replace(
+        f'../papers/', f'{PREFIX}/preview/papers/').replace(
+        '../assets/', f'{PREFIX}/preview/assets/').replace(
+        '../stories.html', f'{PREFIX}/queue').replace(
+        '../index.html', f'{PREFIX}/'))
+
+
+def _preview(s, draft_id):
+    return f"""
+<div class="row" style="margin-bottom:.6rem">
+<span class="pill go">{e(s.get('lens'))}</span>
+<span class="pill">{e(s.get('domain'))}</span>
+<span class="sp" style="margin-left:auto"></span>
+<a class="btn ghost" target="_blank"
+   href="{PREFIX}/preview/{draft_id}/story.html">Open full size &#8599;</a></div>
+<div class="frame"><iframe src="{PREFIX}/preview/{draft_id}/story.html"
+  title="The page as it will be published"></iframe></div>
+<p class="muted">This is the page itself, rendered by <code>build.py</code> —
+the same code that writes the live site. What you see here is what publishes.</p>"""
 
 
 @app.get(PREFIX + '/draft/{draft_id}')
@@ -517,7 +649,7 @@ def draft_detail(request: Request, draft_id: int, m: str = ''):
     discarded = ''.join(f'<li>{e(x)}</li>' for x in check.get('discarded', []))
 
     return page(s.get('title', d['slug']), f"""
-{_preview(s)}
+{_preview(s, draft_id)}
 <h2>Prompt-based edit</h2>
 <form method="post" action="{PREFIX}/draft/{draft_id}/revise" class="card">
 <p class="muted" style="margin-top:0">Say what to change in plain English. The

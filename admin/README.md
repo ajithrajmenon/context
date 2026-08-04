@@ -151,6 +151,19 @@ success.
 
 **The pipeline never publishes.** It produces a queue entry. A person approves.
 
+### What the approval screen shows you
+
+The real page, in a frame — rendered by `build.py`, the same function that
+writes `site/stories/*.html`. Not a mock-up and not a second renderer that can
+drift: if the preview looks right, the published page looks right, because they
+are the same code. Banners, illustrations, diagrams and typography are most of
+what a reader meets, and an outline of the beats cannot tell you whether they
+work.
+
+Below it: the editor's checklist, the graded findings, and what the fact checker
+threw out. You are approving a page you have actually seen and a chain you can
+audit.
+
 ### Prompt-based editing
 
 On the approval screen, say what to change in plain English. The Editor applies
@@ -215,6 +228,7 @@ admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions
 admin/test_pipeline.py   offline orchestration test
 admin/serve.py           first-run setup, then starts — Windows, macOS, Linux
 admin/serve.sh           the same thing in bash, for Unix habit
+preview.py               (repo root) build and serve the public site alone
 admin/.env.example       the settings, documented
 content/stories/*.json   published generated stories, read by build.py
 content/visibility.json  slug -> false hides a story

@@ -26,6 +26,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_FILE = os.path.join(ROOT, 'admin', '.env')
 RULE = '─' * 59
 
+# A Windows console encodes stdout with the active code page, which is cp1252
+# in most installs — 251 characters, none of them an em-dash. Printing one
+# raises UnicodeEncodeError and takes the launcher down before it has told you
+# anything. Ask for UTF-8, and fall back to visible mangling rather than a
+# crash if the terminal cannot manage it.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, ValueError, OSError):
+        pass
+
 
 def _read_env(path):
     values = {}

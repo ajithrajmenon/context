@@ -160,6 +160,27 @@ The unit of pace is the paragraph, not the sentence. Two to four sentences,
 with at least one of them long enough to carry a clause. Then a short one to
 land it. That alternation is the sound of the house.
 
+### Length
+
+A [Context] page is read scrolling, one thought per screen, with illustration
+and diagram carrying as much weight as prose. Beats are short and land hard.
+The published stories measure:
+
+| Element | Budget |
+|---|---|
+| Standfirst | one sentence, about 35 words |
+| Each beat's body | 2 short paragraphs, 20–35 words each — about 45 in total |
+| The Turn | under 25 words, one sentence. It is the line people quote. |
+| The Long View | about 40 words, and it stops |
+
+Two paragraphs rather than one continuous block: the break is a beat of
+silence, and the page needs it.
+
+A beat that has run to 120 words is an essay paragraph wearing a beat's
+clothes. Find the one idea that beat exists for and cut to it. Nothing is lost
+by cutting — the paper is where detail belongs, and it has no budget. The story
+earns the reader's attention; the paper spends it.
+
 ---
 
 ## 5. Design language
@@ -311,6 +332,8 @@ five pages. Longer means it should have been two papers.
 - [ ] Is every diagram labelled, still, and doing work prose could not?
 - [ ] Does anything move that the reader is trying to read?
 - [ ] Is there a number the reader can act on?
+- [ ] Count the words. Each beat 2–3 paragraphs and about 45 words, the Turn
+      under 25, the Long View about 40. This is the one drafts fail most.
 - [ ] Does the paper exist, and is it linked?
 - [ ] Is every figure in the story traceable to the paper?
 - [ ] Have you removed the moral at the end?

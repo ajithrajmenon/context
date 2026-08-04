@@ -149,17 +149,36 @@ STORY_SCHEMA = {
             'city', 'ocean', 'mind', 'colony', 'matter', 'time', 'sun']},
         'standfirst': {'type': 'string'},
         'wrong_head': {'type': 'string'},
-        'wrong_body': {'type': 'string'},
+        'wrong_body': {'type': 'array', 'items': {'type': 'string'},
+                       'minItems': 2, 'maxItems': 3,
+                       'description': 'Short paragraphs, 20-35 words each.'},
         'diagram_one': DIAGRAM_SCHEMA,
         'crack_head': {'type': 'string'},
-        'crack_body': {'type': 'string'},
+        'crack_body': {'type': 'array', 'items': {'type': 'string'},
+                       'minItems': 2, 'maxItems': 3,
+                       'description': 'Short paragraphs, 20-35 words each.'},
         'turn': {'type': 'string'},
         'diagram_two': DIAGRAM_SCHEMA,
         'cost_head': {'type': 'string'},
-        'cost_body': {'type': 'string'},
+        'cost_body': {'type': 'array', 'items': {'type': 'string'},
+                       'minItems': 2, 'maxItems': 3,
+                       'description': 'Short paragraphs, 20-35 words each.'},
         'zoomout': {'type': 'string'},
         'paper_subtitle': {'type': 'string'},
         'paper_abstract': {'type': 'string'},
+        'paper_sections': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'h': {'type': 'string'},
+                    'p': {'type': 'array', 'items': {'type': 'string'}},
+                },
+                'required': ['h', 'p'],
+                'additionalProperties': False,
+            },
+            'minItems': 3,
+        },
         'reading': {
             'type': 'array',
             'items': {
@@ -178,7 +197,7 @@ STORY_SCHEMA = {
                  'scene', 'standfirst', 'wrong_head', 'wrong_body', 'diagram_one',
                  'crack_head', 'crack_body', 'turn', 'diagram_two', 'cost_head',
                  'cost_body', 'zoomout', 'paper_subtitle', 'paper_abstract',
-                 'reading', 'method'],
+                 'paper_sections', 'reading', 'method'],
     'additionalProperties': False,
 }
 
@@ -307,6 +326,30 @@ Write for an intelligent adult who does not know this subject. No exclamation
 marks, no rhetorical questions to the reader, no "imagine that". Never end on an
 instruction to feel something.
 
+**Length is the thing most drafts get wrong, so it is not negotiable.** A
+[Context] page is read scrolling, one thought per screen, with illustration and
+diagram carrying as much as prose. Beats are short and land hard. Measured
+against the hand-written stories:
+
+  standfirst    one sentence, about 35 words
+  each _body    2 short paragraphs, 20-35 words each — about 45 words total
+  turn          under 25 words. One sentence. It is the line people quote.
+  zoomout       about 40 words, and it stops
+
+Two paragraphs, not one: the break is a beat of silence and the page needs it.
+If you have written 120 words for a beat you have written an essay — find the
+one idea that beat is for, and cut to it. What you cut is not lost; the paper
+is where the detail belongs.
+
+Concrete over abstract, always. "A river eats about a metre of bank a year"
+beats "migration rates are appreciable". Name who found something rather than
+saying "scientists showed" — a name is checkable and "scientists" is not.
+
+`paper_sections` is the long layer, and it is where you may take room: three or
+more sections, each with a heading a reader can navigate by and two or three
+real paragraphs. Do not restate the abstract. Say how the question was
+approached, what the evidence actually shows, and where it runs out.
+
 Diagram `data` is a JSON object encoded as a string, matching the kind:
   timeline  {"events": [[0.0, "name", "note"], ...]}
   ranked    {"rows": [["label", 0.0-1.0, "note"], ...]}
@@ -340,6 +383,12 @@ with a note for each:
   8. Is every figure in the story traceable to a finding?
   9. Has the moral been removed from the end?
  10. Read it aloud. Does it sound like an adult or a worksheet?
+ 11. Length. Each body is 2-3 paragraphs of 20-35 words, about 45 words in
+     total; the Turn is under 25 words; the zoomout is about 40. A beat that
+     runs to 100 words is an essay paragraph wearing a beat's clothes — cut it
+     to its one idea and move the detail into a paper section. This is the
+     check drafts fail most often, so count, do not estimate.
+ 12. Do the paper sections say something the abstract does not?
 
 Fix what fails, and return the corrected story — do not merely report problems.
 List what you changed. Set `ship` false only if something is wrong that you

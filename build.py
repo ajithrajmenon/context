@@ -114,6 +114,19 @@ ASSETS = os.path.join(ROOT, 'assets')
 TAGLINE = 'Big ideas, told as stories'
 
 
+def write(path, html):
+    """Every page goes out as UTF-8, explicitly.
+
+    Python takes its default text encoding from the OS, which on Windows is
+    cp1252 — 251 characters. The stories are full of em-dashes, curly quotes
+    and mathematical signs, so an unqualified open(path, 'w') builds the whole
+    site on Linux and dies partway through it on Windows. `≲` in a paper was
+    the one that found this.
+    """
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write(html)
+
+
 def head(title, desc, prefix, tone):
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -636,21 +649,18 @@ def main():
         fh.write('\n\n' + illustrate.anim_css() + '\n')
     open(os.path.join(SITE, '.nojekyll'), 'w').close()
 
-    with open(os.path.join(SITE, 'index.html'), 'w') as fh:
-        fh.write(build_home())
-    with open(os.path.join(SITE, 'stories.html'), 'w') as fh:
-        fh.write(build_stories())
+    write(os.path.join(SITE, 'index.html'), build_home())
+    write(os.path.join(SITE, 'stories.html'), build_stories())
 
-    with open(os.path.join(SITE, 'papers.html'), 'w') as fh:
-        fh.write(build_papers_index())
+    write(os.path.join(SITE, 'papers.html'), build_papers_index())
     for paper in PAPERS:
-        with open(os.path.join(SITE, 'papers', f"{paper['slug']}.html"), 'w') as fh:
-            fh.write(build_paper(paper))
+        write(os.path.join(SITE, 'papers', f"{paper['slug']}.html"),
+              build_paper(paper))
 
     for i, s in enumerate(STORIES):
         nxt = STORIES[(i + 1) % len(STORIES)]
-        with open(os.path.join(SITE, 'stories', f"{s['slug']}.html"), 'w') as fh:
-            fh.write(build_story(s, nxt))
+        write(os.path.join(SITE, 'stories', f"{s['slug']}.html"),
+              build_story(s, nxt))
 
     scenes = sum(1 for s in STORIES for b in s['blocks'] if b['type'] == 'scene') + len(STORIES)
     print(f'built home + stories index + {len(STORIES)} stories '

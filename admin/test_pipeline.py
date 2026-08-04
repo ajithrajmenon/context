@@ -53,7 +53,8 @@ def _story_fixture():
         'tone': 'forest', 'scene': 'matter',
         'standfirst': 'An intact onion is harmless. The weapon does not exist until you cut.',
         'wrong_head': 'It is not in the onion',
-        'wrong_body': 'The onion stores a harmless compound and an enzyme apart.',
+        'wrong_body': ['The onion stores a harmless compound and an enzyme apart.',
+                       'Cut it, and the two meet for the first time.'],
         'diagram_one': {
             'kind': 'timeline', 'title': 'From cut to tears', 'sub': 'Seconds.',
             'data': json.dumps({'events': [[0, 'Intact', 'Stored apart'],
@@ -61,7 +62,8 @@ def _story_fixture():
                                            [1, 'Contact', 'Meets the eye']]}),
             'caption': 'The irritant is manufactured by the damage you did.'},
         'crack_head': 'Your eye is doing the right thing',
-        'crack_body': 'Corneal nerves detect a mild acid and trigger reflex tearing.',
+        'crack_body': ['Corneal nerves detect a mild acid and trigger reflex tearing.',
+                       'The eye is not injured. It is rinsing.'],
         'turn': 'The onion is not making you cry. It is releasing a chemical weapon.',
         'diagram_two': {
             'kind': 'compare', 'title': 'The kitchen tricks, sorted',
@@ -70,10 +72,18 @@ def _story_fixture():
                                 'right': ['Does not', 'Because', ['Bread in your mouth.']]}),
             'caption': 'Everything that works removes or slows the vapour.'},
         'cost_head': 'Why the onion bothers',
-        'cost_body': 'It is a defence against being eaten, aimed at animals that dig.',
+        'cost_body': ['It is a defence against being eaten, aimed at animals that dig.',
+                      'A sharp knife and a cold onion both work, for the same reason.'],
         'zoomout': 'A plant evolved a weapon so effective we now grow it deliberately.',
         'paper_subtitle': 'The lachrymatory factor and the efficacy of mitigations.',
         'paper_abstract': 'We reviewed the enzymatic pathway and common mitigations.',
+        'paper_sections': [
+            {'h': 'How the question was approached',
+             'p': ['We traced the pathway from the 2002 identification forward.']},
+            {'h': 'What the evidence shows',
+             'p': ['The irritant is formed on damage, not stored.']},
+            {'h': 'Where it runs out',
+             'p': ['Individual sensitivity is not explained.']}],
         'reading': [{'source': 'Imai et al. (2002)', 'why': 'Identified the enzyme.'}],
         'method': 'Synthesis of food chemistry research.',
     }
@@ -150,6 +160,18 @@ def main():
     assert len(paper['findings']) == 2
     assert len(paper['contested']) == 1
     assert paper['unknowns'], 'unknowns dropped in expansion'
+
+    # A beat is two short paragraphs, not one block — the break is part of the
+    # rhythm, and collapsing it is what made generated pages read as essays.
+    beats = [b for b in site_story['blocks'] if b['type'] == 'text']
+    assert all(len(b['p']) >= 2 for b in beats), \
+        'a beat lost its paragraph break in expansion'
+    # Old drafts hold one string; splitting on blank lines beats a wall of text.
+    legacy = publish._paras('First thought.\n\nSecond thought.')
+    assert legacy == ['First thought.', 'Second thought.'], legacy
+    assert len(paper['sections']) == 3, 'paper sections dropped in expansion'
+    assert paper['sections'][0]['h'] != 'What we looked at', \
+        'the writer\'s sections were replaced by the abstract fallback'
 
     # The diagram specs must survive into something diagram.build() accepts.
     sys.path.insert(0, publish.ROOT)

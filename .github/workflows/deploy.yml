@@ -27,8 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The site is committed pre-built. If build.py and plates_data.py are
-      # added to the repo later, this regenerates site/ before publishing.
+      # site/ is committed pre-built so the repo is deployable on its own,
+      # but the runner rebuilds it so a stale commit can never ship.
       - name: Build
         run: |
           if [ -f build.py ]; then
@@ -37,7 +37,13 @@ jobs:
             echo "No build.py — publishing the committed site/ as-is."
           fi
 
+      # enablement turns Pages on via the API if it is off, which is the whole
+      # of the first-run failure: the action queries the Pages site, gets a 404
+      # and stops. With this, a fresh repository deploys without anyone opening
+      # the settings page.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

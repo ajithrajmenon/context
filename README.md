@@ -158,6 +158,23 @@ at https://ajithrajmenon.github.io/context/.
 **Cloudflare Pages / Netlify / Vercel** — publish directory `site`, build command
 `python3 build.py`.
 
+## The backoffice
+
+`admin/` is a separate private app — story CRUD, visibility control, and a
+six-agent research team that drafts new stories for a human to approve. It is
+**not** part of the static site and cannot be: GitHub Pages serves files, not
+logins, databases or API keys. The backoffice runs elsewhere, edits this
+repository, and pushes; Pages redeploys itself.
+
+```
+backoffice ──▶ content/*.json ──▶ git push ──▶ Actions ──▶ Pages
+                                                  │
+                                            build.py reads content/
+```
+
+The site stays dependency-free. Switch the backoffice off and nothing here
+changes. See `admin/README.md`.
+
 ## Adding a story
 
 1. Pick the lens first. If you cannot say which of the four it is, it is not ready.

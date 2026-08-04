@@ -1,3 +1,8 @@
 __pycache__/
-*.pyc
-.DS_Store
+*.py[cod]
+admin/context.db
+admin/context.db-wal
+admin/context.db-shm
+admin/.env
+context-site.html
+context-artifact.html

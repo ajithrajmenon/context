@@ -537,3 +537,40 @@ for _s in LIBRARY_STORIES:
             _b['var'] = _used[_sc] + 7
 
 STORIES = STORIES + LIBRARY_STORIES
+
+
+# ------------------------------------------------------------------ generated
+# Stories written by the research team in admin/ and approved by a human land
+# here as JSON in content/stories/. They carry the same shape as everything
+# above, so build.py cannot tell the difference and does not need to.
+#
+# content/visibility.json takes any story off the site by slug — generated or
+# hand-written — without deleting it. Absent means visible.
+
+import glob as _glob
+import json as _json
+import os as _os
+
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_CONTENT = _os.path.join(_HERE, 'content')
+
+GENERATED_PAPERS = []
+for _path in sorted(_glob.glob(_os.path.join(_CONTENT, 'stories', '*.json'))):
+    try:
+        with open(_path, encoding='utf-8') as _fh:
+            _rec = _json.load(_fh)
+    except (OSError, ValueError):
+        continue
+    if _rec.get('story'):
+        STORIES.append(_rec['story'])
+    if _rec.get('paper'):
+        GENERATED_PAPERS.append(_rec['paper'])
+
+try:
+    with open(_os.path.join(_CONTENT, 'visibility.json'), encoding='utf-8') as _fh:
+        VISIBILITY = _json.load(_fh)
+except (OSError, ValueError):
+    VISIBILITY = {}
+
+_hidden = {_k for _k, _v in VISIBILITY.items() if not _v}
+STORIES = [_s for _s in STORIES if _s['slug'] not in _hidden]

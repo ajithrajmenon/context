@@ -522,8 +522,13 @@ PAPERS = [
 
 ]
 
-from stories_data import LIBRARY_PAPERS as _LP
+from stories_data import LIBRARY_PAPERS as _LP, GENERATED_PAPERS as _GP, STORIES as _S
 
-PAPERS = PAPERS + _LP
+PAPERS = PAPERS + _LP + _GP
+
+# A hidden story's paper goes with it — a live paper linking to a 404 is worse
+# than no paper.
+_live = {_s['slug'] for _s in _S}
+PAPERS = [_p for _p in PAPERS if _p['slug'] in _live]
 
 BY_SLUG = {p['slug']: p for p in PAPERS}

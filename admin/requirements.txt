@@ -1,0 +1,5 @@
+# The backoffice only. build.py and the site itself stay dependency-free.
+fastapi>=0.115
+uvicorn[standard]>=0.30
+anthropic>=0.69
+python-multipart>=0.0.9

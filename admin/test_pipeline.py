@@ -177,12 +177,38 @@ def main():
     from . import backend as backend_mod
     cli = backend_mod.CliBackend()
     cli.binary = '/usr/bin/claude'
-    argv = cli._argv('SYS', 'PROMPT', {'type': 'object'}, web=True)
-    assert '--bare' not in argv, 'CLI backend must not use --bare'
-    assert '--json-schema' in argv and '--append-system-prompt' in argv
-    assert 'WebSearch,WebFetch' in argv
-    no_tools = cli._argv('SYS', 'PROMPT', None, web=False)
-    assert no_tools[no_tools.index('--disallowedTools') + 1] == '*'
+
+    web = cli._argv({'type': 'object'}, web=True, sys_path='/tmp/sys.md')
+    assert '--bare' not in web, 'CLI backend must not use --bare'
+    assert '--json-schema' in web
+    assert web[web.index('--append-system-prompt-file') + 1] == '/tmp/sys.md'
+    # --json-schema answers through a StructuredOutput tool call. Allowing the
+    # web tools but not that one leaves the stage unable to reply.
+    allowed = web[web.index('--allowedTools') + 1].split(',')
+    assert set(allowed) == {'WebSearch', 'WebFetch', 'StructuredOutput'}, allowed
+
+    structured = cli._argv({'type': 'object'}, web=False, sys_path='/tmp/sys.md')
+    assert structured[structured.index('--allowedTools') + 1] == 'StructuredOutput'
+    assert int(structured[structured.index('--max-turns') + 1]) > 1, \
+        'a schema stage needs a turn to make the StructuredOutput call'
+    assert '--disallowedTools' not in structured
+
+    plain = cli._argv(None, web=False, sys_path='/tmp/sys.md')
+    assert plain[plain.index('--disallowedTools') + 1] == '*'
+
+    # Nothing large may reach the command line: a system prompt is the whole of
+    # STYLE.md, and Windows runs claude through a cmd.exe shim capped at 8,191
+    # characters. The prompt goes on stdin, the system prompt goes in a file.
+    WINDOWS_BUDGET = 7500          # cmd.exe stops at 8,191
+    for argv in (web, structured, plain):
+        assert not backend_mod._oversized(argv, WINDOWS_BUDGET), \
+            'argv exceeds what a Windows cmd.exe shim accepts'
+        assert max(len(a) for a in argv) < 4000, 'something big leaked into argv'
+
+    # The old shape — system prompt inline — is exactly what blew the limit.
+    inline = cli._argv(None, web=False, system=research._house_rules())
+    assert backend_mod._oversized(inline, WINDOWS_BUDGET), \
+        'the length guard would not have caught the failure it exists for'
 
     print(f'stages       {" -> ".join(seen)}')
     print(f'api calls    {len(backend.calls)} (6 agents + 1 resume)')
@@ -192,7 +218,8 @@ def main():
           f'{len(paper["contested"])} contested, {len(paper["unknowns"])} unknowns')
     print('diagrams     both render')
     print('refusal      raises Refused')
-    print('cli argv     no --bare, schema + system prompt + web tools present')
+    print('cli argv     no --bare, system prompt in a file, StructuredOutput '
+          'allowed,\n             nothing oversized for a Windows cmd shim')
     print('\nPipeline wiring OK. Quality of real output still needs a live run.')
 
 

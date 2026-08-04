@@ -3,6 +3,10 @@
 #
 #   ./admin/serve.sh
 #
+# This is bash, so it needs a shell — on Windows, and for anyone who reached
+# for a .sh file in a file manager, `python admin/serve.py` does the same job
+# and runs everywhere.
+#
 # On the first run it writes admin/.env with a freshly generated secret URL
 # prefix and asks for a password. After that it just starts, and prints the
 # login link.

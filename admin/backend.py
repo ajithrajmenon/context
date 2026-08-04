@@ -22,9 +22,11 @@ because using the subscription is the entire point of the CLI backend.
 """
 import json
 import os
+import platform
 import re
 import shutil
 import subprocess
+import tempfile
 
 
 class Refused(RuntimeError):
@@ -91,10 +93,24 @@ class ApiBackend:
 class CliBackend:
     """The `claude` binary in headless mode, on your subscription.
 
-    `--json-schema` gives schema-conforming output in `structured_output`, so
-    the structured stages are as reliable here as on the API. Tools are the
-    CLI's own WebSearch and WebFetch rather than the server-side ones — same
-    capability, different plumbing.
+    Two things about the CLI shape this class, and both were learned the hard
+    way:
+
+    1. **Nothing large goes on the command line.** An agent's system prompt is
+       the whole of STYLE.md — around 14 KB — and Windows runs npm's `claude`
+       through a `.cmd` shim, where the ceiling is cmd.exe's 8,191 characters,
+       not CreateProcess's 32,767. So the user prompt is piped on stdin and the
+       system prompt goes to a temp file read via `--append-system-prompt-file`.
+       Only flags and a schema are left in argv.
+
+    2. **`--json-schema` is delivered by a tool call.** The CLI hands the model
+       a `StructuredOutput` tool and fills `structured_output` from its input.
+       Denying every tool and capping the run at one turn — which looks like the
+       obviously safe thing to do for a stage that only has to think — denies
+       that tool and kills the run before it can answer.
+
+    Tools are the CLI's own WebSearch and WebFetch rather than the server-side
+    ones: same capability, different plumbing.
     """
 
     name = 'cli'
@@ -112,17 +128,29 @@ class CliBackend:
     def available(self):
         return bool(self.binary)
 
-    def _argv(self, system, prompt, schema, web):
-        argv = [self.binary, '-p', prompt, '--output-format', 'json',
-                '--append-system-prompt', system]
+    def _argv(self, schema, web, sys_path=None, system=None):
+        """Flags only. `sys_path` is a file holding the system prompt; if the
+        installed CLI is too old for that flag, `system` is passed inline."""
+        argv = [self.binary, '-p', '--output-format', 'json']
+        if sys_path:
+            argv += ['--append-system-prompt-file', sys_path]
+        elif system:
+            argv += ['--append-system-prompt', system]
         if self.model:
             argv += ['--model', self.model]
+
+        tools = ['WebSearch', 'WebFetch'] if web else []
         if schema:
             argv += ['--json-schema', json.dumps(schema)]
-        if web:
-            argv += ['--allowedTools', 'WebSearch,WebFetch', '--max-turns', '30']
+            # The model answers by calling this tool. Deny it and the stage
+            # cannot reply at all.
+            tools.append('StructuredOutput')
+        if tools:
+            # Web research wanders; a structured stage should answer and stop.
+            argv += ['--allowedTools', ','.join(tools),
+                     '--max-turns', '30' if web else '6']
         else:
-            # No tools at all: these stages only have to think and write, and a
+            # Nothing to call: this stage only has to think and write, and a
             # tool call here would be the agent wandering off its job.
             argv += ['--disallowedTools', '*', '--max-turns', '1']
         return argv
@@ -135,9 +163,34 @@ class CliBackend:
                 'run `claude` once to sign in, or set an ANTHROPIC_API_KEY to '
                 'use the API backend instead.')
 
-        proc = subprocess.run(self._argv(system, prompt, schema, web),
-                              capture_output=True, text=True, cwd=self.cwd,
-                              timeout=self.timeout)
+        sys_path = None
+        if _supports_system_prompt_file(self.binary):
+            fd, sys_path = tempfile.mkstemp(prefix='context-agent-', suffix='.md')
+            with os.fdopen(fd, 'w', encoding='utf-8') as fh:
+                fh.write(system)
+            argv = self._argv(schema, web, sys_path=sys_path)
+        else:
+            argv = self._argv(schema, web, system=system)
+            if _oversized(argv):
+                # Old CLI on a short command line: the system prompt has
+                # nowhere to go but into the message itself.
+                argv = self._argv(schema, web)
+                prompt = f'{system}\n\n---\n\n{prompt}'
+
+        try:
+            _check_length(argv)
+            # encoding is explicit because Windows would otherwise decode as
+            # cp1252 and mangle every em-dash in STYLE.md.
+            proc = subprocess.run(argv, input=prompt, capture_output=True,
+                                  text=True, encoding='utf-8', errors='replace',
+                                  cwd=self.cwd, timeout=self.timeout)
+        finally:
+            if sys_path:
+                try:
+                    os.remove(sys_path)
+                except OSError:
+                    pass
+
         if proc.returncode != 0:
             raise BackendError(_cli_error(proc))
 
@@ -148,10 +201,20 @@ class CliBackend:
                                + (proc.stdout or proc.stderr)[:900]) from None
 
         if payload.get('is_error') or payload.get('subtype') == 'error_during_execution':
-            raise BackendError(str(payload.get('result') or payload)[:900])
+            denied = [d.get('tool_name') for d in payload.get('permission_denials') or []]
+            detail = payload.get('result') or '; '.join(payload.get('errors') or [])
+            if denied:
+                detail = (detail or 'the run stopped early') + \
+                    ' — tools denied: ' + ', '.join(sorted(set(denied)))
+            raise BackendError(str(detail or payload)[:900])
 
+        # Most of a CLI turn's input arrives as cache reads, so `input_tokens`
+        # alone reports a couple of tokens for a 14 KB prompt. Count all three.
         usage = payload.get('usage') or {}
-        tokens = (usage.get('input_tokens', 0) or 0, usage.get('output_tokens', 0) or 0)
+        tokens = (sum(usage.get(k) or 0 for k in (
+                      'input_tokens', 'cache_creation_input_tokens',
+                      'cache_read_input_tokens')),
+                  usage.get('output_tokens') or 0)
 
         if schema:
             out = payload.get('structured_output')
@@ -169,9 +232,65 @@ class CliBackend:
         return payload.get('result', ''), tokens
 
 
+# npm installs `claude` as a .cmd shim on Windows, so the process is really
+# cmd.exe, whose whole command line must fit in 8,191 characters — not the
+# 32,767 CreateProcess allows. Everywhere else the limit is large enough that
+# it is only worth guarding against absurdity.
+_ARGV_BUDGET = 7500 if platform.system() == 'Windows' else 120000
+
+_FILE_FLAG = {}
+
+
+def _oversized(argv, budget=None):
+    # +3 per argument for the quoting and separator the OS adds.
+    return sum(len(a) + 3 for a in argv) > (_ARGV_BUDGET if budget is None else budget)
+
+
+def _check_length(argv):
+    if _oversized(argv):
+        raise BackendError(
+            'The command line for the CLI came out too long ({} chars, limit {}). '
+            'Update Claude Code — a recent version takes the system prompt from '
+            'a file, which is what keeps this small.'.format(
+                sum(len(a) + 3 for a in argv), _ARGV_BUDGET))
+
+
+def _supports_system_prompt_file(binary):
+    """Does this build take --append-system-prompt-file?
+
+    The flag is hidden from `--help`, so asking for a file that does not exist
+    is the honest probe: a build that knows the flag complains about the file,
+    one that does not complains about the flag. Neither costs an API call.
+    Memoised — this runs once per binary per process.
+    """
+    if binary in _FILE_FLAG:
+        return _FILE_FLAG[binary]
+    ok = False
+    try:
+        probe = subprocess.run(
+            [binary, '-p', 'x', '--append-system-prompt-file',
+             os.path.join(tempfile.gettempdir(), 'context-probe-does-not-exist')],
+            capture_output=True, text=True, encoding='utf-8', errors='replace',
+            timeout=60)
+        blob = ((probe.stdout or '') + (probe.stderr or '')).lower()
+        ok = 'not found' in blob and 'unknown option' not in blob
+    except (OSError, subprocess.SubprocessError):
+        ok = False
+    _FILE_FLAG[binary] = ok
+    return ok
+
+
 def _cli_error(proc):
     blob = (proc.stdout or '') + '\n' + (proc.stderr or '')
     low = blob.lower()
+    if 'command line is too long' in low or 'argument list too long' in low:
+        return ('The command line handed to Claude Code was too long for this '
+                'shell. Update Claude Code (`claude update`) so the system '
+                'prompt can be passed as a file instead.\n\n' + blob[:600])
+    if 'unknown option' in low:
+        return ('Claude Code rejected an option, which usually means the '
+                'installed version is old. Run `claude update`, or '
+                '`npm i -g @anthropic-ai/claude-code`.\n\n' + blob[:600])
     if 'invalid api key' in low or 'authentication' in low or 'not logged in' in low:
         return ('Claude Code is not signed in. Run `claude` once in a terminal '
                 'and log in with your subscription, then try again.\n\n' + blob[:600])

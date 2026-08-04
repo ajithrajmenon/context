@@ -173,7 +173,17 @@ backoffice ──▶ content/*.json ──▶ git push ──▶ Actions ──�
 ```
 
 The site stays dependency-free. Switch the backoffice off and nothing here
-changes. See `admin/README.md`.
+changes.
+
+Start it from a terminal — the same command on Windows, macOS and Linux:
+
+```
+python admin/serve.py
+```
+
+It sets itself up on the first run and prints your login link. The research
+team uses the Claude Code subscription you are already signed into, so there is
+no API key to buy. See `admin/README.md`.
 
 ## Adding a story
 

@@ -24,27 +24,38 @@ the backoffice is switched off, the site is unaffected.
 
 ## Running it
 
-On your own machine, in a clone of this repository:
+On your own machine, in a clone of this repository. **From a terminal** —
+PowerShell on Windows, Terminal on macOS, a shell on Linux:
 
-```bash
-./admin/serve.sh
+```
+python admin/serve.py
 ```
 
-First run: it generates a secret URL prefix, asks for an admin password and an
-API key, writes `admin/.env` (mode 600, gitignored), installs dependencies, and
-prints your login link. Every run after that just starts and prints the link.
+That is the whole command, and it is the same on all three. Use `python3` if
+`python` is not on your PATH.
+
+`admin/serve.sh` does the same thing and is there for Unix habit — but it is a
+bash script, so it only runs from a shell, and on Windows there is no bash to
+run it at all. Double-clicking a `.sh` file gets you Explorer asking which
+application to open it with. `serve.py` exists so there is one answer.
+
+First run: it generates a secret URL prefix, asks for an admin password, finds
+Claude Code or takes an API key, writes `admin/.env` (mode 600, gitignored),
+installs dependencies, and prints your login link. Every run after that just
+starts and prints the link.
 
 The long way, if you would rather set it up by hand:
 
-```bash
+```
 pip install -r admin/requirements.txt
 cp admin/.env.example admin/.env      # then fill it in
-python3 -m uvicorn admin.app:app --host 127.0.0.1 --port 8800
+python -m uvicorn admin.app:app --host 127.0.0.1 --port 8800
 ```
 
 **Where is the login link?** There is no fixed one — it is
 `http://127.0.0.1:8800` plus whatever `CONTEXT_ADMIN_PREFIX` you chose.
-`serve.sh` prints it. If you lose it: `grep PREFIX admin/.env`.
+`serve.py` prints it. If you lose it, it is the `CONTEXT_ADMIN_PREFIX` line in
+`admin/.env`.
 
 The app refuses to serve anything without `CONTEXT_ADMIN_PASSWORD`. It will not
 run open, even locally.
@@ -68,11 +79,18 @@ npm install -g @anthropic-ai/claude-code
 claude          # sign in, then quit with /exit
 ```
 
-`serve.sh` detects it and checks the login before starting, so a missing sign-in
+`serve.py` detects it and checks the login before starting, so a missing sign-in
 shows up immediately rather than four minutes into a research run.
 
 Set `CONTEXT_LLM_BACKEND` to `cli` or `api` to force one. Left blank it prefers
 the CLI, because the CLI costs nothing extra.
+
+**Keep Claude Code current** — `claude update`. Two things the backoffice needs
+arrived in recent versions: `--append-system-prompt-file`, and `--json-schema`.
+Without the first, a 14 KB system prompt has to travel on the command line,
+which Windows will not accept; the backoffice falls back to folding it into the
+message, but that is a worse prompt. Without the second, structured stages
+degrade to scraping JSON out of prose.
 
 **Two honest caveats about the CLI backend.** A six-agent run with web search is
 heavy, so on a Pro plan a couple of runs in an afternoon may hit your usage
@@ -150,11 +168,22 @@ the work; hiding keeps the file and its history.
 
 ## What is tested, and what is not
 
-`python3 -m admin.test_pipeline` runs the whole orchestration against a stub
-backend: stage order, token accounting, refusal handling, draft expansion, that
-both generated diagrams render, and that the CLI backend builds the right argv —
-including that it never passes `--bare`, which would bypass the subscription
-login and demand an API key. Nothing needed, nothing spent.
+`python -m admin.test_pipeline` runs the whole orchestration against a stub
+backend: stage order, token accounting, refusal handling, draft expansion, and
+that both generated diagrams render. Nothing needed, nothing spent.
+
+It also pins down the CLI backend's command line, where two bugs have already
+lived:
+
+- nothing large may reach argv — the prompt goes on stdin and the system prompt
+  goes in a file, because npm's `claude` on Windows is a `.cmd` shim and cmd.exe
+  stops at 8,191 characters;
+- a stage given a JSON schema must be allowed the `StructuredOutput` tool and
+  more than one turn, because that tool call *is* how the CLI returns structured
+  output. Denying all tools looks like the safe choice and silently guarantees
+  failure;
+- and `--bare` is never passed, since it bypasses the subscription login and
+  demands an API key.
 
 It does **not** test the quality of what the real agents write. That needs a live
 run through either backend — do that before trusting the first draft.
@@ -184,7 +213,8 @@ admin/research.py        the six agents, their prompts and schemas
 admin/publish.py         draft -> content/*.json -> build -> commit -> push
 admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions
 admin/test_pipeline.py   offline orchestration test
-admin/serve.sh           first-run setup, then starts and prints the login link
+admin/serve.py           first-run setup, then starts — Windows, macOS, Linux
+admin/serve.sh           the same thing in bash, for Unix habit
 admin/.env.example       the settings, documented
 content/stories/*.json   published generated stories, read by build.py
 content/visibility.json  slug -> false hides a story

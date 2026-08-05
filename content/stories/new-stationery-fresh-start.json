@@ -1,0 +1,227 @@
+{
+ "story": {
+  "slug": "new-stationery-fresh-start",
+  "kicker": "Behavioral Economics",
+  "lens": "What",
+  "card_tone": "solar",
+  "thumb": null,
+  "featured": false,
+  "title": "What Is a Fresh Start, Actually?",
+  "teaser": "A new notebook feels like day one. The feeling has been tested. The payoff, only once — and only for real.",
+  "takeaway": "Framing a date as a fresh start reliably boosts short-term signals like sign-ups and clicks. The one large real-world trial of the same idea found no effect on actual behavior, and anticipating a start date can even excuse doing less right now.",
+  "hero": {
+   "tone": "solar",
+   "scene": "sun",
+   "var": 2,
+   "standfirst": "Every September, students buy a new notebook expecting a fresh start; psychologists have spent a decade testing that feeling, and only recently ran the one real-world trial that reveals what the feeling actually buys you."
+  },
+  "blocks": [
+   {
+    "type": "text",
+    "h": "The notebook as a starting gun",
+    "p": [
+     "Before the semester starts, you buy the notebook. Blank pages, unused pens — for a moment, the organized version of yourself feels one purchase away.",
+     "It isn't only stationery. New Year brings the same pull toward a planner, Monday toward a diet that finally starts."
+    ]
+   },
+   {
+    "type": "scene",
+    "tone": "void",
+    "scene": "sun",
+    "var": 9,
+    "h": "A new notebook feels like day one. The feeling has been tested. The payoff, only once — and only for real."
+   },
+   {
+    "type": "diagram",
+    "spec": {
+     "kind": "parts",
+     "title": "Built-in restart buttons",
+     "sub": "What people already treat as a fresh start",
+     "centre": "A fresh start",
+     "callouts": [
+      [
+       "New notebook",
+       "the back-to-school buy"
+      ],
+      [
+       "New Year's Day",
+       "tested in a real trial"
+      ],
+      [
+       "A birthday",
+       "also tested"
+      ],
+      [
+       "A new semester",
+       "feels like day one"
+      ]
+     ]
+    },
+    "caption": "Some of these have been tested by psychologists. The notebook, so far, hasn't."
+   },
+   {
+    "type": "text",
+    "h": "The lab tested its own idea for real",
+    "p": [
+     "The 'fresh start effect' is real in the lab. Framing an ordinary date as a new beginning raised sign-ups and clicks across five studies.",
+     "Then the same lab mailed real fresh-start reminders to 15,011 patients, timed to a birthday or New Year. Their medication use didn't move."
+    ]
+   },
+   {
+    "type": "turn",
+    "tone": "dusk",
+    "text": "The date you pick to start something doesn't power you through it — anticipating it can be the reason you wait."
+   },
+   {
+    "type": "diagram",
+    "spec": {
+     "kind": "parts",
+     "title": "What the feeling actually moves",
+     "sub": "Four measured effects of fresh-start framing",
+     "centre": "The feeling",
+     "callouts": [
+      [
+       "Sign-ups jump",
+       "25.6% vs 7.2%, one study"
+      ],
+      [
+       "Clicks jump",
+       "28.6% vs 4.4%, another"
+      ],
+      [
+       "Real pill-taking",
+       "no change, 15k patients"
+      ],
+      [
+       "Effort right now",
+       "can drop while you wait"
+      ]
+     ]
+    },
+    "caption": "The feeling reliably moves the click. It has not been shown to move what happens after."
+   },
+   {
+    "type": "text",
+    "h": "Use the date, don't lean on it",
+    "p": [
+     "If a landmark gets you to buy the notebook, that part is real. Use the date to begin, not as the plan.",
+     "Knowing a 'real start' is coming can be an excuse to coast until it arrives, with no evidence people catch up later."
+    ]
+   }
+  ],
+  "zoomout": {
+   "tone": "solar",
+   "text": "The instinct to mark a clean break — a new notebook, a new year, a new week — is one of the better-documented ways to get a person moving. Whether the moving continues is still mostly untested outside the moment it was measured."
+  }
+ },
+ "paper": {
+  "slug": "new-stationery-fresh-start",
+  "title": "What Is a Fresh Start, Actually: the research",
+  "subtitle": "What a decade of \"fresh start\" research does and doesn't support.",
+  "date": "August 2026",
+  "minutes": 9,
+  "abstract": "We set out to test a specific, popular claim: that buying a goal-related object — a notebook, a planner — taps into the same psychological \"fresh start\" that makes calendar landmarks like New Year's Day or a birthday feel motivating, and that this feeling reliably launches follow-through. We found solid lab evidence for the underlying temporal-landmark effect on short-term signals of intent, a well-powered field trial in which that same effect produced no measurable change in real behavior, and a separate finding that anticipating a landmark can excuse doing less beforehand. No study has tested the object-purchase link itself.",
+  "sections": [
+   {
+    "h": "The claim we tried to verify",
+    "p": [
+     "The popular idea is simple: buy the tool, and something about the purchase itself makes today feel like day one, which makes you more likely to actually start. We wanted to know how much of that is established psychology and how much is a story people tell about a habit they already have.",
+     "The nearest real research is the \"fresh start effect\": the finding that certain calendar dates — the start of a week, a year, a semester, a birthday — get people to disengage psychologically from a less-than-ideal past self and pursue goals with more energy. It is often miscited as appearing in a 2014 Psychological Science paper; the actual paper, by Hengchen Dai, Katherine Milkman and Jason Riis, ran in Psychological Science in 2015."
+    ]
+   },
+   {
+    "h": "What is well supported",
+    "p": [
+     "Across five studies (online workers and a US university subject pool), framing an ordinary date as a \"new beginning\" moved short-term signals: 25.6% of people signed up under new-beginning framing versus 7.2% under standard framing (Study 1A); 28.6% versus 4.4% clicked through in a related study (1B); further studies found similar effects on click-throughs and self-reported motivation, all statistically significant.",
+     "The same research group later ran the test that matters most: a preregistered field trial with the health insurer Humana, mailing fresh-start-framed medication reminders to 15,011 real patients across five different framings, including birthday and New Year. Every comparison's confidence interval crossed zero — no framing changed whether people actually took their medication."
+    ]
+   },
+   {
+    "h": "What complicates the story",
+    "p": [
+     "Two explanations compete for the null result. The researchers suggest the lab effect may only govern the initiation of a goal, not its maintenance — signing up is not the same as sticking with a pill regimen for months. But they also note a mail-timing confound: some New Year's reminders arrived after New Year's Day had already passed, undercutting the manipulation itself. Which explanation is doing the real work is not settled.",
+     "Separately, Mina Koo, Hengchen Dai, Kelly Mai and Sunyee Song (2020) found that anticipating a future landmark can license less effort in the present, with no later catch-up — confirmed at the level of the paper's own abstract, since the full statistical detail was not available to verify further. And the effect is not culturally uniform: in the original researchers' own supplementary study timed to Yom Kippur, the effect reversed for participants who were not Jewish, and the authors state directly that it may depend on whether the date resonates with a person's cultural, occupational or religious identity."
+    ]
+   },
+   {
+    "h": "What we could not establish",
+    "p": [
+     "No study we found has directly tested whether the physical act of buying a goal-related object — a notebook, a planner, running shoes — produces the same psychological state as a calendar landmark. The closest adjacent work looks at archival spikes in gym-membership purchases and a lab study on generic \"self-improvement product\" preference using hypothetical scenarios, not stationery. The link between buying the object and feeling the fresh start is a reasonable inference, not a finding.",
+     "We also found no study, in either direction, measuring whether buying school supplies or planners predicts later task completion or grades. Two literatures that might seem to fill that gap don't: retail-therapy research (on mood repair after situational sadness) doesn't address productivity, and moral-licensing research (a virtuous act licensing an unrelated indulgence) describes a different kind of substitution than a tool licensing non-use of itself. Both were considered and set aside."
+    ]
+   }
+  ],
+  "findings": [
+   [
+    "Framing a date as a psychological 'new beginning' (vs. an ordinary date) increases short-term goal-initiation signals — reminder sign-ups, link clicks, self-reported motivation — across five studies.",
+    "best current explanation",
+    "Dai, Milkman & Riis, Psych Science 2015 (PMC4839284), full text read: 1A n=165, 25.6% vs 7.2%, p=.001; 1B n=278, 28.6% vs 4.4%, p<.0001; Study 2 n=216, clicks p=.01 but secondary time-spent measure only p=.047; Study 3 n=399, p=.003; Study 4 n=300, mediation CI [0.003, 0.22] — wide, barely excludes zero. All samples MTurk or a US university subject pool, not a field RCT with real people at a real landmark."
+   ],
+   [
+    "The same fresh-start framing failed to produce real-world behavior change in a large, preregistered field trial.",
+    "established",
+    "Milkman et al., Humana RCT (PMC6157600), full text read: n=15,011, five arms, all treatment-vs-control 95% CIs straddle zero (e.g., Birthday Framed vs Control [-1.09, 2.19] pp). This is a directly reported, unambiguous null result from the original effect's own lab."
+   ],
+   [
+    "The reason for that null result is contested between the researchers' own two explanations: an initiation-vs-maintenance boundary condition, versus a mail-timing confound that let some New Year reminders arrive after the landmark passed.",
+    "contested",
+    "Authors of PMC6157600 state both explanations themselves; the notes flag the confound as tempering how cleanly this can be read as a true failure of the psychological effect."
+   ],
+   [
+    "No study has tested whether the physical act of buying a goal-related object (a notebook, planner, etc.) itself triggers the same psychological 'new beginning' state that calendar-date landmarks do — the object-purchase-as-landmark link is an inference, not a finding.",
+    "contested",
+    "Search notes Q2 bottom line: closest adjacent work is Koo et al. 2020 (archival gym-membership purchase spikes, a different behavior) and a 2025 APJML lab paper on generic 'self-improvement product' preference using abstract/hypothetical stimuli, not stationery. Notes state explicitly: 'Nobody has run the direct study.'"
+   ],
+   [
+    "A 'day one' feeling anticipated from an upcoming landmark can license reduced present-day effort on a goal, with no later compensating effort — a direct tension with the idea that the feeling 'gets you started.'",
+    "best current explanation",
+    "Koo, Dai, Mai & Song, OBHDP 2020 — confirmed at abstract level only (reading notes: full PDF unreadable, so underlying stats and sample sizes are unverified); direction and existence of the finding are stated plainly by the authors' own abstract."
+   ],
+   [
+    "The fresh-start effect's applicability outside US/MTurk populations is uncertain, with the authors' own supplementary data showing the effect can reverse for people outside the relevant cultural/religious identity.",
+    "established",
+    "Dai et al. 2015 supplementary Yom Kippur field study (reading notes, full text read): effect reversed for non-Jewish participants; directionally positive but underpowered for Jewish participants (target n=160, actual n=86); authors explicitly state effectiveness 'may depend on whether it resonates with our cultural, occupational, or religious identity.'"
+   ]
+  ],
+  "contested": [
+   [
+    "Does the fresh-start/temporal-landmark effect actually change real-world behavior, or mostly short-term lab/self-report proxies?",
+    "Dai, Milkman & Riis (Psych Science 2015, 5 studies, MTurk/university samples) find significant boosts to sign-ups, clicks, and self-reported motivation from 'new beginning' framing. Milkman's own later preregistered field RCT with Humana (n=15,011) found null effects of fresh-start framing on real medication adherence. The authors attribute the null partly to an initiation-vs-maintenance distinction and partly to a mail-timing confound (New Year mailers often arrived after the landmark had passed), so the field failure doesn't cleanly overturn the lab findings, but it is a genuine, well-powered non-replication in an applied setting from the original lab."
+   ],
+   [
+    "Does a 'day one' feeling increase present effort toward a goal, or can it license reduced effort instead?",
+    "The initiation literature (Dai/Milkman/Riis) treats fresh-start psychology as effort-boosting. Koo, Dai, Mai & Song (OBHDP 2020, confirmed only at abstract level — full stats unverified) find that anticipating an upcoming landmark leads people to offload responsibility to a 'future self,' licensing reduced present-day effort with no later compensating makeup effort. This directly complicates any claim that the 'day one' feeling reliably 'gets you started.'"
+   ],
+   [
+    "Is the fresh-start effect culturally general enough to apply to 'students' as a broad category?",
+    "A Japanese sample (N=457) replicated increased milestone-meaningfulness from landmark framing. But Dai et al.'s own supplementary Yom Kippur field study reversed direction for non-Jewish participants (and was underpowered for Jewish participants), and the authors explicitly state the effect may depend on cultural/religious resonance. East Asian populations' more continuous self-construal is theorized, not demonstrated, as a further dampener."
+   ]
+  ],
+  "unknowns": [
+   "Whether purchasing a physical object (notebook, planner) itself induces a fresh-start psychological state — never directly tested.",
+   "Whether stationery/tool purchases predict subsequent task completion or academic performance, positively or negatively — never directly tested in either direction.",
+   "The underlying statistics, sample size, and methodology of Koo et al. 2020 — full text was unreadable, so only the abstract-level claim (anticipation licenses reduced effort with no makeup) is confirmed.",
+   "Whether the fresh-start effect generalizes beyond MTurk/US-university samples — only one non-Western data point (Japan, N=457) exists, and it comes with an untested theoretical reason (continuous self-construal) to expect a weaker effect there.",
+   "Whether the Humana RCT's null result reflects a genuine boundary condition (initiation vs. maintenance) or is substantially an artifact of the mail-timing confound the authors themselves flagged — not disentangled by any further study in the notes."
+  ],
+  "method": "We read primary sources in full where available — the 2015 Psychological Science paper and the Humana field-trial report — and checked the specific percentages and confidence intervals against the text rather than relying on abstracts or secondary summaries. One source, Koo et al. (2020), could only be confirmed at the abstract level; its full statistics are marked unverified throughout. We also checked a commonly circulated citation (\"Dai, Milkman & Riis, 2014\") and found no such paper exists, only the 2015 one. The literature is itself a bias worth naming: nearly every sample is American or MTurk-recruited, and the one non-Western data point we found (Japan, N=457) tested a narrower claim than the ones examined here.",
+  "reading": [
+   [
+    "Dai, H., Milkman, K. L., & Riis, J. (2015). \"Put Your Imperfections Behind You: Temporal Landmarks Spur Goal-Directed Behavior.\" Psychological Science.",
+    "The original five-study evidence that framing a date as a new beginning boosts sign-ups, clicks, and self-reported motivation — the lab result the whole piece starts from."
+   ],
+   [
+    "Milkman, K. L. et al. Preregistered field RCT with health insurer Humana (n=15,011).",
+    "The same lab's real-world test of fresh-start-framed mailers on actual medication adherence — the null result that supplies the Crack."
+   ],
+   [
+    "Koo, M., Dai, H., Mai, K. M., & Song, S. (2020). Organizational Behavior and Human Decision Processes.",
+    "The finding that anticipating a future landmark can license less effort today with no compensating catch-up — read at abstract level only, full text unavailable."
+   ],
+   [
+    "Dai, Milkman & Riis (2015), supplementary Yom Kippur field study.",
+    "Shows the effect reversing for people outside the relevant cultural or religious identity, the basis for flagging the effect as culturally bounded rather than universal."
+   ]
+  ]
+ }
+}

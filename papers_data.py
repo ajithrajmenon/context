@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-"""The long layer.
+"""The long layer, for the four stories built by hand.
 
 Every story links to one of these. The story is the public face; the paper is
 what earns it the right to be believed. See STYLE.md section 6 — nobody has to
 read the paper, everybody has to be able to.
+
+This file is data and nothing else. Which papers are actually published, and the
+rule that a hidden story takes its paper with it, live in corpus.py.
 
 Each paper carries:
     abstract     what we set out to establish and what we found
@@ -18,7 +21,7 @@ Confidence levels are deliberately only three: 'established', 'best current
 explanation', 'contested'. More gradations would be false precision.
 """
 
-PAPERS = [
+FLAGSHIP = [
 
 # ------------------------------------------------------------------ sleep
 {
@@ -521,14 +524,3 @@ PAPERS = [
 },
 
 ]
-
-from stories_data import LIBRARY_PAPERS as _LP, GENERATED_PAPERS as _GP, STORIES as _S
-
-PAPERS = PAPERS + _LP + _GP
-
-# A hidden story's paper goes with it — a live paper linking to a 404 is worse
-# than no paper.
-_live = {_s['slug'] for _s in _S}
-PAPERS = [_p for _p in PAPERS if _p['slug'] in _live]
-
-BY_SLUG = {p['slug']: p for p in PAPERS}

@@ -17,7 +17,11 @@ padded: every one has a real reversal, real numbers, and a paper behind it.
 
     b(...)  one brief
     expand()  -> (story dict, paper dict)
+
+The order itself is not here. It is in beats.py, shared with the stories the
+research team generates, so there is exactly one definition of the grammar.
 """
+import beats
 
 
 def b(slug, kicker, title, teaser, take, tone, scene, var, stand,
@@ -32,49 +36,55 @@ def pp(sub, abstract, findings, contested, unknowns, method, reading):
                 unknowns=unknowns, method=method, reading=reading)
 
 
-TONES = ['dusk', 'ember', 'deepsea', 'nebula', 'forest', 'solar', 'rose', 'void']
+TONES = beats.TONES
+
+# Every brief in this file was written in the same month, and a brief carries no
+# date of its own. Stating it once here beats repeating it fifty times.
+LIBRARY_DATE = 'August 2026'
+
+
+def _beat(field):
+    """A brief packs a beat as one tuple: (heading, paragraph, paragraph...).
+    The grammar wants (heading, [paragraphs])."""
+    return field[0], list(field[1:])
 
 
 def expand(br, i):
-    """One brief -> (story, paper), in the house order."""
+    """One brief -> (story, paper).
+
+    An adapter, and only an adapter. The six-beat order, the block shapes and
+    the envelopes are in beats.py, shared with the generated stories, so the two
+    cannot drift apart. What lives here is the brief's own vocabulary: positional
+    tuples, `take`/`stand`/`zoom` short field names, and a lens looked up by slug.
+    """
     tone = br['tone']
-    alt = TONES[(TONES.index(tone) + 3) % len(TONES)]
 
-    # The full-bleed panel sits early, holding the teaser over the artwork as a
-    # pull-quote. It used to sit just before the Turn and repeat the story's own
-    # title and teaser, which put the title on the page twice and stacked two
-    # big statements back to back. Here it sets up the Crack instead.
-    blocks = [
-        {'type': 'text', 'h': br['wrong'][0], 'p': list(br['wrong'][1:])},
-        {'type': 'scene', 'tone': 'void', 'scene': br['scene'], 'var': br['var'] + 7,
-         'h': br['teaser']},
-        {'type': 'diagram', 'spec': br['d1'][0], 'caption': br['d1'][1]},
-        {'type': 'text', 'h': br['crack'][0], 'p': list(br['crack'][1:])},
-        {'type': 'turn', 'tone': alt, 'text': br['turn']},
-        {'type': 'diagram', 'spec': br['d2'][0], 'caption': br['d2'][1]},
-        {'type': 'text', 'h': br['cost'][0], 'p': list(br['cost'][1:])},
-    ]
+    blocks = beats.stack(
+        wrong=_beat(br['wrong']),
+        crack=_beat(br['crack']),
+        cost=_beat(br['cost']),
+        turn=br['turn'],
+        teaser=br['teaser'],
+        scene=br['scene'],
+        scene_var=br['var'] + beats.SCENE_VAR_OFFSET,
+        diagram_one=(br['d1'][0], br['d1'][1]),
+        diagram_two=(br['d2'][0], br['d2'][1]),
+        turn_tone=beats.counter_tone(tone),
+    )
 
-    story = {
-        'slug': br['slug'], 'kicker': br['kicker'], 'lens': LENS[br['slug']],
-        'card_tone': tone, 'thumb': None, 'featured': False,
-        'title': br['title'], 'teaser': br['teaser'], 'takeaway': br['take'],
-        'hero': {'tone': tone, 'scene': br['scene'], 'var': br['var'],
-                 'standfirst': br['stand']},
-        'blocks': blocks,
-        'zoomout': {'tone': tone, 'text': br['zoom']},
-    }
+    story = beats.story_envelope(
+        slug=br['slug'], kicker=br['kicker'], lens=LENS[br['slug']], tone=tone,
+        title=br['title'], teaser=br['teaser'], takeaway=br['take'],
+        scene=br['scene'], hero_var=br['var'], standfirst=br['stand'],
+        blocks=blocks, zoomout=br['zoom'])
 
     p = br['paper']
-    paper = {
-        'slug': br['slug'], 'title': br['title'].rstrip('?') + ': the research',
-        'subtitle': p['sub'], 'date': 'August 2026',
-        'minutes': max(4, 3 + len(p['findings'])),
-        'abstract': p['abstract'],
-        'sections': [{'h': 'What we looked at', 'p': [p['abstract']]}],
-        'findings': p['findings'], 'contested': p['contested'],
-        'unknowns': p['unknowns'], 'method': p['method'], 'reading': p['reading'],
-    }
+    paper = beats.paper_envelope(
+        slug=br['slug'], title=beats.research_title(br['title']),
+        subtitle=p['sub'], date=LIBRARY_DATE, abstract=p['abstract'],
+        findings=p['findings'], contested=p['contested'],
+        unknowns=p['unknowns'], method=p['method'], reading=p['reading'])
+
     return story, paper
 
 

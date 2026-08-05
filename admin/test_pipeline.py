@@ -173,8 +173,41 @@ def main():
     assert paper['sections'][0]['h'] != 'What we looked at', \
         'the writer\'s sections were replaced by the abstract fallback'
 
-    # The diagram specs must survive into something diagram.build() accepts.
+    # The six-beat order is the house grammar and there must be exactly one
+    # definition of it. A hand-written brief and a generated draft go through
+    # different adapters — positional tuples versus named fields — but they must
+    # come out of beats.py with the same block order and the same envelope shape.
+    # Two copies of this grammar is what the shared module exists to prevent, and
+    # divergence would otherwise be silent: both halves would still render.
     sys.path.insert(0, publish.ROOT)
+    import beats as grammar
+    import library
+
+    brief_story, brief_paper = library.expand(library.BRIEFS[0], 0)
+    assert [b['type'] for b in brief_story['blocks']] == \
+           [b['type'] for b in site_story['blocks']], \
+        'hand-written and generated stories disagree on the beat order'
+    assert brief_story.keys() == site_story.keys(), \
+        'the story envelope differs between the two expanders'
+    assert brief_paper.keys() == paper.keys(), \
+        'the paper envelope differs between the two expanders'
+    assert brief_story['hero'].keys() == site_story['hero'].keys()
+
+    # The Turn is set in a contrasting tone, and both halves must rotate the same
+    # way. An unknown tone falls back rather than raising, because older drafts
+    # predate the schema that constrains it.
+    assert grammar.counter_tone('dusk') == 'nebula'
+    assert grammar.counter_tone('void') == 'deepsea'
+    assert grammar.counter_tone('not-a-tone') == 'nebula'
+
+    # The panel reuses the hero's scene at an offset variant, so one page never
+    # frames the same artwork identically twice.
+    hero_var = site_story['hero']['var']
+    panel = next(b for b in site_story['blocks'] if b['type'] == 'scene')
+    assert panel['var'] == hero_var + grammar.SCENE_VAR_OFFSET
+    assert panel['var'] != hero_var
+
+    # The diagram specs must survive into something diagram.build() accepts.
     import diagram
     for block in site_story['blocks']:
         if block['type'] == 'diagram':
@@ -193,6 +226,156 @@ def main():
         assert 'cyber' in str(exc)
     else:
         raise AssertionError('a refusal did not raise')
+
+    # ---------------------------------------------------------------- corpus
+    # Assembling the corpus is a function call now, not a side effect of an
+    # import, which is the only reason any of this can be asserted.
+    import corpus
+
+    live = corpus.load()
+    assert len(live.stories) >= 50, len(live.stories)
+
+    # Calling it twice must give the same answer. When assembly happened at
+    # import time the module appended to its own list, so anything that caused a
+    # reload grew the corpus — this is the regression test for that.
+    again = corpus.load()
+    assert [s['slug'] for s in again.stories] == [s['slug'] for s in live.stories], \
+        'loading the corpus twice changed it'
+
+    # Slugs are URLs, so a duplicate silently overwrites a published page.
+    slugs = [s['slug'] for s in live.stories]
+    assert len(slugs) == len(set(slugs)), 'two stories share a slug'
+
+    # Every story sits under exactly one of the four lenses, and every paper
+    # belongs to a story that is actually live.
+    for s in live.stories:
+        assert s['lens'] in ('What', 'Why', 'How', 'What if'), (s['slug'], s['lens'])
+    for p in live.papers:
+        assert live.story_for(p['slug']), f'{p["slug"]} paper has no live story'
+
+    # No two banners on the site may be the same picture. Recycled artwork is the
+    # failure this project corrected twice, and with twelve stories sharing the
+    # `mind` scene it cannot be checked by eye.
+    banners = [(s['hero']['scene'], s['hero'].get('var', 0)) for s in live.stories]
+    assert len(banners) == len(set(banners)), 'two stories share a banner'
+
+    # The pager wraps, so no story is a dead end.
+    assert live.next_after(len(live.stories) - 1)['slug'] == live.stories[0]['slug']
+
+    # Hiding a story takes its paper with it — a live paper linking to a 404 is
+    # worse than no paper at all. Compared against a corpus assembled the same
+    # way, so the count is not off by whatever is sitting in content/.
+    base = corpus.assemble()
+    victim = base.stories[0]['slug']
+    hidden = corpus.assemble(visibility={victim: False})
+    assert hidden.story_for(victim) is None, 'a hidden story stayed on the site'
+    assert hidden.paper_for(victim) is None, 'a hidden story kept its paper'
+    assert len(hidden.stories) == len(base.stories) - 1
+
+    # Any corpus, not just the real one: this is what lets build.py be exercised
+    # on data a test controls, and what the draft preview relies on.
+    mine = corpus.assemble(flagship=[site_story], flagship_papers=[paper],
+                           library_stories=[], library_papers=[])
+    assert len(mine.stories) == 1
+    assert mine.paper_for(site_story['slug']) is paper
+    assert mine.next_after(0) is site_story, 'a corpus of one must point at itself'
+
+    # A generated story arrives with a lens the Planner chose, and must keep it.
+    assert mine.stories[0]['lens'] == 'Why'
+
+    # build.py renders whatever it is handed, and reads nothing itself. If this
+    # breaks, the draft preview and the published page have drifted apart.
+    import build
+    html = build.build_story(site_story, site_story, mine)
+    assert site_story['title'] in html
+    assert f'../papers/{site_story["slug"]}.html' in html, \
+        'the research card did not find the paper'
+    # Without a corpus there is no paper to point at, and the card is simply
+    # absent rather than broken.
+    assert 'card-paper' not in build.build_story(site_story, site_story)
+
+    # The approval screen renders a draft inside the real corpus, because a banner
+    # variant is only unique with respect to every other story. Rendered alone a
+    # draft would be framed one way and published another, and the collision this
+    # replaced was exactly that: a generated story with the same banner as a
+    # hand-written one.
+    around = corpus.preview(site_story, paper)
+    framing = [(s['hero']['scene'], s['hero'].get('var', 0)) for s in around.stories]
+    assert len(framing) == len(set(framing)), \
+        'a draft was framed identically to a published story'
+    assert around.paper_for(site_story['slug']) is paper
+    assert around.story_for(site_story['slug']) is site_story
+
+    # Previewing a draft whose slug is already published shows one of it, not two.
+    slugs_seen = [s['slug'] for s in around.stories]
+    assert slugs_seen.count(site_story['slug']) == 1
+
+    # ---------------------------------------------------------------- chrome
+    # ui.py is pure functions of its arguments, which is the point of it being a
+    # separate module: the chrome can be rendered and checked without a server,
+    # a session or a run.
+    from . import ui
+
+    assert ui.state_pill('done').count('pill ok') == 1
+    assert 'pill bad' in ui.state_pill('failed')
+    assert 'pill warn' in ui.state_pill('running')
+
+    # The rail is the only thing a person watches for several minutes, so its
+    # states have to be right: delivered stages are done, the current one is
+    # live, and the ones after it have not happened yet.
+    bar = ui.rail(research.STAGES, {'plan': 12.0, 'search': 90.0}, 'read', 'running')
+    assert bar.count('step done') == 2, 'delivered stages should read as done'
+    assert bar.count('step live') == 1, 'exactly one stage is in progress'
+    assert bar.count('step todo') == 3
+    assert '12s' in bar and '90s' in bar, 'the rail lost its timings'
+    assert 'working' in bar
+
+    failed = ui.rail(research.STAGES, {'plan': 3.0}, 'search', 'failed')
+    assert 'step fail' in failed, 'a failed run must show where it stopped'
+    assert 'step live' not in failed
+
+    # Every page carries the nav, and the current tab is the marked one.
+    body = ui.page('Dashboard', '<p>hi</p>', nav='/stories').body.decode()
+    assert 'noindex,nofollow' in body, 'the backoffice must not be indexable'
+    assert body.count('class="on"') == 1
+    assert ui.CSS[:20] in body, 'the page lost its stylesheet'
+    # Titles and messages are escaped: a draft title is model output.
+    hostile = ui.page('<script>x</script>', '', message='<b>m</b>').body.decode()
+    assert '<script>x</script>' not in hostile
+    assert '&lt;b&gt;m&lt;/b&gt;' in hostile
+
+    # ---------------------------------------------------------------- runner
+    # The background run lives outside the web layer now, so the two things it
+    # does — advance the stage pointer, and turn a result into a draft — can be
+    # checked directly. Both are stubbed at the store boundary: no thread, no
+    # database write, no Claude.
+    from . import runner, store as store_mod
+
+    advanced, added = [], []
+    real_update, real_add, real_create = (
+        store_mod.update_run, store_mod.add_stage, store_mod.create_draft)
+    store_mod.update_run = lambda rid, **kw: advanced.append(kw.get('stage'))
+    store_mod.add_stage = lambda rid, n, o, s: added.append(n)
+    store_mod.create_draft = lambda *a, **kw: 4242
+    try:
+        on_stage = runner._record_stages(1)
+        for name in research.STAGES:
+            on_stage(name, 'output', 1.0)
+        assert added == research.STAGES, 'a stage was not recorded'
+        # After each agent, `stage` names whoever is up next; after the last one
+        # it reads done, which is what stops the run page polling.
+        assert advanced == research.STAGES[1:] + ['done'], advanced
+
+        draft_id = runner._queue_draft(1, result)
+        assert draft_id == 4242
+        # The graded findings and the date must ride along with the draft — the
+        # paper cannot be rendered without them, and a prompt-based edit must
+        # not drop them.
+        assert result['story']['_findings'] == result['check']
+        assert result['story']['_date'], 'the draft lost its date'
+    finally:
+        store_mod.update_run, store_mod.add_stage, store_mod.create_draft = (
+            real_update, real_add, real_create)
 
     # The CLI backend must build the right argv, and must never pass --bare,
     # which would bypass the subscription login and demand an API key.
@@ -238,8 +421,15 @@ def main():
     print(f'blocks       {[b["type"] for b in site_story["blocks"]]}')
     print(f'paper        {len(paper["findings"])} findings, '
           f'{len(paper["contested"])} contested, {len(paper["unknowns"])} unknowns')
+    print(f'grammar      one definition; brief and draft agree on '
+          f'{len(site_story["blocks"])} beats')
     print('diagrams     both render')
     print('refusal      raises Refused')
+    print(f'corpus       {len(live.stories)} live, stable across loads, '
+          f'no shared banners')
+    print('build        renders any corpus; hiding removes story and paper')
+    print('chrome       rail states, nav, escaping')
+    print('runner       stage pointer advances, draft carries findings')
     print('cli argv     no --bare, system prompt in a file, StructuredOutput '
           'allowed,\n             nothing oversized for a Windows cmd shim')
     print('\nPipeline wiring OK. Quality of real output still needs a live run.')

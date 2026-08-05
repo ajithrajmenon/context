@@ -19,13 +19,28 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONTENT = os.path.join(ROOT, 'content')
 STORIES = os.path.join(CONTENT, 'stories')
 VISIBILITY = os.path.join(CONTENT, 'visibility.json')
 
-TONES = ['dusk', 'ember', 'deepsea', 'nebula', 'forest', 'solar', 'rose', 'void']
+# beats.py lives at the repository root and is the shared definition of the six
+# beats. It reads nothing and holds no state, so unlike build.py it is safe to
+# import at module scope — there is no content/ to go stale underneath us.
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+import beats  # noqa: E402
+
+TONES = beats.TONES
+
+# A placeholder framing, overwritten by corpus.py when the story takes its place
+# in the corpus. It has to be *something* for the story dict to be complete, but
+# nothing should read it: a variant is only unique with respect to every other
+# story, and this file can only see one. Choosing it here is what once gave a
+# generated story the same banner as a hand-written one.
+GENERATED_VAR = 2
 
 
 def slugify(text):
@@ -65,55 +80,54 @@ def _paras(value):
 
 def expand(s):
     """One writer output -> (story dict, paper dict), in the same shape the
-    hand-written stories use. This is library.expand() for generated content."""
+    hand-written stories use.
+
+    An adapter, and only an adapter. The six-beat order and the envelopes live in
+    beats.py, shared with library.expand(), so a generated story and a
+    hand-written one cannot end up with different grammars. What belongs here is
+    the writer's own vocabulary: `wrong_head`/`wrong_body` field pairs, diagram
+    data arriving as a JSON string, findings as dicts rather than tuples, and the
+    tolerance for older drafts that the queue still has to render.
+    """
     tone = s.get('tone') or 'dusk'
-    alt = TONES[(TONES.index(tone) + 3) % len(TONES)] if tone in TONES else 'nebula'
     slug = s.get('slug') or slugify(s.get('title'))
 
-    blocks = [
-        {'type': 'text', 'h': s['wrong_head'], 'p': _paras(s['wrong_body'])},
-        {'type': 'scene', 'tone': 'void', 'scene': s['scene'], 'var': 9,
-         'h': s['teaser']},
-        {'type': 'diagram', 'spec': _spec(s['diagram_one']),
-         'caption': s['diagram_one'].get('caption', '')},
-        {'type': 'text', 'h': s['crack_head'], 'p': _paras(s['crack_body'])},
-        {'type': 'turn', 'tone': alt, 'text': s['turn']},
-        {'type': 'diagram', 'spec': _spec(s['diagram_two']),
-         'caption': s['diagram_two'].get('caption', '')},
-        {'type': 'text', 'h': s['cost_head'], 'p': _paras(s['cost_body'])},
-    ]
+    blocks = beats.stack(
+        wrong=(s['wrong_head'], _paras(s['wrong_body'])),
+        crack=(s['crack_head'], _paras(s['crack_body'])),
+        cost=(s['cost_head'], _paras(s['cost_body'])),
+        turn=s['turn'],
+        teaser=s['teaser'],
+        scene=s['scene'],
+        scene_var=GENERATED_VAR + beats.SCENE_VAR_OFFSET,
+        diagram_one=(_spec(s['diagram_one']), s['diagram_one'].get('caption', '')),
+        diagram_two=(_spec(s['diagram_two']), s['diagram_two'].get('caption', '')),
+        turn_tone=beats.counter_tone(tone),
+    )
 
-    story = {
-        'slug': slug, 'kicker': s.get('domain', 'General'), 'lens': s['lens'],
-        'card_tone': tone, 'thumb': None, 'featured': False,
-        'title': s['title'], 'teaser': s['teaser'], 'takeaway': s['takeaway'],
-        'hero': {'tone': tone, 'scene': s['scene'], 'var': 2,
-                 'standfirst': s['standfirst']},
-        'blocks': blocks,
-        'zoomout': {'tone': tone, 'text': s['zoomout']},
-    }
+    story = beats.story_envelope(
+        slug=slug, kicker=s.get('domain', 'General'), lens=s['lens'], tone=tone,
+        title=s['title'], teaser=s['teaser'], takeaway=s['takeaway'],
+        scene=s['scene'], hero_var=GENERATED_VAR, standfirst=s['standfirst'],
+        blocks=blocks, zoomout=s['zoomout'])
 
     findings = s.get('_findings') or {}
-    paper = {
-        'slug': slug,
-        'title': s['title'].rstrip('?') + ': the research',
-        'subtitle': s['paper_subtitle'],
-        'date': s.get('_date', ''),
-        'minutes': max(4, 3 + len(findings.get('findings', []))),
-        'abstract': s['paper_abstract'],
-        # A paper whose only section restates its own abstract is not a paper.
-        # The writer supplies real sections; the fallback is for older drafts.
-        'sections': ([{'h': sec['h'], 'p': _paras(sec['p'])}
-                      for sec in s.get('paper_sections') or []]
-                     or [{'h': 'What we looked at', 'p': [s['paper_abstract']]}]),
-        'findings': [(f['claim'], f['confidence'], f['basis'])
-                     for f in findings.get('findings', [])],
-        'contested': [(c['question'], c['dispute'])
-                      for c in findings.get('contested', [])],
-        'unknowns': list(findings.get('unknowns', [])),
-        'method': s['method'],
-        'reading': [(r['source'], r['why']) for r in s.get('reading', [])],
-    }
+    paper = beats.paper_envelope(
+        slug=slug,
+        title=beats.research_title(s['title']),
+        subtitle=s['paper_subtitle'],
+        date=s.get('_date', ''),
+        abstract=s['paper_abstract'],
+        sections=[{'h': sec['h'], 'p': _paras(sec['p'])}
+                  for sec in s.get('paper_sections') or []],
+        findings=[(f['claim'], f['confidence'], f['basis'])
+                  for f in findings.get('findings', [])],
+        contested=[(c['question'], c['dispute'])
+                   for c in findings.get('contested', [])],
+        unknowns=list(findings.get('unknowns', [])),
+        method=s['method'],
+        reading=[(r['source'], r['why']) for r in s.get('reading', [])])
+
     return story, paper
 
 
@@ -162,44 +176,77 @@ def remove_story(slug):
 
 # ---------------------------------------------------------------- git
 
-def _git(*args, check=True):
-    return subprocess.run(['git', '-C', ROOT, *args], capture_output=True,
-                          text=True, timeout=120, check=check)
+class Repo:
+    """Everything the backoffice does to the repository, behind one seam.
+
+    `run` is the subprocess runner, and it is a constructor argument rather than
+    a hard call to subprocess so that a test can drive a whole publish — build,
+    add, commit, push, and each way they fail — without a git remote, without a
+    network, and without committing anything. This module was previously
+    untestable for exactly that reason: the only way to find out what happened on
+    a failed push was to have one.
+    """
+
+    def __init__(self, root=ROOT, run=subprocess.run, python=None):
+        self.root = root
+        self.run = run
+        # sys.executable, not 'python3': on Windows there is usually no python3
+        # on PATH, and the name is an App Execution Alias that opens the
+        # Microsoft Store instead of running anything. It also guarantees the
+        # build uses the same interpreter the server is running under.
+        self.python = python or sys.executable
+
+    def git(self, *args, check=False):
+        return self.run(['git', '-C', self.root, *args], capture_output=True,
+                        text=True, timeout=120, check=check)
+
+    def build(self):
+        """Rebuild so a publish fails here, in front of the editor, rather than
+        in CI after the push."""
+        return self.run([self.python, 'build.py'], cwd=self.root,
+                        capture_output=True, text=True, timeout=600)
+
+    def branch(self):
+        head = self.git('rev-parse', '--abbrev-ref', 'HEAD')
+        return (head.stdout or 'main').strip() or 'main'
+
+    def commit_and_push(self, message, branch=None):
+        """Returns (ok, log). Never raises — the caller shows the log to a human,
+        and a half-finished publish that reports itself is worth more than a
+        stack trace in a terminal nobody is watching."""
+        lines = []
+        build = self.build()
+        lines.append((build.stdout or '') + (build.stderr or ''))
+        if build.returncode != 0:
+            return False, '\n'.join(lines) + '\nBuild failed. Nothing was committed.'
+
+        self.git('add', '-A', 'content', 'site')
+        status = self.git('status', '--porcelain', 'content', 'site')
+        if not status.stdout.strip():
+            return True, '\n'.join(lines) + '\nNothing to commit — content already current.'
+
+        commit = self.git('commit', '-m', message)
+        lines.append(commit.stdout + commit.stderr)
+        if commit.returncode != 0:
+            return False, '\n'.join(lines)
+
+        branch = branch or self.branch()
+        push = self.git('push', 'origin', branch)
+        lines.append(push.stdout + push.stderr)
+        if push.returncode != 0:
+            lines.append('Push failed. The commit is local — push it by hand, or fix '
+                         'the GitHub credentials and use Retry push.')
+            return False, '\n'.join(lines)
+        return True, '\n'.join(lines) + f'\nPushed to {branch}. Pages rebuilds on its own.'
+
+
+# The one the app uses. Tests build their own with a stub runner.
+repo = Repo()
 
 
 def build_site():
-    """Rebuild so a publish fails here, in front of the editor, rather than in
-    CI after the push."""
-    return subprocess.run(['python3', 'build.py'], cwd=ROOT, capture_output=True,
-                          text=True, timeout=600)
+    return repo.build()
 
 
 def commit_and_push(message, branch=None):
-    """Returns (ok, log). Never raises — the caller shows the log to a human."""
-    lines = []
-    build = build_site()
-    lines.append((build.stdout or '') + (build.stderr or ''))
-    if build.returncode != 0:
-        return False, '\n'.join(lines) + '\nBuild failed. Nothing was committed.'
-
-    _git('add', '-A', 'content', 'site', check=False)
-    status = _git('status', '--porcelain', 'content', 'site', check=False)
-    if not status.stdout.strip():
-        return True, '\n'.join(lines) + '\nNothing to commit — content already current.'
-
-    commit = _git('commit', '-m', message, check=False)
-    lines.append(commit.stdout + commit.stderr)
-    if commit.returncode != 0:
-        return False, '\n'.join(lines)
-
-    if branch is None:
-        head = _git('rev-parse', '--abbrev-ref', 'HEAD', check=False)
-        branch = (head.stdout or 'main').strip() or 'main'
-
-    push = _git('push', 'origin', branch, check=False)
-    lines.append(push.stdout + push.stderr)
-    if push.returncode != 0:
-        lines.append('Push failed. The commit is local — push it by hand, or fix '
-                     'the GitHub credentials and use Retry push.')
-        return False, '\n'.join(lines)
-    return True, '\n'.join(lines) + f'\nPushed to {branch}. Pages rebuilds on its own.'
+    return repo.commit_and_push(message, branch)

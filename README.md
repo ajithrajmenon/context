@@ -38,18 +38,26 @@ Nobody has to read the paper. Everybody has to be able to.
 ## Structure
 
 ```
-build.py           generates site/ — the only thing you run
-stories_data.py    the four flagship stories, hand-built, plus the library merge
-papers_data.py     the four flagship papers, plus the library merge
+build.py           takes a corpus, writes site/ — the only thing you run
+corpus.py          assembles what is published, from the four sources below
+beats.py           the six-beat grammar, shared by the library and the writer
+stories_data.py    the four flagship stories, hand-built. Data only
+papers_data.py     the four flagship papers. Data only
 library.py         stories 5-50 as briefs, the expander, and the lens map
+content/           stories written by the research team, plus visibility.json
 diagram.py         labelled diagrams: 12 hand-composed, plus a 7-type grammar
 illustrate.py      generated SVG scenes — the banners
+preview.py         build and serve the site locally
 bundle.py          folds site/ into one self-contained HTML file
 assets/style.css   the design system
 assets/motion.js   scroll reveals, parallax, the progress rail
 assets/fonts/      self-hosted woff2 — no font CDN
 site/              build output. Deploy this
 ```
+
+`build.py` renders whatever corpus it is handed, and never reads content itself.
+That is what lets the backoffice preview an unpublished draft through this exact
+code rather than a second renderer that would drift away from it.
 
 Four kinds of page: a homepage, a `stories` index that filters in place, one page per
 story, and one per paper. Set `featured: True` to surface a story on the homepage.

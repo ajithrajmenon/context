@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Every story Context tells. One dict each; build.py does the rest.
+"""The four stories built long, by hand. One dict each.
+
+This file is data and nothing else — it reads no files, imports nothing, and
+assembles nothing. The full corpus (these four, plus the library, plus anything
+the research team has published) is put together in corpus.py.
 
 Four stories, chosen because each one changes something a person does or
 believes about their own body — and because each has a genuine reversal in
@@ -28,7 +32,7 @@ Only the hero panel carries ambient movement. Everything that explains
 something holds still.
 """
 
-STORIES = [
+FLAGSHIP = [
 
 # ================================================================== 01
 {
@@ -499,78 +503,6 @@ draw();
 
 ]
 
-# ------------------------------------------------------------------ the library
-# Stories 5-50 live in library.py as briefs and are expanded here. They are
-# shorter than the flagship four by design; the four above carry hand-composed
-# diagrams and interactive figures, the rest carry the same six beats at a
-# tighter length. Both are held to the standard in STYLE.md.
-
-from library import BRIEFS as _BRIEFS, expand as _expand
-
-LIBRARY_STORIES = []
-LIBRARY_PAPERS = []
-for _i, _br in enumerate(_BRIEFS):
-    _s, _p = _expand(_br, _i)
-    LIBRARY_STORIES.append(_s)
-    LIBRARY_PAPERS.append(_p)
-
-# Every story sits under exactly one of the four lenses. The flagship four are
-# written by hand and do not carry the field, so it is filled in from the same
-# map the library uses — one classification, one place to change it.
-from library import LENS as _LENS
-
-for _s in LIBRARY_STORIES + STORIES:
-    _s.setdefault('lens', _LENS[_s['slug']])
-
-# Twelve stories share the `mind` scene and nine share `cell`, so the variant
-# picked by hand in a brief was never going to be unique. Assign it here
-# instead: every story gets its own index within its scene, which the
-# illustrator turns into its own palette rotation and its own framing. No two
-# banners on the site are the same picture.
-_used = {}
-for _s in LIBRARY_STORIES:
-    _sc = _s['hero']['scene']
-    _used[_sc] = _used.get(_sc, 0) + 1
-    _s['hero']['var'] = _used[_sc]
-    for _b in _s['blocks']:
-        if _b['type'] == 'scene':
-            _b['var'] = _used[_sc] + 7
-
-STORIES = STORIES + LIBRARY_STORIES
-
-
-# ------------------------------------------------------------------ generated
-# Stories written by the research team in admin/ and approved by a human land
-# here as JSON in content/stories/. They carry the same shape as everything
-# above, so build.py cannot tell the difference and does not need to.
-#
-# content/visibility.json takes any story off the site by slug — generated or
-# hand-written — without deleting it. Absent means visible.
-
-import glob as _glob
-import json as _json
-import os as _os
-
-_HERE = _os.path.dirname(_os.path.abspath(__file__))
-_CONTENT = _os.path.join(_HERE, 'content')
-
-GENERATED_PAPERS = []
-for _path in sorted(_glob.glob(_os.path.join(_CONTENT, 'stories', '*.json'))):
-    try:
-        with open(_path, encoding='utf-8') as _fh:
-            _rec = _json.load(_fh)
-    except (OSError, ValueError):
-        continue
-    if _rec.get('story'):
-        STORIES.append(_rec['story'])
-    if _rec.get('paper'):
-        GENERATED_PAPERS.append(_rec['paper'])
-
-try:
-    with open(_os.path.join(_CONTENT, 'visibility.json'), encoding='utf-8') as _fh:
-        VISIBILITY = _json.load(_fh)
-except (OSError, ValueError):
-    VISIBILITY = {}
-
-_hidden = {_k for _k, _v in VISIBILITY.items() if not _v}
-STORIES = [_s for _s in STORIES if _s['slug'] not in _hidden]
+# Stories 5-50 live in library.py as briefs, and stories written by the research
+# team live in content/stories/. Both are combined with the four above in
+# corpus.py — see that file for the order and the visibility rules.

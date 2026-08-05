@@ -220,16 +220,35 @@ the first section.
 ## Files
 
 ```
-admin/app.py             FastAPI: auth, CRUD, generation, queue, publish
+admin/app.py             the FastAPI app, assembled. Nothing else
+admin/routes/            one router per thing the tool is for
+admin/config.py          where the settings come from
+admin/session.py         who is allowed in, and the cookie policy
+admin/ui.py              how it looks — CSS, chrome, the progress rail
+admin/catalogue.py       what is actually on the site
+admin/drafts.py          preview, revise, approve, reject
+admin/runner.py          running the research team in the background
 admin/backend.py         two ways to reach Claude — CLI or API — one interface
 admin/research.py        the six agents, their prompts and schemas
 admin/publish.py         draft -> content/*.json -> build -> commit -> push
 admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions
-admin/test_pipeline.py   offline orchestration test
+admin/test_pipeline.py   offline test: the six agents and the grammar
+admin/test_web.py        offline test: routing, the lock, and publishing
 admin/serve.py           first-run setup, then starts — Windows, macOS, Linux
 admin/serve.sh           the same thing in bash, for Unix habit
 preview.py               (repo root) build and serve the public site alone
 admin/.env.example       the settings, documented
-content/stories/*.json   published generated stories, read by build.py
+content/stories/*.json   published generated stories, read by corpus.py
 content/visibility.json  slug -> false hides a story
+```
+
+A route reads the request, calls one function from the service layer, and renders
+the answer. If a route is doing more than that, the work belongs in `drafts.py`,
+`catalogue.py`, `runner.py` or `publish.py`.
+
+Both test files run offline — no Claude, no network, no git remote:
+
+```
+python -m admin.test_pipeline
+python -m admin.test_web
 ```

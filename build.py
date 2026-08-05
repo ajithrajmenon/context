@@ -1,26 +1,32 @@
 #!/usr/bin/env python3
 """Builds [Context] into site/.
 
-No dependencies and no framework — read stories_data.py, write HTML.
+No dependencies and no framework — take a corpus, write HTML.
 
     site/index.html          the homepage
     site/stories.html        every story, filterable
     site/stories/<slug>.html one story
+    site/papers/<slug>.html  the paper behind it
 
 A story is a stack of cards, and colour belongs to the card rather than
-the page, so a piece walks through several tones as it goes. Adding a
-story means appending one dict to STORIES and running this again.
-Categories are derived from the stories, so a new subject needs no other
-change.
+the page, so a piece walks through several tones as it goes. Categories are
+derived from the stories, so a new subject needs no other change.
+
+What to render is a parameter, not an import. Every page function takes the
+corpus it is rendering, which is what lets the backoffice preview an unpublished
+draft through this exact code rather than a second renderer that would drift away
+from it. corpus.py assembles the real one; see corpus.assemble() for building a
+different one.
+
+    python build.py           write the live site into site/
 """
 import os
 import re
 import shutil
 
+import corpus as corpus_mod
 import diagram
 import illustrate
-from papers_data import BY_SLUG, PAPERS
-from stories_data import STORIES
 
 # The stories name scenes in the old vocabulary; each maps onto one of the
 # generated illustrations. Keeping the map here means story data never had
@@ -270,8 +276,8 @@ def block_figure(b, i, story):
 </li>'''
 
 
-def block_paper(story):
-    paper = BY_SLUG.get(story['slug'])
+def block_paper(story, corpus):
+    paper = corpus.paper_for(story['slug']) if corpus else None
     if not paper:
         return ''
     return f'''<li data-reveal="0">
@@ -309,12 +315,8 @@ PILLARS = [
 ]
 
 
-def build_home():
-    featured = [s for s in STORIES if s.get('featured')]
-    kickers = []
-    for s in STORIES:
-        if s['kicker'] not in kickers:
-            kickers.append(s['kicker'])
+def build_home(corpus):
+    featured = [s for s in corpus.stories if s.get('featured')]
 
     pillars = ''.join(f'''<li class="pillar t-{t}" data-reveal="{i * 90}">
   <span class="pillar-mark"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="{3 + i}" fill="#fff"/></svg></span>
@@ -323,7 +325,7 @@ def build_home():
 </li>''' for i, ((h, p), t) in enumerate(zip(PILLARS, ['nebula', 'deepsea', 'ember'])))
 
     counts = {}
-    for s in STORIES:
+    for s in corpus.stories:
         counts[s['lens']] = counts.get(s['lens'], 0) + 1
     lens_cards = ''.join(f'''<li data-reveal="{i * 80}">
   <a class="lens-card lens-{lens_slug(t)}" href="stories.html">
@@ -389,9 +391,9 @@ def build_home():
     )
 
 
-def build_stories():
+def build_stories(corpus):
     counts = {}
-    for s in STORIES:
+    for s in corpus.stories:
         counts[s['lens']] = counts.get(s['lens'], 0) + 1
     chips = ''.join(
         f'<li><button class="filter filter-{lens_slug(t)}" data-filter="{t}" '
@@ -400,7 +402,7 @@ def build_stories():
 
     # Grouped by lens rather than by when it was written, so the framework is
     # visible in the grid itself and not only in the filter above it.
-    by_lens = sorted(STORIES, key=lambda s: LENSES.index(s['lens']))
+    by_lens = sorted(corpus.stories, key=lambda s: LENSES.index(s['lens']))
 
     return (
         head('Stories &#8212; [Context]',
@@ -415,7 +417,7 @@ def build_stories():
     you will come away knowing, so you can pick on that rather than on the title.</p>
   </div>
   <ul class="filters" data-reveal="60">
-    <li><button class="filter" data-filter="" aria-pressed="true">Everything <b>{len(STORIES)}</b></button></li>
+    <li><button class="filter" data-filter="" aria-pressed="true">Everything <b>{len(corpus.stories)}</b></button></li>
     {chips}
   </ul>
   <ul class="grid" id="storyGrid">
@@ -443,7 +445,7 @@ buttons.forEach(function (b) {{
     )
 
 
-def build_story(s, nxt):
+def build_story(s, nxt, corpus=None):
     hero = s['hero']
     stack = '\n'.join(BLOCKS[b['type']](b, i, s) for i, b in enumerate(s['blocks']))
     scripts = '\n'.join(b['js'] for b in s['blocks'] if b['type'] == 'figure')
@@ -472,7 +474,7 @@ def build_story(s, nxt):
     <p>{zoom['text']}</p>
   </div>
 </li>
-{block_paper(s)}
+{block_paper(s, corpus)}
 </ol>
 
 <nav class="pager">
@@ -496,8 +498,8 @@ CONF = {
 }
 
 
-def build_paper(paper):
-    story = next((x for x in STORIES if x['slug'] == paper['slug']), None)
+def build_paper(paper, corpus=None):
+    story = corpus.story_for(paper['slug']) if corpus else None
 
     secs = ''.join(f'''<section class="pp-sec" data-reveal="0">
   <h2>{sec['h']}</h2>
@@ -594,10 +596,10 @@ def row_art(story):
     return f'<span class="scene row-scene">{art(h["scene"], story["slug"] + "row", light=True, variant=h.get("var", 0))}</span>'
 
 
-def build_papers_index():
+def build_papers_index(corpus):
     rows = ''
-    for i, paper in enumerate(PAPERS):
-        story = next((x for x in STORIES if x['slug'] == paper['slug']), None)
+    for i, paper in enumerate(corpus.papers):
+        story = corpus.story_for(paper['slug'])
         rows += f'''<li class="t-{story["card_tone"] if story else "dusk"}" data-reveal="{(i % 3) * 80}">
   <a class="row" href="papers/{paper['slug']}.html">
     <span class="row-art">{row_art(story)}</span>
@@ -633,37 +635,41 @@ def build_papers_index():
     )
 
 
-def main():
-    if os.path.isdir(SITE):
-        shutil.rmtree(SITE)
-    os.makedirs(os.path.join(SITE, 'stories'))
-    os.makedirs(os.path.join(SITE, 'papers'))
+def build(corpus, site=SITE):
+    """Write the whole site. Returns what was written, for the caller to report."""
+    if os.path.isdir(site):
+        shutil.rmtree(site)
+    os.makedirs(os.path.join(site, 'stories'))
+    os.makedirs(os.path.join(site, 'papers'))
 
-    shutil.copytree(ASSETS, os.path.join(SITE, 'assets'))
+    shutil.copytree(ASSETS, os.path.join(site, 'assets'))
 
     # The illustrator's animation timings live in classes rather than style
     # attributes, so the classes have to exist. Appending them to the copy
     # keeps the source stylesheet hand-written and the generated part obvious.
-    css_out = os.path.join(SITE, 'assets', 'style.css')
+    css_out = os.path.join(site, 'assets', 'style.css')
     with open(css_out, 'a', encoding='utf-8') as fh:
         fh.write('\n\n' + illustrate.anim_css() + '\n')
-    open(os.path.join(SITE, '.nojekyll'), 'w').close()
+    open(os.path.join(site, '.nojekyll'), 'w').close()
 
-    write(os.path.join(SITE, 'index.html'), build_home())
-    write(os.path.join(SITE, 'stories.html'), build_stories())
+    write(os.path.join(site, 'index.html'), build_home(corpus))
+    write(os.path.join(site, 'stories.html'), build_stories(corpus))
 
-    write(os.path.join(SITE, 'papers.html'), build_papers_index())
-    for paper in PAPERS:
-        write(os.path.join(SITE, 'papers', f"{paper['slug']}.html"),
-              build_paper(paper))
+    write(os.path.join(site, 'papers.html'), build_papers_index(corpus))
+    for paper in corpus.papers:
+        write(os.path.join(site, 'papers', f"{paper['slug']}.html"),
+              build_paper(paper, corpus))
 
-    for i, s in enumerate(STORIES):
-        nxt = STORIES[(i + 1) % len(STORIES)]
-        write(os.path.join(SITE, 'stories', f"{s['slug']}.html"),
-              build_story(s, nxt))
+    for i, s in enumerate(corpus.stories):
+        write(os.path.join(site, 'stories', f"{s['slug']}.html"),
+              build_story(s, corpus.next_after(i), corpus))
 
-    scenes = sum(1 for s in STORIES for b in s['blocks'] if b['type'] == 'scene') + len(STORIES)
-    print(f'built home + stories index + {len(STORIES)} stories '
+    return len(corpus.stories), corpus.scenes()
+
+
+def main():
+    stories, scenes = build(corpus_mod.load())
+    print(f'built home + stories index + {stories} stories '
           f'({scenes} animated scenes) into {SITE}')
 
 

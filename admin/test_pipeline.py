@@ -105,6 +105,9 @@ class StubBackend:
 
     def complete(self, system, prompt, schema=None, web=False, **kw):
         self.calls.append(system.split('\n', 1)[0])
+        on_progress = kw.get('on_progress')
+        if on_progress:
+            on_progress(f'working: {system.split(chr(10), 1)[0][:20]}')
         usage = (1200, 800)
         if 'Planner' in system:
             return FIXTURES['plan'], usage
@@ -139,11 +142,22 @@ def main():
         tokens[0] += a
         tokens[1] += b
 
+    progress = []
+
+    def on_progress(stage, text):
+        progress.append((stage, text))
+
     backend = StubBackend()
     result = research.run('Why does chopping an onion sting?', 'Why',
-                          on_stage, on_tokens, backend=backend)
+                          on_stage, on_tokens, backend=backend,
+                          on_progress=on_progress)
 
     assert seen == research.STAGES, f'stage order wrong: {seen}'
+    # Each agent's progress must be labelled with its own stage, not whichever
+    # one happened to be running when research.run() built the closure —  that
+    # is the bug a shared/late-bound loop variable would cause here.
+    assert [p[0] for p in progress] == research.STAGES, \
+        f'progress lines were not attributed to the right stage: {progress}'
     assert result['ship'] is True
     assert tokens[0] > 0 and tokens[1] > 0, 'token accounting never fired'
     # 6 agents + 1 marker for the search resume
@@ -415,6 +429,80 @@ def main():
     assert backend_mod._oversized(inline, WINDOWS_BUDGET), \
         'the length guard would not have caught the failure it exists for'
 
+    # stream-json is what lets complete() narrate a run live; the single-blob
+    # 'json' format cannot be read until the process exits.
+    assert 'stream-json' in web and '--verbose' in web
+    # 16 turns bounds a web stage's cost — the ceiling that used to be 30 was
+    # generous enough to let a chatty run search far past the point of
+    # diminishing return.
+    assert web[web.index('--max-turns') + 1] == '16'
+
+    # ------------------------------------------------------------ streaming
+    # The reader that turns stream-json lines into progress a person would
+    # want to read, and the heartbeat that fires when a stage goes quiet.
+    search_line = json.dumps({'type': 'assistant', 'message': {'content': [
+        {'type': 'tool_use', 'name': 'WebSearch',
+         'input': {'query': 'onion enzyme 2002'}}]}})
+    text, obj = backend_mod._stream_event(search_line)
+    assert text == 'Searching the web: onion enzyme 2002', text
+    assert obj['type'] == 'assistant'
+
+    fetch_text, _ = backend_mod._stream_event(json.dumps({
+        'type': 'assistant', 'message': {'content': [
+            {'type': 'tool_use', 'name': 'WebFetch',
+             'input': {'url': 'https://example.org/paper'}}]}}))
+    assert fetch_text == 'Reading a source: https://example.org/paper'
+
+    # The final answer arriving through StructuredOutput is not narrated —
+    # it is the result itself, not a step on the way to it.
+    quiet, _ = backend_mod._stream_event(json.dumps({
+        'type': 'assistant', 'message': {'content': [
+            {'type': 'tool_use', 'name': 'StructuredOutput',
+             'input': {'answer': '4'}}]}}))
+    assert quiet is None
+
+    result_text, result_obj = backend_mod._stream_event(
+        json.dumps({'type': 'result', 'is_error': False, 'result': 'ok'}))
+    assert result_text is None and result_obj['type'] == 'result'
+
+    assert backend_mod._stream_event('not json at all') == (None, None)
+    assert backend_mod._stream_event('') == (None, None)
+
+    # Output ceilings were cut once the length rules made the real target a
+    # fraction of the old figure — this is the actual cost lever, not just the
+    # jargon and mechanism rules above it.
+    assert research._TOKENS['write'] < 10000 and research._TOKENS['edit'] < 10000
+    assert research._TOKENS['write'] < 24000, 'the old, oversized ceiling is still set'
+
+    # ------------------------------------------------------------ progress store
+    # A live tail, not a permanent log: old lines fall off once a run has said
+    # enough of them, so a long, chatty stage cannot grow the database forever.
+    store_mod.init()
+    for i in range(store_mod.PROGRESS_KEEP + 20):
+        store_mod.add_progress(9001, 'search', f'line {i}')
+    kept = store_mod.run_progress(9001)
+    assert len(kept) == store_mod.PROGRESS_KEEP, len(kept)
+    assert kept[-1]['text'] == f'line {store_mod.PROGRESS_KEEP + 19}', \
+        'pruning kept the wrong end of the window'
+    assert kept[0]['text'] == f'line {20}', 'pruning dropped the wrong lines'
+    with store_mod.connect() as db:
+        db.execute('DELETE FROM run_progress WHERE run_id = ?', (9001,))
+
+    # A run that fails mid-stage should explain itself with what the team was
+    # doing, not just where the exception was raised.
+    rid = 9002
+    store_mod.add_progress(rid, 'search', 'Searching the web: a real query')
+    store_mod.add_progress(rid, 'search', 'Searching the web: a follow-up')
+    real_get_run = store_mod.get_run
+    store_mod.get_run = lambda _id: {'stage': 'search'}
+    try:
+        context = runner._failure_context(rid)
+    finally:
+        store_mod.get_run = real_get_run
+    assert 'a follow-up' in context, 'the failure context lost the last step'
+    with store_mod.connect() as db:
+        db.execute('DELETE FROM run_progress WHERE run_id = ?', (rid,))
+
     print(f'stages       {" -> ".join(seen)}')
     print(f'api calls    {len(backend.calls)} (6 agents + 1 resume)')
     print(f'tokens       {tokens[0]:,} in / {tokens[1]:,} out')
@@ -431,7 +519,14 @@ def main():
     print('chrome       rail states, nav, escaping')
     print('runner       stage pointer advances, draft carries findings')
     print('cli argv     no --bare, system prompt in a file, StructuredOutput '
-          'allowed,\n             nothing oversized for a Windows cmd shim')
+          'allowed,\n             nothing oversized for a Windows cmd shim, '
+          '16-turn cap on web stages')
+    print('progress     stage-labelled live lines, tool calls narrated, '
+          'quiet lines skipped')
+    print('cost         write/edit ceilings cut from 24,000 tokens')
+    print('progress db  rolling window prunes to the last '
+          f'{store_mod.PROGRESS_KEEP} lines')
+    print('failure      a failed run leads with its last concrete steps')
     print('\nPipeline wiring OK. Quality of real output still needs a live run.')
 
 

@@ -49,10 +49,10 @@ class Stage:
         self.on_tokens = on_tokens or (lambda a, b: None)
 
     def call(self, system, prompt, schema=None, web=False, effort='high',
-             max_tokens=16000):
+             max_tokens=16000, on_progress=None):
         out, (tin, tout) = self.backend.complete(
             system, prompt, schema=schema, web=web, effort=effort,
-            max_tokens=max_tokens)
+            max_tokens=max_tokens, on_progress=on_progress)
         self.on_tokens(tin, tout)
         return out
 
@@ -260,6 +260,12 @@ report what the literature actually says. For each question:
   - say plainly where sources disagree, and who is on each side
   - say plainly where you found nothing solid
 
+One search per question is usually enough to find where the real sources are;
+a second search to chase a disagreement or fill a gap is worth it, a fourth
+rarely is. Aim for one to two searches per question and stop once you can
+answer it, rather than searching until the turn limit does it for you — every
+extra search this stage runs is one the Reader has to sift through next.
+
 Do not write prose for a reader. You are writing notes for a colleague who will
 check them. Be specific, be attributable, and do not smooth over a gap. If the
 popular claim about this subject turns out to be unsupported, that is the single
@@ -268,7 +274,9 @@ most valuable thing you can report."""
 READER = """You are the Web Reader on the [Context] research team.
 
 You have web fetch. Take the search notes you are given, pick the sources most
-worth reading in full, and fetch them. Your job is depth, not breadth.
+worth reading in full, and fetch them. Your job is depth, not breadth: three or
+four well-chosen sources read in full beat eight skimmed ones, and cost less to
+produce for the same or better result.
 
 For each source you read, report:
   - what it actually measured or argued, in its own terms
@@ -345,6 +353,27 @@ Concrete over abstract, always. "A river eats about a metre of bank a year"
 beats "migration rates are appreciable". Name who found something rather than
 saying "scientists showed" — a name is checkable and "scientists" is not.
 
+**No word the reader has to look up.** Every field-specific term — the kind a
+practitioner uses without noticing and a newcomer has never met — either gets
+replaced by the everyday word for the same thing, or gets explained the moment
+it is used, in the same sentence, in six words or fewer. "Superelevation" is
+not a word; "the water tilts up at the outer bank" is the same fact, said so a
+newcomer keeps it. If you cannot gloss a term that briefly, you do not yet
+understand it well enough to use it — go back to what it means, not a shorter
+way to say it.
+
+**Give the mechanism a cast.** The Crack and the Machinery diagram are where
+drafts go abstract and lose the reader, because a process has no one doing
+anything: "erosion is enhanced by increased shear stress" has no actor in it.
+Rewrite it as a sequence of things doing something to each other, in order,
+each step following causally from the last — the water pushes harder on the
+outer bank, the bank gives way, the sediment lands on the inner one. This is
+not a children's-book device and nothing gets a face or a feeling; it is
+naming which concrete thing acts on which other concrete thing, which is what
+"concrete nouns, active verbs" in the house voice already asks for. A reader
+who can point at each actor in order has understood the mechanism. One who has
+only read that "shear increases" has memorised a phrase.
+
 `paper_sections` is the long layer, and it is where you may take room: three or
 more sections, each with a heading a reader can navigate by and two or three
 real paragraphs. Do not restate the abstract. Say how the question was
@@ -362,7 +391,14 @@ Diagram `data` is a JSON object encoded as a string, matching the kind:
   field     {"share": 0.0-1.0, "lit_label": "...", "dim_label": "..."}
 
 Keep every label under 26 characters — they are drawn into a fixed viewBox and
-longer strings run off the edge.
+longer strings run off the edge. **Every label is a plain-language rule, not a
+smaller version of one.** A diagram exists to make the mechanism easier to hold
+than the prose did; a label that introduces a term the prose never used makes
+it harder instead, which is worse than not drawing the diagram at all. If a row
+needs a technical name to make sense, that name belongs in the prose, glossed,
+before the diagram — never introduced for the first time inside one. When in
+doubt, use fewer rows or callouts and plainer words on each, rather than
+packing in everything the research turned up.
 
 `reading` is real sources described so a reader knows what each is for. `method`
 says how the work was done and names its own biases."""
@@ -389,6 +425,20 @@ with a note for each:
      to its one idea and move the detail into a paper section. This is the
      check drafts fail most often, so count, do not estimate.
  12. Do the paper sections say something the abstract does not?
+ 13. Jargon. Read every sentence, including every diagram label and callout,
+     and name the field-specific term in each — there should be none you
+     cannot immediately gloss in six words. A diagram label that would send a
+     reader to a dictionary has failed at the one thing a diagram is for. Fix
+     each one by replacing the term or folding its gloss into the words next
+     to it, in the story and in the diagram data both.
+ 14. Mechanism check. In the Crack and the diagram carrying the Machinery, can
+     you point to a specific thing doing something to another specific thing,
+     in order? "Shear increases" is a phrase, not a mechanism. If you cannot
+     name the actor and what it does, rewrite the sentence until you can.
+ 15. Diagram load. Could a newcomer explain what each diagram shows out loud,
+     from the labels alone, without having read the prose first? If a diagram
+     needs the paper to be readable, it has too much in it — cut rows or
+     callouts until the picture carries its own weight.
 
 Fix what fails, and return the corrected story — do not merely report problems.
 List what you changed. Set `ship` false only if something is wrong that you
@@ -398,60 +448,76 @@ cannot fix from the material you were given."""
 STAGES = ['plan', 'search', 'read', 'check', 'write', 'edit']
 
 
-def run(goal, lens_hint, on_stage, on_tokens, backend=None):
+# Output ceilings, sized to what a stage actually has to produce rather than
+# left at a round number. This is a real lever on cost, not just a safety
+# rail: a model asked for up to 24,000 tokens of a page whose own house style
+# now budgets it at a few hundred words will drift toward the ceiling it was
+# given. write/edit dropped from 24,000 once the length rules above made the
+# real target roughly a tenth of that; search/read stayed more generous
+# because their job is genuinely more words, just fewer searches to get there.
+_TOKENS = {'search': 10000, 'read': 10000, 'write': 8000, 'edit': 8000}
+
+
+def run(goal, lens_hint, on_stage, on_tokens, backend=None, on_progress=None):
     """Run the whole team. `on_stage(name, output, seconds)` is called after
-    each agent so the caller can persist progress; the UI polls that."""
+    each agent so the caller can persist progress; the UI polls that.
+    `on_progress(stage, text)`, if given, is called throughout a stage with a
+    line of what the agent is doing right now — a web search it just ran, a
+    source it is reading — so a run in progress shows work happening rather
+    than a single spinner for however many minutes it takes.
+    """
     agent = Stage(backend or get_backend(), on_tokens)
     rules = _house_rules()
+    on_progress = on_progress or (lambda stage, text: None)
 
     def timed(name, fn):
         t0 = time.time()
-        out = fn()
+        out = fn(lambda text: on_progress(name, text))
         on_stage(name, out if isinstance(out, str) else json.dumps(out, indent=1),
                  time.time() - t0)
         return out
 
-    plan = timed('plan', lambda: agent.call(
+    plan = timed('plan', lambda watch: agent.call(
         PLANNER % rules,
         f'Research goal: {goal}\n\n'
         + (f'The editor suggests the lens should be: {lens_hint}\n\n' if lens_hint else '')
         + 'Decide whether this can become a [Context] story, and plan the research.',
-        schema=PLAN_SCHEMA))
+        schema=PLAN_SCHEMA, on_progress=watch))
 
     questions = '\n'.join(f'{i + 1}. {q}' for i, q in enumerate(plan['questions']))
-    search = timed('search', lambda: agent.call(
+    search = timed('search', lambda watch: agent.call(
         SEARCHER,
         f'Subject: {plan["title"]}\nCandidate Turn: {plan["candidate_turn"]}\n\n'
         f'Research questions:\n{questions}\n\nSearch, and report what you find.',
-        web=True, max_tokens=20000))
+        web=True, max_tokens=_TOKENS['search'], on_progress=watch))
 
-    read = timed('read', lambda: agent.call(
+    read = timed('read', lambda watch: agent.call(
         READER,
         f'Subject: {plan["title"]}\n\nSearch notes:\n\n{search}\n\n'
         'Fetch and read the sources most worth reading in full.',
-        web=True, max_tokens=20000))
+        web=True, max_tokens=_TOKENS['read'], on_progress=watch))
 
-    check = timed('check', lambda: agent.call(
+    check = timed('check', lambda watch: agent.call(
         CHECKER,
         f'Subject: {plan["title"]}\nCandidate Turn: {plan["candidate_turn"]}\n\n'
         f'SEARCH NOTES\n\n{search}\n\nREADING NOTES\n\n{read}\n\nGrade it.',
-        schema=CHECK_SCHEMA, effort='xhigh'))
+        schema=CHECK_SCHEMA, effort='xhigh', on_progress=watch))
 
     if check['verdict'] == 'drop':
         raise RuntimeError('Fact checker dropped the story: ' + check['verdict_reason'])
 
     findings = json.dumps(check, indent=1)
-    story = timed('write', lambda: agent.call(
+    story = timed('write', lambda watch: agent.call(
         WRITER,
         f'{rules}\n\n---\n\nPLAN\n\n{json.dumps(plan, indent=1)}\n\n'
         f'GRADED FINDINGS\n\n{findings}\n\nWrite the story and the paper.',
-        schema=STORY_SCHEMA, effort='xhigh', max_tokens=24000))
+        schema=STORY_SCHEMA, effort='xhigh', max_tokens=_TOKENS['write'], on_progress=watch))
 
-    edited = timed('edit', lambda: agent.call(
+    edited = timed('edit', lambda watch: agent.call(
         EDITOR,
         f'{rules}\n\n---\n\nGRADED FINDINGS\n\n{findings}\n\n'
         f'DRAFT\n\n{json.dumps(story, indent=1)}\n\nRun the checklist.',
-        schema=EDIT_SCHEMA, effort='xhigh', max_tokens=24000))
+        schema=EDIT_SCHEMA, effort='xhigh', max_tokens=_TOKENS['edit'], on_progress=watch))
 
     return {'plan': plan, 'check': check, 'story': edited['story'],
             'checklist': edited['checklist'], 'changes': edited['changes'],
@@ -473,7 +539,7 @@ claim the paper does not support — apply what you can, and say so in `changes`
 Diagram label limit is 26 characters, as before."""
 
 
-def revise(story, instruction, on_tokens=None, backend=None):
+def revise(story, instruction, on_tokens=None, backend=None, on_progress=None):
     """Prompt-based edit from the approval screen."""
     agent = Stage(backend or get_backend(), on_tokens)
     out = agent.call(
@@ -485,5 +551,5 @@ def revise(story, instruction, on_tokens=None, backend=None):
                                'changes': {'type': 'array', 'items': {'type': 'string'}}},
                 'required': ['story', 'changes'],
                 'additionalProperties': False},
-        effort='high', max_tokens=24000)
+        effort='high', max_tokens=_TOKENS['edit'], on_progress=on_progress)
     return out['story'], out['changes']

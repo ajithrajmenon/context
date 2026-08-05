@@ -102,6 +102,31 @@ other people, the API is the right home for it.
 Everything except **Generate** works with neither backend: story CRUD,
 visibility, publishing, and the approval queue.
 
+### Spending less
+
+A run's cost is mostly two dials, and both are turned down from where they
+started:
+
+- **Output ceilings.** `write` and `edit` used to be allowed up to 24,000
+  tokens each. Once the length rules in `STYLE.md` fixed what a page actually
+  needs — a few hundred words, not several thousand — that ceiling was mostly
+  headroom a model had no reason not to use. It is now 8,000. Search and read
+  are 10,000, down from 20,000: real research notes, but not unbounded ones.
+- **How much a stage is allowed to search.** Web stages were capped at 30
+  turns; a chatty run could spend most of them on searches past the point of
+  the answer already being clear. The cap is 16, and the Search and Reader
+  system prompts now say plainly that one or two searches per question and
+  three or four sources read in full are the target — not the maximum the
+  turn limit happens to allow.
+
+Neither change touches `check`, which stays at full reasoning effort: grading
+evidence correctly is the one place in the chain that is worth paying for, and
+a Fact Checker that skims is the actual expensive mistake.
+
+If you still want more headroom for a particular run, `CONTEXT_CLI_TIMEOUT` and
+the token ceilings in `admin/research.py` (`_TOKENS`) are the two places to
+raise it back.
+
 An API key, if you want one: <https://platform.claude.com/settings/keys>. Note
 it is billed separately from a Pro or Max subscription — a subscription does not
 include API usage, which is the surprise this whole section exists to avoid.
@@ -151,6 +176,30 @@ success.
 
 **The pipeline never publishes.** It produces a queue entry. A person approves.
 
+### Plain language, not just short prose
+
+Short and simple are not the same thing, and a first pass at this pipeline
+proved it: drafts came back shorter but still dense with the field's own
+vocabulary — a diagram row that read "tilts up at outer bank … superelevation"
+has taught the reader nothing by adding that second word, only sent them to a
+dictionary. Two rules now run through the Writer and the Editor's checklist
+both, because a rule the Writer alone follows and nobody checks is a rule that
+erodes by the second edit:
+
+- **No word the reader has to look up.** A technical term is either replaced by
+  its everyday name, or glossed in six words or fewer the moment it appears —
+  including inside a diagram label, which is exactly where jargon used to hide
+  because no one reads a label as closely as a sentence.
+- **The mechanism gets a cast.** "Shear increases" has no actor in it, and a
+  reader cannot follow a process where nothing is depicted as doing anything.
+  The house style now asks for a causal chain of concrete things acting on
+  concrete things, in order — which is what "concrete nouns, active verbs"
+  already asked for, aimed specifically at the sentence that carries the
+  mechanism, where a draft is most tempted to go abstract instead.
+
+See `STYLE.md`, section "Plain language", for the rule in full, and the
+Editor's checklist items 13–15 in `admin/research.py` for how it is checked.
+
 ### What the approval screen shows you
 
 The real page, in a frame — rendered by `build.py`, the same function that
@@ -163,6 +212,24 @@ work.
 Below it: the editor's checklist, the graded findings, and what the fact checker
 threw out. You are approving a page you have actually seen and a chain you can
 audit.
+
+### Watching a run
+
+The run page shows a live tail of what the team is doing right now — a search
+it just ran, a source it is reading — under the progress rail, while a stage is
+in flight. It comes from the same CLI process as the answer, narrated as it
+happens rather than assembled afterward: `--output-format stream-json` reports
+every tool call the moment it is made, and the backend turns `WebSearch` and
+`WebFetch` calls into a line a person would want to read. A stage that is not
+calling tools — Planner, Fact checker, Writer, Editor — gets a heartbeat every
+fifteen seconds instead, so "the page has not moved in three minutes" reads as
+"it is thinking" rather than "it might be stuck".
+
+**When a run fails, the error leads with what it was doing**, not just where
+the code broke. The last several lines of that same live tail are kept and put
+in front of the traceback, so a failed run reads "it was reading these three
+sources, then this happened" instead of a wall of text with no way to tell
+which part of a six-agent chain produced it.
 
 ### Prompt-based editing
 
@@ -185,8 +252,8 @@ the work; hiding keeps the file and its history.
 backend: stage order, token accounting, refusal handling, draft expansion, and
 that both generated diagrams render. Nothing needed, nothing spent.
 
-It also pins down the CLI backend's command line, where two bugs have already
-lived:
+It also pins down the CLI backend's command line and its streaming reader,
+where real bugs have already lived:
 
 - nothing large may reach argv — the prompt goes on stdin and the system prompt
   goes in a file, because npm's `claude` on Windows is a `.cmd` shim and cmd.exe
@@ -195,8 +262,16 @@ lived:
   more than one turn, because that tool call *is* how the CLI returns structured
   output. Denying all tools looks like the safe choice and silently guarantees
   failure;
-- and `--bare` is never passed, since it bypasses the subscription login and
-  demands an API key.
+- `--bare` is never passed, since it bypasses the subscription login and
+  demands an API key;
+- a `WebSearch`/`WebFetch` tool call turns into a line a person would read,
+  `StructuredOutput` does not narrate itself, and a heartbeat fires on a clock
+  measured from the last thing actually shown — not the last line that
+  happened to arrive, which is what let the CLI's own internal chatter
+  (thinking-budget pings, plugin metadata) silently suppress it the first time
+  this was built;
+- and the progress table keeps only its most recent window per run, so a long,
+  chatty stage cannot grow the database without bound.
 
 It does **not** test the quality of what the real agents write. That needs a live
 run through either backend — do that before trusting the first draft.
@@ -231,7 +306,7 @@ admin/runner.py          running the research team in the background
 admin/backend.py         two ways to reach Claude — CLI or API — one interface
 admin/research.py        the six agents, their prompts and schemas
 admin/publish.py         draft -> content/*.json -> build -> commit -> push
-admin/store.py           SQLite: drafts, runs, stages, edits, audit, sessions
+admin/store.py           SQLite: drafts, runs, stages, live progress, edits, audit, sessions
 admin/test_pipeline.py   offline test: the six agents and the grammar
 admin/test_web.py        offline test: routing, the lock, and publishing
 admin/serve.py           first-run setup, then starts — Windows, macOS, Linux

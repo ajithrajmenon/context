@@ -154,6 +154,31 @@ juvenile. Clarity does not come from short words. It comes from correct order.
 - **Numbers are approximate and say so.** "About", "roughly", "on the order of".
   False precision is the fastest way to lose a careful reader.
 
+### Plain language
+
+**No word the reader has to look up.** A field's own vocabulary is invisible to
+the people who use it every day and a wall to everyone else, and everyone else
+is who this is for. Two moves, applied everywhere including inside diagrams:
+
+- Replace the term with the everyday name for the same thing, when one exists.
+- When it does not, gloss it on first use, in the same sentence, in six words
+  or fewer. If you cannot gloss it that briefly, the explanation is not
+  finished — go back to what the term means, not a shorter way to name it.
+
+**Give the mechanism a cast.** "Erosion is enhanced by increased shear stress"
+has no actor in it, and a reader cannot follow a process with nobody doing
+anything. Name the concrete thing acting and the concrete thing acted on, in
+causal order — the water pushes harder here, the bank gives way, the sediment
+lands there. This is the same instruction as "concrete nouns, active verbs"
+above, aimed specifically at the sentence that carries the mechanism, which is
+where a draft is most tempted to go abstract.
+
+A diagram inherits both rules and cannot use its box-and-label shape as an
+excuse: a label that introduces a technical term the prose never used is
+teaching a new word instead of showing a picture, and it should either be
+plain enough to stand alone or not exist. When a diagram would need more words
+to explain than it saves, the fix is fewer rows or callouts, not smaller text.
+
 ### Sentence rhythm
 
 The unit of pace is the paragraph, not the sentence. Two to four sentences,
@@ -334,6 +359,11 @@ five pages. Longer means it should have been two papers.
 - [ ] Is there a number the reader can act on?
 - [ ] Count the words. Each beat 2–3 paragraphs and about 45 words, the Turn
       under 25, the Long View about 40. This is the one drafts fail most.
+- [ ] Read every diagram label and callout. Could a stranger to the field
+      gloss each one in six words? If not, it is jargon that slipped past.
+- [ ] In the sentence carrying the mechanism, can you point to a specific
+      thing acting on another specific thing? If the verb has no visible
+      actor ("is increased", "occurs"), the mechanism is still a phrase.
 - [ ] Does the paper exist, and is it linked?
 - [ ] Is every figure in the story traceable to the paper?
 - [ ] Have you removed the moral at the end?

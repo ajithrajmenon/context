@@ -88,6 +88,15 @@ animation:p 1.1s ease-in-out infinite}
 .step.todo .name{color:var(--muted)}
 .step.fail .mark{border-color:#B91C1C;background:#B91C1C;color:#fff}
 
+/* The live tail of what the current agent is doing. A run can sit on one
+   stage for several minutes with nothing else on the page to look at, so this
+   is deliberately terminal-shaped and auto-scrolled: it is the one place on
+   the run page that is supposed to look like something is happening. */
+.live-log{font:.84rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+max-height:14rem;overflow-y:auto;display:flex;flex-direction:column-reverse}
+.live-log .pline{padding:.1rem 0;color:var(--muted)}
+.live-log .pline:last-child{color:var(--ink);font-weight:600}
+
 /* The draft preview is the live page in a frame, so give it room and a phone
    width to switch to — most readers will arrive on one. */
 .frame{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
@@ -147,6 +156,22 @@ def preview_panel(lens, domain, draft_id):
   title="The page as it will be published"></iframe></div>
 <p class="muted">This is the page itself, rendered by <code>build.py</code> —
 the same code that writes the live site. What you see here is what publishes.</p>"""
+
+
+def progress_log(rows):
+    """The live tail of what the current agent is doing.
+
+    Rendered only while a run is in flight — once a stage is done, run_stage
+    already holds its real, complete output, and this rolling window has
+    nothing left to add. `column-reverse` in the CSS keeps the newest line at
+    the top of the box without any script: the DOM order is oldest-first, the
+    layout direction is reversed, and a box scrolled to its default position
+    shows what just happened rather than what happened first.
+    """
+    if not rows:
+        return ''
+    lines = ''.join(f'<div class="pline">{e(r["text"])}</div>' for r in rows[-24:])
+    return f'<div class="card"><div class="live-log">{lines}</div></div>'
 
 
 def rail(stages, seconds, current, state):

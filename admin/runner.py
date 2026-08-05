@@ -48,6 +48,33 @@ def _record_stages(run_id):
     return on_stage
 
 
+def _record_progress(run_id):
+    """A live tail of what the current agent is doing, so a run in progress
+    shows work happening rather than one spinner for however long it takes."""
+    def on_progress(stage, text):
+        store.add_progress(run_id, stage, text)
+    return on_progress
+
+
+def _failure_context(run_id):
+    """The last few things the team was doing when it broke, read first.
+
+    A raw traceback answers "what line failed", which is rarely the useful
+    question for a run that failed because a search turned up nothing, a
+    source would not load, or a subscription hit its usage window. The
+    progress lines already say what the agent was doing; leading with them
+    turns "here is a wall of text" into "here is where it was, and then this
+    happened" — the actual complaint a person reads this to answer.
+    """
+    current = store.get_run(run_id)
+    stage = current['stage'] if current else None
+    tail = [row['text'] for row in store.run_progress(run_id, stage=stage)][-6:]
+    if not tail:
+        return ''
+    return ('Last steps before the failure:\n'
+           + '\n'.join(f'  - {line}' for line in tail) + '\n\n')
+
+
 def _queue_draft(run_id, result):
     """A finished run -> a draft awaiting a human.
 
@@ -73,16 +100,20 @@ def _work(run_id, goal, lens_hint):
     try:
         store.update_run(run_id, stage='plan', state='running')
         result = research.run(goal, lens_hint, _record_stages(run_id),
-                              lambda a, b: store.add_tokens(run_id, a, b))
+                              lambda a, b: store.add_tokens(run_id, a, b),
+                              on_progress=_record_progress(run_id))
         draft_id = _queue_draft(run_id, result)
         store.update_run(run_id, state='done', stage='done', draft_id=draft_id)
         store.log('run.done', f'run {run_id} -> draft {draft_id}')
     except Exception as exc:                      # noqa: BLE001 - shown to a human
         # Every failure mode here ends up in front of a person: a refusal, a
         # dropped premise, an expired login, a rate limit. Swallowing the type
-        # and keeping the traceback is deliberate — the run page shows it.
+        # and keeping the traceback is deliberate — the run page shows it. What
+        # changed is what comes first: the concrete steps that were happening
+        # right before it broke, not just where in the code it broke.
+        context = _failure_context(run_id)
         store.update_run(run_id, state='failed',
-                         error=f'{exc}\n\n{traceback.format_exc()[-1500:]}')
+                         error=f'{context}{exc}\n\n{traceback.format_exc()[-1500:]}')
         store.log('run.failed', str(exc)[:400])
     finally:
         RUNNING.pop(run_id, None)

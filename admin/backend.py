@@ -23,10 +23,13 @@ because using the subscription is the entire point of the CLI backend.
 import json
 import os
 import platform
+import queue
 import re
 import shutil
 import subprocess
 import tempfile
+import threading
+import time
 
 
 class Refused(RuntimeError):
@@ -55,7 +58,8 @@ class ApiBackend:
         return bool(os.environ.get('ANTHROPIC_API_KEY'))
 
     def complete(self, system, prompt, schema=None, web=False, effort='high',
-                 max_tokens=16000):
+                 max_tokens=16000, on_progress=None):
+        on_progress = on_progress or (lambda text: None)
         messages = [{'role': 'user', 'content': prompt}]
         kwargs = {
             'model': self.model, 'max_tokens': max_tokens, 'system': system,
@@ -71,8 +75,23 @@ class ApiBackend:
 
         # A server-side tool loop can stop with "pause_turn" when it hits its
         # iteration limit. Re-sending resumes it; the cap stops a runaway.
-        for _ in range(6):
-            response = self.client.messages.create(messages=messages, **kwargs)
+        for i in range(6):
+            on_progress('Contacting Claude…' if i == 0 else
+                       'The server tool loop continued — still working…')
+            # Streamed so a long web-research call reports something before it
+            # is fully done. The CLI backend narrates each tool call by name and
+            # argument; doing the same here means buffering the incremental
+            # `input_json` deltas a tool_use block streams in, which is a second
+            # parser to get right and keep right. Coarser but true is better
+            # than a precise-looking guess, so this only says a tool ran, not
+            # what it searched for.
+            with self.client.messages.stream(messages=messages, **kwargs) as stream:
+                for event in stream:
+                    if (getattr(event, 'type', '') == 'content_block_start'
+                            and getattr(event.content_block, 'type', '') == 'server_tool_use'):
+                        name = getattr(event.content_block, 'name', 'a tool')
+                        on_progress(f'Using {name}…')
+                response = stream.get_final_message()
             usage = (response.usage.input_tokens or 0,
                      response.usage.output_tokens or 0)
             if response.stop_reason == 'refusal':
@@ -130,8 +149,15 @@ class CliBackend:
 
     def _argv(self, schema, web, sys_path=None, system=None):
         """Flags only. `sys_path` is a file holding the system prompt; if the
-        installed CLI is too old for that flag, `system` is passed inline."""
-        argv = [self.binary, '-p', '--output-format', 'json']
+        installed CLI is too old for that flag, `system` is passed inline.
+
+        Output format is always `stream-json` rather than the single-blob
+        `json`: the final line carries the identical fields either way, so
+        nothing downstream changes, but every line before it is a tool call or
+        a thinking tick that `complete()` can narrate live instead of the
+        caller staring at silence for however long the stage takes.
+        """
+        argv = [self.binary, '-p', '--output-format', 'stream-json', '--verbose']
         if sys_path:
             argv += ['--append-system-prompt-file', sys_path]
         elif system:
@@ -147,8 +173,11 @@ class CliBackend:
             tools.append('StructuredOutput')
         if tools:
             # Web research wanders; a structured stage should answer and stop.
+            # 16 turns is enough for several searches and a handful of fetches
+            # — the ceiling exists to bound cost on a stage that could
+            # otherwise keep searching indefinitely, not to be generous.
             argv += ['--allowedTools', ','.join(tools),
-                     '--max-turns', '30' if web else '6']
+                     '--max-turns', '16' if web else '6']
         else:
             # Nothing to call: this stage only has to think and write, and a
             # tool call here would be the agent wandering off its job.
@@ -156,7 +185,8 @@ class CliBackend:
         return argv
 
     def complete(self, system, prompt, schema=None, web=False, effort='high',
-                 max_tokens=16000):
+                 max_tokens=16000, on_progress=None):
+        on_progress = on_progress or (lambda text: None)
         if not self.binary:
             raise BackendError(
                 'The `claude` command is not on PATH. Install Claude Code and '
@@ -179,11 +209,7 @@ class CliBackend:
 
         try:
             _check_length(argv)
-            # encoding is explicit because Windows would otherwise decode as
-            # cp1252 and mangle every em-dash in STYLE.md.
-            proc = subprocess.run(argv, input=prompt, capture_output=True,
-                                  text=True, encoding='utf-8', errors='replace',
-                                  cwd=self.cwd, timeout=self.timeout)
+            payload, proc = _stream(argv, prompt, self.cwd, self.timeout, on_progress)
         finally:
             if sys_path:
                 try:
@@ -194,11 +220,9 @@ class CliBackend:
         if proc.returncode != 0:
             raise BackendError(_cli_error(proc))
 
-        try:
-            payload = json.loads(proc.stdout)
-        except ValueError:
+        if payload is None:
             raise BackendError('The CLI did not return JSON:\n'
-                               + (proc.stdout or proc.stderr)[:900]) from None
+                               + (proc.stdout or proc.stderr)[:900])
 
         if payload.get('is_error') or payload.get('subtype') == 'error_during_execution':
             denied = [d.get('tool_name') for d in payload.get('permission_denials') or []]
@@ -230,6 +254,149 @@ class CliBackend:
             return out, tokens
 
         return payload.get('result', ''), tokens
+
+
+class _Proc:
+    """Just enough of subprocess.CompletedProcess for `_cli_error()` to read —
+    the streaming reader below assembles this from a live process instead of
+    getting one for free from subprocess.run()."""
+    __slots__ = ('returncode', 'stdout', 'stderr')
+
+    def __init__(self, returncode, stdout, stderr):
+        self.returncode, self.stdout, self.stderr = returncode, stdout, stderr
+
+
+# How long with nothing said before the run page should say *something*,
+# rather than let a person wonder if it has hung. Real events pre-empt this —
+# it only fires in the gaps.
+_HEARTBEAT = 15
+
+
+def _pump(stream, out_queue, tag):
+    """Feed a subprocess's stream to a queue, line by line, from its own
+    thread. Popen.stdout.readline() blocks, so reading stdout and stderr
+    without deadlocking, and reading either without blocking the timeout
+    watchdog, both need this off the main thread."""
+    try:
+        for line in iter(stream.readline, ''):
+            out_queue.put((tag, line))
+    finally:
+        out_queue.put((tag, None))          # this stream is done
+
+
+def _feed_stdin(stdin, text):
+    try:
+        stdin.write(text)
+    except (BrokenPipeError, OSError):
+        pass                                 # the process exited; nothing to feed
+    finally:
+        try:
+            stdin.close()
+        except OSError:
+            pass
+
+
+def _tool_progress(name, args):
+    """One tool call -> one line a person would actually want to read."""
+    if name == 'WebSearch':
+        return f'Searching the web: {args.get("query", "")}'.strip()
+    if name == 'WebFetch':
+        url = args.get('url', '')
+        return f'Reading a source: {url}'.strip() if url else 'Reading a source…'
+    if name == 'StructuredOutput':
+        return None                          # the answer itself, not a step
+    return f'Using {name}…' if name else None
+
+
+def _stream_event(line):
+    """One stream-json line -> (a progress string or None, the parsed object
+    or None). Only assistant tool calls become progress: thinking-budget
+    pings, plugin metadata and rate-limit housekeeping are real events but not
+    ones anyone watching a run would want narrated."""
+    line = line.strip()
+    if not line:
+        return None, None
+    try:
+        obj = json.loads(line)
+    except ValueError:
+        return None, None
+    if obj.get('type') != 'assistant':
+        return None, obj
+    for block in obj.get('message', {}).get('content', []) or []:
+        if block.get('type') == 'tool_use':
+            return _tool_progress(block.get('name', ''), block.get('input') or {}), obj
+    return None, obj
+
+
+def _stream(argv, prompt, cwd, timeout, on_progress):
+    """Run the CLI, narrating tool calls as they happen and falling back to a
+    heartbeat when a stage is silently thinking. Returns (payload, proc):
+    `payload` is the parsed final `result` line, or None if the process ended
+    before producing one; `proc` is enough of a CompletedProcess for
+    `_cli_error()` to explain what went wrong.
+    """
+    proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, text=True, encoding='utf-8',
+                            errors='replace', cwd=cwd, bufsize=1)
+    threading.Thread(target=_feed_stdin, args=(proc.stdin, prompt), daemon=True).start()
+
+    lines = queue.Queue()
+    threading.Thread(target=_pump, args=(proc.stdout, lines, 'out'), daemon=True).start()
+    threading.Thread(target=_pump, args=(proc.stderr, lines, 'err'), daemon=True).start()
+
+    out, err, payload = [], [], None
+    open_streams = 2
+    deadline = time.monotonic() + timeout
+    # Tracks when something was last actually shown to the caller — not when a
+    # line last arrived. The CLI's internal chatter (thinking-budget pings,
+    # plugin metadata) keeps the pipe busy without ever being worth narrating,
+    # and counting *that* as activity is what let a genuinely silent stage go
+    # unreported until this function's own timeout finally cut it off: every
+    # arriving line reset the old clock even though none of them said anything
+    # a person watching the run would see.
+    last_shown = time.monotonic()
+
+    while open_streams:
+        now = time.monotonic()
+        remaining = deadline - now
+        if remaining <= 0:
+            proc.kill()
+            proc.wait()
+            raise BackendError(
+                f'Claude took longer than {timeout}s and was stopped. A slow '
+                'web-research stage may just need CONTEXT_CLI_TIMEOUT raised; '
+                'anything faster hanging usually means the CLI is stuck on a '
+                'permission prompt it cannot ask in the background.')
+        try:
+            tag, line = lines.get(timeout=min(_HEARTBEAT, remaining))
+        except queue.Empty:
+            tag = line = None
+
+        if tag is not None and line is None:
+            open_streams -= 1
+        elif tag == 'err':
+            err.append(line)
+        elif tag == 'out':
+            out.append(line)
+            text, obj = _stream_event(line)
+            if obj is not None and obj.get('type') == 'result':
+                payload = obj
+            if text:
+                on_progress(text)
+                last_shown = time.monotonic()
+
+        # However that line landed — a real one, none at all — say something
+        # if it has genuinely been quiet for a while. Checked every pass rather
+        # than only on an empty queue, so a stage that is busy but silent (all
+        # chatter, no tool calls) still gets a heartbeat on schedule instead of
+        # the internal noise perpetually postponing it.
+        now = time.monotonic()
+        if now - last_shown >= _HEARTBEAT:
+            on_progress(f'Still working… ({int(now - last_shown)}s since the last update)')
+            last_shown = now
+
+    proc.wait()
+    return payload, _Proc(proc.returncode, ''.join(out), ''.join(err))
 
 
 # npm installs `claude` as a .cmd shim on Windows, so the process is really

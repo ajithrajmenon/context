@@ -63,6 +63,20 @@ CREATE TABLE IF NOT EXISTS run_stage (
   created_at  REAL NOT NULL
 );
 
+-- A live tail of what the current agent is doing — "searching for X", "reading
+-- Y" — so a run in progress shows something more honest than a spinner. This is
+-- deliberately not the record: run_stage holds each agent's real, complete
+-- output once it lands. This table is a rolling window (see PROGRESS_KEEP)
+-- that exists only so a person watching a run does not stare at nothing for
+-- three minutes and then see one wall of text.
+CREATE TABLE IF NOT EXISTS run_progress (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  run_id      INTEGER NOT NULL,
+  stage       TEXT NOT NULL,
+  text        TEXT NOT NULL,
+  created_at  REAL NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS edit (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   draft_id    INTEGER NOT NULL,
@@ -239,6 +253,33 @@ def run_stages(run_id):
     with connect() as db:
         return db.execute('SELECT * FROM run_stage WHERE run_id = ? ORDER BY id',
                           (run_id,)).fetchall()
+
+
+# A live status feed, not a log — old lines are worth nothing once newer ones
+# exist, so each insert prunes the run back to its most recent window rather
+# than growing forever across a long, chatty research stage.
+PROGRESS_KEEP = 80
+
+
+def add_progress(run_id, stage, text):
+    with connect() as db:
+        db.execute('INSERT INTO run_progress (run_id, stage, text, created_at)'
+                   ' VALUES (?, ?, ?, ?)', (run_id, stage, text, time.time()))
+        db.execute(
+            'DELETE FROM run_progress WHERE run_id = ? AND id NOT IN '
+            '(SELECT id FROM run_progress WHERE run_id = ? ORDER BY id DESC LIMIT ?)',
+            (run_id, run_id, PROGRESS_KEEP))
+
+
+def run_progress(run_id, stage=None):
+    q = 'SELECT * FROM run_progress WHERE run_id = ?'
+    args = [run_id]
+    if stage:
+        q += ' AND stage = ?'
+        args.append(stage)
+    q += ' ORDER BY id'
+    with connect() as db:
+        return db.execute(q, args).fetchall()
 
 
 # ---------------------------------------------------------------- audit

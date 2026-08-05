@@ -5,7 +5,7 @@ from fastapi import APIRouter, Form, Request
 from .. import backend, research, runner, store
 from ..config import PREFIX
 from ..session import authed, go, login_redirect
-from ..ui import e, page, rail, state_pill
+from ..ui import e, page, progress_log, rail, state_pill
 
 router = APIRouter()
 
@@ -71,6 +71,9 @@ def run_detail(request: Request, run_id: int, m: str = ''):
         return page('Not found', '<div class="card">No such run.</div>')
     seconds = {s['name']: s['seconds'] for s in store.run_stages(run_id)}
     progress = rail(research.STAGES, seconds, r['stage'], r['state'])
+    # Once a run is no longer going, run_stage below already holds the real,
+    # complete output of every stage — the live tail would just repeat it.
+    live = progress_log(store.run_progress(run_id)) if r['state'] == 'running' else ''
 
     stages = ''.join(
         f'<h2>{s["name"].title()} <span class="muted" style="font-weight:400">'
@@ -89,4 +92,4 @@ def run_detail(request: Request, run_id: int, m: str = ''):
                else f' &#183; {total:.0f}s so far' if total else '')
     return page(r['goal'][:70], f"""
 <p class="sub">{e(r['cost_in'] + r['cost_out']):} tokens{elapsed}.</p>
-{progress}{err}{link}{stages}{poll}""", '/runs', m)
+{progress}{live}{err}{link}{stages}{poll}""", '/runs', m)

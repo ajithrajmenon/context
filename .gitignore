@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+.idea/
 admin/context.db
 admin/context.db-wal
 admin/context.db-shm

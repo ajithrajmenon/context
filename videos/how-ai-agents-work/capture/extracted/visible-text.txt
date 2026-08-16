@@ -1,0 +1,67 @@
+Topic: How AI agents work
+
+Core idea: An AI agent is not one big model call that returns a finished
+answer. It is a language model wired into a LOOP, and that loop is the whole
+difference between a chatbot and an agent.
+
+The loop (four moves, repeated):
+1. PERCEIVE — the agent reads the current state: the user's goal, the
+   conversation so far, its own memory, and the result of whatever it did
+   last step.
+2. REASON / PLAN — the model decides what the next single step should be,
+   given the goal. It breaks a big goal into smaller steps as it goes,
+   rather than planning the whole thing up front.
+3. ACT — the agent takes that one step, usually by calling a TOOL: running
+   code, searching the web, querying a database, calling an API, editing a
+   file. The tool is what lets the agent touch the real world instead of
+   just talking about it.
+4. OBSERVE — the agent looks at what the tool actually returned or changed,
+   and feeds that back in as the next PERCEIVE. Errors, unexpected results,
+   and partial progress all get folded back into the loop.
+
+Then it repeats: perceive, reason, act, observe — again and again — until
+the goal is reached, a limit is hit, or it hands control back to a human.
+
+Why a loop instead of one shot: a single prompt-response can't recover from
+a wrong turn. A loop can — the agent notices the tool call failed or
+returned something unexpected, and tries a different approach on the next
+pass. That self-correction is what makes an agent's behavior look
+"autonomous" even though each individual step is just the same model being
+asked the same kind of question: "given everything so far, what's the next
+best step?"
+
+Tools: the actions available to the agent. A tool has a name, a
+description, and defined inputs/outputs, so the model can pick the right
+one and call it with the right arguments. Tools turn a language model from
+something that only produces text into something that can search, compute,
+read and write files, hit APIs, and trigger real side effects (send an
+email, refund a charge, deploy code).
+
+Memory: agents keep state across loop iterations so they don't restart from
+zero every step. Short-term memory is the running context of the current
+task (what's been tried, what's left). Longer-term memory can persist
+across sessions — facts learned, past outcomes, user preferences — so the
+agent gets better or at least more consistent over time.
+
+Planning: for a big goal, the agent may explicitly decompose it into
+sub-goals first (a plan), then work the loop on each sub-goal — or it may
+plan just one step ahead every iteration and let the plan emerge from the
+loop itself (more flexible, easier to recover, but can wander). Most
+production agents mix both: a rough plan up front, replanned as new
+information from tool calls comes in.
+
+Stopping conditions: the loop ends when the goal is verifiably met, when a
+step or time budget runs out, or when the agent decides it needs a human
+to confirm before continuing (a "human in the loop" checkpoint) — important
+for actions with real consequences.
+
+What this is not: not magic, not a single giant "understand everything and
+solve it" inference. It is the same underlying language model, called
+repeatedly, each time with more context than the last, taking small
+verifiable steps and course-correcting based on what actually happened.
+That is the entire trick — and it is why agents can do multi-step, open-
+ended tasks that a single prompt never could.
+
+One clean way to say the whole thing: an agent is a model in a loop with
+tools and memory, taking one step at a time, checking its work, and
+repeating until the goal is done.

@@ -253,7 +253,7 @@
       <div class="obs6-node" id="obs6-node-reason" style="left: 746px; top: 576px; opacity: 0.65">
         <div class="obs6-node-circle">
           <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 4 L20 36 M4 20 L36 20 M9 9 L31 31 M31 9 L9 31" stroke="#fdfae7" stroke-width="3" stroke-linecap="round" />
+            <path d="M20 4 L20 36 M4 20 L36 20 M9 9 L31 31 M31 9 L9 31" fill="none" stroke="#fdfae7" stroke-width="3" stroke-linecap="round" />
           </svg>
         </div>
       </div>
@@ -298,22 +298,18 @@
     (function () {
       window.__timelines = window.__timelines || {};
 
-      var root = document.currentScript.closest("template")
-        ? document.currentScript.parentElement
-        : document;
-
       // Measure + arm every arc's dash pattern from its real geometry.
       var arcIds = ["obs6-arc-pr", "obs6-arc-ra", "obs6-arc-ao", "obs6-arc-op"];
       arcIds.forEach(function (id) {
-        var p = root.querySelector("#" + id);
+        var p = document.getElementById(id);
         var len = p.getTotalLength();
         p.style.strokeDasharray = String(len);
         p.style.strokeDashoffset = String(len);
       });
       // Perceive->Reason and Reason->Act were drawn in earlier frames on this
       // shared stage — this frame carries them in already fully drawn.
-      root.querySelector("#obs6-arc-pr").style.strokeDashoffset = "0";
-      root.querySelector("#obs6-arc-ra").style.strokeDashoffset = "0";
+      document.getElementById("obs6-arc-pr").style.strokeDashoffset = "0";
+      document.getElementById("obs6-arc-ra").style.strokeDashoffset = "0";
 
       var tl = gsap.timeline({ paused: true });
 
@@ -367,7 +363,7 @@
       tl.fromTo(
         "#obs6-ring-glow",
         { opacity: 0, scale: 0.86 },
-        { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" },
+        { opacity: 0.4, scale: 1, duration: 0.4, ease: "power2.out" },
         CLOSE_LANDING,
       );
       tl.to("#obs6-ring-glow", { opacity: 0, duration: 0.75, ease: "power1.in" }, CLOSE_LANDING + 0.55);
@@ -389,7 +385,7 @@
       );
       tl.to(
         ".obs6-node-circle",
-        { scale: 1.06, duration: 0.22, ease: "power2.out" },
+        { scale: 1.04, duration: 0.22, ease: "power2.out" },
         CLOSE_LANDING,
       );
       tl.to(

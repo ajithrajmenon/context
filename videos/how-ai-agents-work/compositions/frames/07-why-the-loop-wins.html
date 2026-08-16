@@ -1,0 +1,428 @@
+<template>
+<div id="root" data-composition-id="07-why-the-loop-wins">
+
+  <div class="clip wtlw-bg" data-start="0" data-duration="5.12" data-track-index="0"></div>
+
+  <div class="clip wtlw-glow wtlw-glow-top" data-start="0" data-duration="5.12" data-track-index="1"></div>
+  <div class="clip wtlw-glow wtlw-glow-bottom" data-start="0" data-duration="5.12" data-track-index="2"></div>
+
+  <div class="clip wtlw-title" data-start="0" data-duration="5.12" data-track-index="3">
+    <span class="wtlw-title-plain">Why the&nbsp;</span><span class="wtlw-title-accent">loop</span><span class="wtlw-title-plain">&nbsp;wins</span>
+  </div>
+
+  <div class="clip wtlw-stage-wrap" data-start="0" data-duration="5.12" data-track-index="4">
+    <div class="wtlw-stage">
+
+      <div class="wtlw-card wtlw-card-top">
+        <div class="wtlw-card-headline">One Prompt</div>
+        <div class="wtlw-diagram">
+          <svg class="wtlw-crack-svg" viewBox="0 0 760 130" preserveAspectRatio="xMidYMid meet">
+            <path id="wtlw-crack-path" d="M20,65 L400,65 L428,35 L456,95 L482,20 L508,80 L534,45 L560,70 L720,70" />
+          </svg>
+          <div class="wtlw-crack-end"></div>
+        </div>
+      </div>
+
+      <div class="wtlw-card wtlw-card-bottom">
+        <div class="wtlw-card-headline">The Loop</div>
+        <div class="wtlw-diagram">
+          <svg class="wtlw-loop-icon" viewBox="0 0 120 120">
+            <path d="M100,60 A40,40 0 1 1 65,21" fill="none" class="wtlw-loop-arc" stroke-width="9" stroke-linecap="round" />
+            <polygon points="60,8 80,17 62,31" class="wtlw-loop-head" />
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="clip wtlw-badges" data-start="0" data-duration="5.12" data-track-index="5">
+    <div class="wtlw-badge-row wtlw-badge-row-top">
+      <div class="wtlw-badge wtlw-badge-top">
+        <svg class="wtlw-badge-icon" viewBox="0 0 24 24">
+          <line x1="5" y1="5" x2="19" y2="19" />
+          <line x1="19" y1="5" x2="5" y2="19" />
+        </svg>
+        <span>Stuck</span>
+      </div>
+    </div>
+    <div class="wtlw-badge-row wtlw-badge-row-bottom">
+      <div class="wtlw-badge wtlw-badge-bottom">
+        <svg class="wtlw-badge-icon" viewBox="0 0 24 24">
+          <path d="M19,12 A7,7 0 1 1 12,5" fill="none" stroke-width="2.6" stroke-linecap="round" />
+          <polygon points="12,1 12,8 6,4.5" />
+        </svg>
+        <span>Retry</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="clip wtlw-memory" data-start="0" data-duration="5.12" data-track-index="6">
+    <svg class="wtlw-memory-icon" viewBox="0 0 36 24">
+      <circle cx="8" cy="12" r="6" />
+      <circle cx="20" cy="12" r="4.4" opacity="0.6" />
+      <circle cx="29" cy="12" r="2.8" opacity="0.35" />
+    </svg>
+    <span class="wtlw-memory-label">Memory</span>
+  </div>
+
+</div>
+
+<style>
+  #root {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+    color: #111111;
+    --c-bg: #fdfae7;
+    --c-primary: #1e2bfa;
+    --c-text: #111111;
+    --c-text-muted: #6b6b6b;
+    --c-accent-light: rgba(30, 43, 250, 0.08);
+    --c-border: rgba(30, 43, 250, 0.2);
+    --c-card-bg: rgba(30, 43, 250, 0.04);
+    --c-cream: #fdfae7;
+  }
+
+  #root * {
+    box-sizing: border-box;
+  }
+
+  /* ---- background ---- */
+  .wtlw-bg {
+    position: absolute;
+    inset: 0;
+    background: var(--c-bg);
+  }
+
+  .wtlw-glow {
+    position: absolute;
+    left: 140px;
+    width: 800px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .wtlw-glow-top {
+    top: 230px;
+    height: 620px;
+    background: radial-gradient(circle, rgba(30, 43, 250, 0.10) 0%, rgba(30, 43, 250, 0) 70%);
+  }
+  .wtlw-glow-bottom {
+    top: 840px;
+    height: 660px;
+    background: radial-gradient(circle, rgba(30, 43, 250, 0.15) 0%, rgba(30, 43, 250, 0) 70%);
+  }
+
+  /* ---- title ---- */
+  .wtlw-title {
+    position: absolute;
+    top: 150px;
+    left: 60px;
+    width: 960px;
+    text-align: center;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 64px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .wtlw-title-plain {
+    color: var(--c-text);
+  }
+  .wtlw-title-accent {
+    color: var(--c-primary);
+  }
+
+  /* ---- stage / cards ---- */
+  .wtlw-stage-wrap {
+    position: absolute;
+    inset: 0;
+    perspective: 1700px;
+  }
+  .wtlw-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .wtlw-card {
+    position: absolute;
+    left: 110px;
+    width: 860px;
+    height: 520px;
+    padding: 48px 40px 40px;
+    background: var(--c-card-bg);
+    border: 1.5px solid var(--c-border);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px;
+    transform-style: preserve-3d;
+    will-change: transform;
+    opacity: 0;
+  }
+  .wtlw-card-top {
+    top: 320px;
+    transform-origin: center top;
+  }
+  .wtlw-card-bottom {
+    top: 930px;
+    transform-origin: center bottom;
+  }
+
+  .wtlw-card-headline {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 56px;
+    letter-spacing: -0.02em;
+    color: var(--c-text);
+    text-align: center;
+    opacity: 0;
+  }
+
+  .wtlw-diagram {
+    width: 100%;
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* crack (top card) */
+  .wtlw-crack-svg {
+    width: 640px;
+    height: 130px;
+  }
+  #wtlw-crack-path {
+    fill: none;
+    stroke: var(--c-text);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.72;
+  }
+  .wtlw-crack-end {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin-left: 274px;
+    margin-top: -22px;
+    border-radius: 50%;
+    background: var(--c-text);
+    opacity: 0;
+  }
+
+  /* loop icon (bottom card) */
+  .wtlw-loop-icon {
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+  }
+  .wtlw-loop-arc {
+    stroke: var(--c-primary);
+  }
+  .wtlw-loop-head {
+    fill: var(--c-primary);
+  }
+
+  /* ---- badges ---- */
+  .wtlw-badges {
+    position: absolute;
+    inset: 0;
+  }
+  .wtlw-badge-row {
+    position: absolute;
+    left: 110px;
+    width: 860px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wtlw-badge-row-top {
+    top: 810px;
+  }
+  .wtlw-badge-row-bottom {
+    top: 900px;
+  }
+  .wtlw-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    background: var(--c-primary);
+    border-radius: 100px;
+    color: var(--c-cream);
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0;
+  }
+  .wtlw-badge-icon {
+    width: 22px;
+    height: 22px;
+  }
+  .wtlw-badge-icon line,
+  .wtlw-badge-icon path {
+    stroke: var(--c-cream);
+  }
+  .wtlw-badge-icon polygon {
+    fill: var(--c-cream);
+  }
+
+  /* ---- memory chip ---- */
+  .wtlw-memory {
+    position: absolute;
+    top: 906px;
+    left: 810px;
+    width: 170px;
+    height: 56px;
+    background: var(--c-accent-light);
+    border: 1.5px solid var(--c-border);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    opacity: 0;
+  }
+  .wtlw-memory-icon {
+    width: 32px;
+    height: 18px;
+  }
+  .wtlw-memory-icon circle {
+    fill: var(--c-primary);
+  }
+  .wtlw-memory-label {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-primary);
+  }
+</style>
+
+<script>
+  (function () {
+    var comp = document.querySelector('[data-composition-id="07-why-the-loop-wins"]');
+    if (!comp) return;
+
+    // measure + arm the crack path for a real stroke-draw (svg-path-draw rule)
+    var crackPath = comp.querySelector("#wtlw-crack-path");
+    if (crackPath) {
+      var len = crackPath.getTotalLength();
+      crackPath.style.strokeDasharray = len;
+      crackPath.style.strokeDashoffset = len;
+    }
+
+    var tl = gsap.timeline({ paused: true });
+
+    // ambient side glows establish top / bottom zones
+    tl.fromTo(
+      comp.querySelectorAll(".wtlw-glow"),
+      { opacity: 0 },
+      { opacity: 1, duration: 0.6, ease: "power1.out" },
+      0,
+    );
+
+    // Scene 1 — title slides down into place
+    tl.fromTo(
+      comp.querySelector(".wtlw-title"),
+      { y: -40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.65, ease: "power3.out" },
+      0,
+    );
+
+    // Scene 2 — top card arrives with a book-open rotateX tilt, hinged at its top edge
+    tl.fromTo(
+      comp.querySelector(".wtlw-card-top"),
+      { y: -90, rotateX: 18, scale: 0.85, opacity: 0 },
+      { y: 0, rotateX: 12, scale: 1, opacity: 1, duration: 0.85, ease: "power3.out" },
+      0.35,
+    );
+    tl.fromTo(
+      comp.querySelector(".wtlw-card-top .wtlw-card-headline"),
+      { y: 16, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+      0.55,
+    );
+
+    // the crack draws across the top card as it settles, lands on "wrong turn"
+    tl.to(
+      crackPath,
+      { strokeDashoffset: 0, duration: 0.65, ease: "power2.out" },
+      1.4,
+    );
+    tl.fromTo(
+      comp.querySelector(".wtlw-crack-end"),
+      { opacity: 0 },
+      { opacity: 1, duration: 0.2, ease: "power1.out" },
+      2.1,
+    );
+    // the card freezes here — no further motion on the top card for the rest of the shot
+
+    // Scene 3 — bottom card arrives from below with the opposing tilt, hinged at its bottom edge
+    tl.fromTo(
+      comp.querySelector(".wtlw-card-bottom"),
+      { y: 90, rotateX: -18, scale: 0.85, opacity: 0 },
+      { y: 0, rotateX: -12, scale: 1, opacity: 1, duration: 0.85, ease: "power3.out" },
+      2.8,
+    );
+    tl.fromTo(
+      comp.querySelector(".wtlw-card-bottom .wtlw-card-headline"),
+      { y: 16, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+      2.95,
+    );
+    tl.fromTo(
+      comp.querySelector(".wtlw-loop-icon"),
+      { opacity: 0, scale: 0.8 },
+      { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" },
+      3.05,
+    );
+
+    // inner-edge badge pop — the one earned overshoot in the shot
+    tl.fromTo(
+      comp.querySelector(".wtlw-badge-top"),
+      { scale: 0, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2.2)" },
+      3.3,
+    );
+    tl.fromTo(
+      comp.querySelector(".wtlw-badge-bottom"),
+      { scale: 0, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2.2)" },
+      3.6,
+    );
+
+    // the memory icon persists beside the loop card
+    tl.fromTo(
+      comp.querySelector(".wtlw-memory"),
+      { scale: 0.7, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.35, ease: "power2.out" },
+      3.75,
+    );
+
+    // the loop card keeps a small trace of life — the one prompt card stays frozen
+    tl.to(
+      comp.querySelector(".wtlw-card-bottom"),
+      { y: -8, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 },
+      4.1,
+    );
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["07-why-the-loop-wins"] = tl;
+  })();
+</script>
+</template>

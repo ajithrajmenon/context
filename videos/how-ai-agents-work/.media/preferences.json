@@ -42,6 +42,13 @@
         "how-ai-agents-work"
       ],
       "updated_at": "2026-08-16T18:31:12.222Z"
+    },
+    "voice": {
+      "value": "am_michael",
+      "confirmed_in": [
+        "how-ai-agents-work"
+      ],
+      "updated_at": "2026-08-16T18:55:50.766Z"
     }
   },
   "sightings": {}

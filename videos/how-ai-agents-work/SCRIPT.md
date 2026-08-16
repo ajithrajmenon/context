@@ -1,8 +1,7 @@
 # SCRIPT — how-ai-agents-work
 
-**Voice:** ElevenLabs (provider selected — the specific voice ID needs live
-catalog access, currently blocked in this session; see note in chat)
-**Voice settings:** stability 0.45 · similarity 0.8 · style 0.15
+**Voice:** Michael (Kokoro-82M, local) — `am_michael`
+**Voice settings:** speed 1.0
 **Voice direction:** Clear, confident, a little brisk — a sharp explainer
 voice, not a lecture. Technical but never dry.
 

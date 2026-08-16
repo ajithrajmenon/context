@@ -5,5 +5,6 @@ admin/context.db
 admin/context.db-wal
 admin/context.db-shm
 admin/.env
+.env
 context-site.html
 context-artifact.html

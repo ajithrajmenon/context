@@ -1,0 +1,49 @@
+{
+  "provider": "auto",
+  "speed": 1,
+  "lines": [
+    {
+      "id": "01",
+      "text": "\"AI agent\" isn't one smart answer — it's a tiny loop, on repeat."
+    },
+    {
+      "id": "02",
+      "text": "Four moves — perceive, reason, act, observe — that's the whole engine."
+    },
+    {
+      "id": "03",
+      "text": "First: perceive. It reads the goal, the context — and what just happened."
+    },
+    {
+      "id": "04",
+      "text": "Then: reason. Given all that, what's the single best next step?"
+    },
+    {
+      "id": "05",
+      "text": "Next: act. Call a tool — search, run code, hit an API."
+    },
+    {
+      "id": "06",
+      "text": "Finally: observe what happened — then loop back to perceive, and go again."
+    },
+    {
+      "id": "07",
+      "text": "One prompt can't recover from a wrong turn. A loop notices — and tries again."
+    },
+    {
+      "id": "08",
+      "text": "That's the whole trick — a model in a loop, with tools and memory."
+    },
+    {
+      "id": "09",
+      "text": "Next time you see \"AI agent\" — look for the loop underneath."
+    }
+  ],
+  "bgm": {
+    "mode": "retrieve",
+    "query": "confident minimal tech underscore",
+    "blob": "An AI agent isn't one big model call — it's a loop: perceive, decide, act, observe, repeat, until the goal is done.",
+    "arc": "concept-explainer with process"
+  },
+  "voice": "am_michael"
+}

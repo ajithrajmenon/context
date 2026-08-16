@@ -1,0 +1,310 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: transparent;
+      font-family: "Inter", sans-serif;
+    }
+
+    #root .clip {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ---- background ---- */
+    #perceive03-bg {
+      background: #fdfae7;
+    }
+
+    /* ---- ambient ring layer (faint, full loop + 4 ghost positions) ---- */
+    #perceive03-ring-svg {
+      pointer-events: none;
+    }
+    .perceive03-ring-outline {
+      fill: none;
+      stroke: #9a9a9a;
+      stroke-width: 2;
+      stroke-dasharray: 4 10;
+      opacity: 0;
+    }
+    .perceive03-dot {
+      fill: none;
+      stroke: #9a9a9a;
+      stroke-width: 2;
+      stroke-dasharray: 3 4;
+      opacity: 0;
+    }
+
+    /* ---- glow (behind node) ---- */
+    #perceive03-glow {
+      inset: auto;
+      left: 300px;
+      top: 130px;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(15, 20, 150, 1) 0%,
+        rgba(15, 20, 150, 0.4) 42%,
+        rgba(15, 20, 150, 0) 72%
+      );
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ---- node layer (arc + badge, the hero) ---- */
+    #perceive03-node-svg {
+      pointer-events: none;
+    }
+    #perceive03-arc {
+      fill: none;
+      stroke: #1e2bfa;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+    #perceive03-node {
+      fill: #1e2bfa;
+      fill-opacity: 0;
+      stroke: #1e2bfa;
+      stroke-width: 4;
+      transform-origin: 540px 370px;
+      transform: rotate(-90deg);
+    }
+
+    /* ---- label ---- */
+    #perceive03-label {
+      inset: auto;
+      left: 0;
+      top: 452px;
+      width: 100%;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 30px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #1e2bfa;
+      opacity: 0;
+    }
+
+    /* ---- connector tick from label down to readout ---- */
+    #perceive03-connector {
+      inset: auto;
+      left: 539px;
+      top: 502px;
+      width: 2px;
+      height: 46px;
+      background: rgba(30, 43, 250, 0.35);
+      transform-origin: top center;
+      transform: scaleY(0);
+    }
+
+    /* ---- readout chips ---- */
+    .perceive03-chip-row {
+      inset: auto;
+      left: 0;
+      width: 100%;
+      text-align: center;
+    }
+    #perceive03-chip-goal-row {
+      top: 566px;
+    }
+    #perceive03-chip-context-row {
+      top: 630px;
+    }
+    #perceive03-chip-result-row {
+      top: 694px;
+    }
+    .perceive03-chip {
+      display: inline-block;
+      padding: 12px 26px;
+      border-radius: 100px;
+      background: rgba(30, 43, 250, 0.08);
+      border: 1.5px solid rgba(30, 43, 250, 0.2);
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 500;
+      font-size: 20px;
+      letter-spacing: 0.03em;
+      color: #1e2bfa;
+      opacity: 0;
+    }
+  </style>
+
+  <div id="root" data-composition-id="03-perceive">
+    <div id="perceive03-bg" class="clip" data-start="0" data-duration="4.523" data-track-index="0"></div>
+
+    <svg
+      id="perceive03-ring-svg"
+      class="clip"
+      data-start="0"
+      data-duration="4.523"
+      data-track-index="1"
+      width="1080"
+      height="1920"
+      viewBox="0 0 1080 1920"
+    >
+      <!-- full faint ring, all 4 stage positions -->
+      <circle class="perceive03-ring-outline" cx="540" cy="630" r="260" />
+      <!-- Perceive (top, 12 o'clock) — ghost, fades as the real node draws in -->
+      <circle id="perceive03-ghost-top" class="perceive03-dot" cx="540" cy="370" r="9" />
+      <!-- Reason (3 o'clock) -->
+      <circle class="perceive03-dot" cx="800" cy="630" r="9" />
+      <!-- Act (6 o'clock) -->
+      <circle class="perceive03-dot" cx="540" cy="890" r="9" />
+      <!-- Observe (9 o'clock) -->
+      <circle class="perceive03-dot" cx="280" cy="630" r="9" />
+    </svg>
+
+    <div id="perceive03-glow" class="clip" data-start="0" data-duration="4.523" data-track-index="2"></div>
+
+    <svg
+      id="perceive03-node-svg"
+      class="clip"
+      data-start="0"
+      data-duration="4.523"
+      data-track-index="3"
+      width="1080"
+      height="1920"
+      viewBox="0 0 1080 1920"
+    >
+      <!-- highlighted arc segment of the ring, centered on the Perceive node -->
+      <path id="perceive03-arc" d="M 372.8 430.8 A 260 260 0 0 1 707.2 430.8" />
+      <!-- the Perceive node badge: draws its outline, then fills solid -->
+      <circle id="perceive03-node" cx="540" cy="370" r="54" />
+    </svg>
+
+    <div id="perceive03-label" class="clip" data-start="0" data-duration="4.523" data-track-index="4">PERCEIVE</div>
+
+    <div id="perceive03-connector" class="clip" data-start="0" data-duration="4.523" data-track-index="5"></div>
+
+    <div
+      id="perceive03-chip-goal-row"
+      class="clip perceive03-chip-row"
+      data-start="0"
+      data-duration="4.523"
+      data-track-index="6"
+    >
+      <span id="perceive03-chip-goal" class="perceive03-chip">goal</span>
+    </div>
+    <div
+      id="perceive03-chip-context-row"
+      class="clip perceive03-chip-row"
+      data-start="0"
+      data-duration="4.523"
+      data-track-index="7"
+    >
+      <span id="perceive03-chip-context" class="perceive03-chip">context</span>
+    </div>
+    <div
+      id="perceive03-chip-result-row"
+      class="clip perceive03-chip-row"
+      data-start="0"
+      data-duration="4.523"
+      data-track-index="8"
+    >
+      <span id="perceive03-chip-result" class="perceive03-chip">last result</span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+
+      // Measure real geometry for the stroke-draw segments — never guessed.
+      var arcPath = document.getElementById("perceive03-arc");
+      var nodeCircle = document.getElementById("perceive03-node");
+      [arcPath, nodeCircle].forEach(function (el) {
+        var len = el.getTotalLength();
+        el.style.strokeDasharray = String(len);
+        el.style.strokeDashoffset = String(len);
+      });
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–1.0s): ambient staging — faint full ring + 4 ghost positions.
+      tl.fromTo(
+        "#perceive03-ring-svg .perceive03-ring-outline",
+        { opacity: 0 },
+        { opacity: 0.15, duration: 0.6, ease: "power1.out" },
+        0.05,
+      );
+      tl.fromTo(
+        ".perceive03-dot",
+        { opacity: 0 },
+        { opacity: 0.18, duration: 0.35, ease: "power1.out", stagger: 0.08 },
+        0.2,
+      );
+
+      // ── Scene 2 (1.0–2.6s): "First: perceive." — the node self-draws, fills, blooms, and labels.
+      tl.to("#perceive03-ghost-top", { opacity: 0, duration: 0.2, ease: "power1.out" }, 1.0);
+
+      tl.to("#perceive03-arc", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 1.0);
+      tl.to("#perceive03-node", { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 1.375);
+      tl.to("#perceive03-node", { fillOpacity: 1, duration: 0.25, ease: "power1.out" }, 1.725);
+
+      // Ambient glow bloom — lands together with the node's fill-settle at 1.975s.
+      tl.fromTo(
+        "#perceive03-glow",
+        { opacity: 0, scale: 0.85 },
+        { opacity: 0.3, scale: 1, duration: 0.8, ease: "power2.out" },
+        1.175,
+      );
+      var glow = document.getElementById("perceive03-glow");
+      var phase = { p: 0 };
+      tl.to(
+        phase,
+        {
+          p: Math.PI * 2,
+          duration: 2.5,
+          ease: "none",
+          onUpdate: function () {
+            var s = Math.sin(phase.p);
+            glow.style.opacity = String(0.3 + s * 0.03);
+            glow.style.transform = "scale(" + (1 + s * 0.015) + ")";
+          },
+        },
+        1.975,
+      );
+
+      tl.fromTo(
+        "#perceive03-label",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power1.out" },
+        2.0,
+      );
+
+      // ── Scene 3 (2.6–4.523s): "the goal, the context — and what just happened." — readout chips stagger in.
+      tl.fromTo(
+        "#perceive03-connector",
+        { scaleY: 0 },
+        { scaleY: 1, duration: 0.25, ease: "power1.out" },
+        2.55,
+      );
+      tl.fromTo(
+        "#perceive03-chip-goal",
+        { opacity: 0, x: -24 },
+        { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" },
+        2.65,
+      );
+      tl.fromTo(
+        "#perceive03-chip-context",
+        { opacity: 0, x: -24 },
+        { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" },
+        3.1,
+      );
+      tl.fromTo(
+        "#perceive03-chip-result",
+        { opacity: 0, x: -24 },
+        { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" },
+        3.55,
+      );
+      // holds to the end (4.523s) — camera locked, no exit.
+
+      window.__timelines["03-perceive"] = tl;
+    })();
+  </script>
+</template>

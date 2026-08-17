@@ -1,6 +1,6 @@
 ---
 format: 1080x1920
-duration: 45s
+duration: 38.934s
 message: "An AI agent isn't one big model call — it's a loop: perceive, decide, act, observe, repeat, until the goal is done."
 arc: concept-explainer with process
 audience: general tech-curious viewers, Shorts/TikTok
@@ -24,7 +24,7 @@ music: confident minimal tech underscore
 - voiceover: "\"AI agent\" isn't one smart answer — it's a tiny loop, on repeat."
 - duration: 4.651s
 - transition_in: cut
-- status: outline
+- status: animated
 - src: compositions/frames/01-hook.html
 - type: hook
 - persuasion: Common-belief vs reality
@@ -50,7 +50,7 @@ Scene 3 (3.2–4.651s): beat 2 holds dead still — settle-and-hold, at most sub
 - voiceover: "Four moves — perceive, reason, act, observe — that's the whole engine."
 - duration: 4.288s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/02-name-the-loop.html
 - type: product_intro
 - persuasion: Frame-then-fill (state the shape, then populate it)
@@ -76,7 +76,7 @@ Scene 3 (3.0–4.288s): "that's the whole engine" fades up beneath the four word
 - voiceover: "First: perceive. It reads the goal, the context — and what just happened."
 - duration: 4.523s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/03-perceive.html
 - type: feature_showcase
 - persuasion: Signposting (first… then… finally)
@@ -102,7 +102,7 @@ Scene 3 (2.6–4.523s): as the VO names "the goal, the context — and what just
 - voiceover: "Then: reason. Given all that, what's the single best next step?"
 - duration: 4.032s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/04-reason.html
 - type: feature_showcase
 - persuasion: Signposting (first… then… finally)
@@ -128,7 +128,7 @@ Scene 3 (2.2–4.032s): as the VO asks "what's the single best next step?" a sma
 - voiceover: "Next: act. Call a tool — search, run code, hit an API."
 - duration: 4.117s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/05-act.html
 - type: feature_showcase
 - persuasion: Concretization (abstract → tangible object)
@@ -154,7 +154,7 @@ Scene 3 (2.0–4.117s): as the VO enumerates "search, run code, hit an API," thr
 - voiceover: "Finally: observe what happened — then loop back to perceive, and go again."
 - duration: 4.651s
 - transition_in: push-slide LEFT
-- status: outline
+- status: animated
 - src: compositions/frames/06-observe-repeat.html
 - type: feature_showcase
 - persuasion: Causal chain (A → B → C)
@@ -180,7 +180,7 @@ Scene 3 (2.2–4.651s): as the VO says "then loop back to perceive, and go again
 - voiceover: "One prompt can't recover from a wrong turn. A loop notices — and tries again."
 - duration: 5.12s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/07-why-the-loop-wins.html
 - type: benefit_highlight
 - persuasion: Before/after
@@ -206,7 +206,7 @@ Scene 3 (2.8–5.12s): as the VO says "A loop notices — and tries again," the 
 - voiceover: "That's the whole trick — a model in a loop, with tools and memory."
 - duration: 3.84s
 - transition_in: crossfade
-- status: outline
+- status: animated
 - src: compositions/frames/08-thesis.html
 - type: branding
 - persuasion: Distillation (compress to one line)
@@ -232,7 +232,7 @@ Scene 3 (1.6–3.84s): the ONE move — the line slides up and fades as the seco
 - voiceover: "Next time you see \"AI agent\" — look for the loop underneath."
 - duration: 3.712s
 - transition_in: zoom-through
-- status: outline
+- status: animated
 - src: compositions/frames/09-close.html
 - type: cta
 - persuasion: Generalization (specific → principle)

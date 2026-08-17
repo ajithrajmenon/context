@@ -1,5 +1,10 @@
 <template>
   <style>
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
+
     #root {
       --bg: #fdfae7;
       --primary: #1e2bfa;
@@ -237,10 +242,10 @@
     }
   </style>
 
-  <div id="root" data-composition-id="04-reason">
-    <div id="r4-bg" class="clip" data-start="0" data-duration="4.032" data-track-index="0"></div>
+  <div id="root" data-composition-id="04-reason" data-width="1080" data-height="1920" data-duration="5.032">
+    <div id="r4-bg" class="clip" data-start="0" data-duration="5.032" data-track-index="0"></div>
 
-    <div id="r4-stage" class="clip" data-start="0" data-duration="4.032" data-track-index="1">
+    <div id="r4-stage" class="clip" data-start="0" data-duration="5.032" data-track-index="1">
       <!-- ring + arcs + dotted node outlines -->
       <svg class="r4-svg-layer" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
         <circle id="r4-ring-base" cx="540" cy="630" r="260" />
@@ -278,7 +283,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="assets/vendor/gsap.min.js"></script>
   <script>
     (function () {
       // ---- measured SVG path setup (svg-path-draw) ----
@@ -331,7 +336,7 @@
       tl.to(
         "#r4-reason-glow",
         { opacity: 0, scale: 1.6, duration: 0.3, ease: "power2.out" },
-        2.05
+        2.06
       );
       tl.fromTo(
         "#r4-reason-label",

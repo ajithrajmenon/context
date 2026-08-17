@@ -1,6 +1,9 @@
 <template>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap");
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
 
     #root {
       position: relative;
@@ -52,7 +55,7 @@
 
     .act05-headline {
       position: absolute;
-      top: 244px;
+      top: 1260px;
       left: 60px;
       right: 60px;
       text-align: center;
@@ -171,19 +174,19 @@
     }
   </style>
 
-  <div id="root" data-composition-id="05-act" data-width="1080" data-height="1920">
-    <div class="clip act05-bg" data-start="0" data-duration="4.117" data-track-index="0"></div>
+  <div id="root" data-composition-id="05-act" data-width="1080" data-height="1920" data-duration="5.117">
+    <div class="clip act05-bg" data-start="0" data-duration="5.117" data-track-index="0"></div>
 
-    <div class="clip act05-chrome" data-start="0" data-duration="4.117" data-track-index="1">
+    <div class="clip act05-chrome" data-start="0" data-duration="5.117" data-track-index="1">
       <span class="act05-eyebrow" id="act05-eyebrow">The Agent Loop</span>
       <span class="act05-steppill" id="act05-steppill">Step 3 / 4</span>
     </div>
 
-    <div class="clip act05-headline" id="act05-headline" data-start="1.6" data-duration="2.517" data-track-index="1">
+    <div class="clip act05-headline" id="act05-headline" data-start="1.6" data-duration="3.517" data-track-index="4">
       Act
     </div>
 
-    <div class="clip act05-diagram" data-start="0" data-duration="4.117" data-track-index="2">
+    <div class="clip act05-diagram" data-start="0" data-duration="5.117" data-track-index="2">
       <svg viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="act05-glow-grad" cx="50%" cy="50%" r="50%">
@@ -232,7 +235,7 @@
       </svg>
     </div>
 
-    <div class="clip act05-chips" data-start="2.0" data-duration="2.117" data-track-index="3">
+    <div class="clip act05-chips" data-start="2.0" data-duration="3.117" data-track-index="3">
       <div class="act05-chip-glow" id="act05-chip-glow-code"></div>
 
       <div class="act05-chip" id="act05-chip-search">
@@ -263,30 +266,28 @@
 
   <script>
     (function () {
-      var root = document.querySelector('#root[data-composition-id="05-act"]');
+      var eyebrow = document.getElementById("act05-eyebrow");
+      var steppill = document.getElementById("act05-steppill");
+      var headline = document.getElementById("act05-headline");
 
-      var eyebrow = root.querySelector("#act05-eyebrow");
-      var steppill = root.querySelector("#act05-steppill");
-      var headline = root.querySelector("#act05-headline");
+      var nodePerceive = document.getElementById("act05-node-perceive");
+      var nodeReason = document.getElementById("act05-node-reason");
+      var arcPR = document.getElementById("act05-arc-pr");
+      var arcRA = document.getElementById("act05-arc-ra");
 
-      var nodePerceive = root.querySelector("#act05-node-perceive");
-      var nodeReason = root.querySelector("#act05-node-reason");
-      var arcPR = root.querySelector("#act05-arc-pr");
-      var arcRA = root.querySelector("#act05-arc-ra");
+      var actGhost = document.getElementById("act05-act-ghost");
+      var actFill = document.getElementById("act05-act-fill");
+      var actGlow = document.getElementById("act05-act-glow");
+      var actLabel = document.getElementById("act05-act-label");
 
-      var actGhost = root.querySelector("#act05-act-ghost");
-      var actFill = root.querySelector("#act05-act-fill");
-      var actGlow = root.querySelector("#act05-act-glow");
-      var actLabel = root.querySelector("#act05-act-label");
+      var connSearch = document.getElementById("act05-conn-search");
+      var connCode = document.getElementById("act05-conn-code");
+      var connApi = document.getElementById("act05-conn-api");
 
-      var connSearch = root.querySelector("#act05-conn-search");
-      var connCode = root.querySelector("#act05-conn-code");
-      var connApi = root.querySelector("#act05-conn-api");
-
-      var chipSearch = root.querySelector("#act05-chip-search");
-      var chipCode = root.querySelector("#act05-chip-code");
-      var chipApi = root.querySelector("#act05-chip-api");
-      var chipGlowCode = root.querySelector("#act05-chip-glow-code");
+      var chipSearch = document.getElementById("act05-chip-search");
+      var chipCode = document.getElementById("act05-chip-code");
+      var chipApi = document.getElementById("act05-chip-api");
+      var chipGlowCode = document.getElementById("act05-chip-glow-code");
 
       // Measure the two draw-on arcs (real geometry, not a guessed length).
       var lenPR = arcPR.getTotalLength();
@@ -308,10 +309,10 @@
 
       // ---- Setup (t=0): ring exactly as Frame 4 left it ----
       gsap.set(nodePerceive, { opacity: 0.65 });
-      gsap.set(arcPR, { opacity: 0.65 });
+      gsap.set(arcPR, { opacity: 1 });
       gsap.set(nodeReason, { opacity: 1 });
       gsap.set([actFill, actGlow], { opacity: 0, scale: 0.75 });
-      gsap.set(actLabel, { opacity: 0, y: 6 });
+      gsap.set(actLabel, { opacity: 0 });
       gsap.set([chipSearch, chipCode, chipApi], { opacity: 0, scale: 0.4 });
       gsap.set(chipGlowCode, { opacity: 0, scale: 0.85 });
 
@@ -319,7 +320,9 @@
       tl.fromTo(steppill, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0.1);
 
       // Scene 1 (0.0-0.7s): Reason settles to ~65% opacity — a quick, smooth dim.
+      // Its feeding arc dims with it so the two read as one supporting unit.
       tl.to(nodeReason, { opacity: 0.65, duration: 0.6, ease: "power1.out" }, 0.0);
+      tl.to(arcPR, { opacity: 0.65, duration: 0.6, ease: "power1.out" }, 0.0);
 
       // Scene 2 (0.7-2.0s): "Next: act" — the arc self-draws from Reason to Act.
       tl.to(arcRA, { strokeDashoffset: 0, duration: 0.85, ease: "power2.out" }, 0.7);
@@ -333,7 +336,7 @@
         1.45
       );
       tl.to(actFill, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 1.55);
-      tl.fromTo(actLabel, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 1.7);
+      tl.fromTo(actLabel, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 1.7);
 
       // Headline "Act" lands with the node.
       tl.fromTo(headline, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1.6);

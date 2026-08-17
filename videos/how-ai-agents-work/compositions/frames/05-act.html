@@ -1,0 +1,405 @@
+<template>
+  <style>
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
+
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+    }
+
+    .act05-bg {
+      inset: 0;
+      background: #fdfae7;
+    }
+
+    /* Safe zone (explicit spec): 150px top, 170px bottom, 60px sides. */
+    .act05-chrome {
+      position: absolute;
+      top: 150px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .act05-eyebrow {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 21px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #1e2bfa;
+      opacity: 0;
+    }
+
+    .act05-steppill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 18px;
+      border-radius: 100px;
+      background: rgba(30, 43, 250, 0.08);
+      color: #1e2bfa;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      opacity: 0;
+    }
+
+    .act05-headline {
+      position: absolute;
+      top: 1260px;
+      left: 60px;
+      right: 60px;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 128px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: #111111;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+    }
+
+    .act05-diagram {
+      position: absolute;
+      inset: 0;
+    }
+
+    .act05-diagram svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .act05-node-label {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 21px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .act05-node {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+    }
+
+    #act05-act-fill,
+    #act05-act-glow {
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+      opacity: 0;
+    }
+
+    .act05-chips {
+      position: absolute;
+      inset: 0;
+    }
+
+    .act05-chip-glow {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(30, 43, 250, 0.45) 0%,
+        rgba(30, 43, 250, 0.14) 55%,
+        rgba(30, 43, 250, 0) 74%
+      );
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .act05-chip {
+      position: absolute;
+      width: 160px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      background: rgba(30, 43, 250, 0.04);
+      border: 1.5px solid rgba(30, 43, 250, 0.2);
+      border-radius: 14px;
+      box-shadow: none;
+      transform-box: border-box;
+      transform-origin: 50% 50%;
+      opacity: 0;
+    }
+
+    .act05-chip svg {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      color: #1e2bfa;
+    }
+
+    .act05-chip-label {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      color: #111111;
+    }
+
+    #act05-chip-search {
+      left: 240px;
+      top: 1052px;
+    }
+
+    #act05-chip-code {
+      left: 460px;
+      top: 1122px;
+    }
+
+    #act05-chip-api {
+      left: 680px;
+      top: 1052px;
+    }
+
+    #act05-chip-glow-code {
+      left: 420px;
+      top: 1032px;
+    }
+  </style>
+
+  <div id="root" data-composition-id="05-act" data-width="1080" data-height="1920" data-duration="5.117">
+    <div class="clip act05-bg" data-start="0" data-duration="5.117" data-track-index="0"></div>
+
+    <div class="clip act05-chrome" data-start="0" data-duration="5.117" data-track-index="1">
+      <span class="act05-eyebrow" id="act05-eyebrow">The Agent Loop</span>
+      <span class="act05-steppill" id="act05-steppill">Step 3 / 4</span>
+    </div>
+
+    <div class="clip act05-headline" id="act05-headline" data-start="1.6" data-duration="3.517" data-track-index="4">
+      Act
+    </div>
+
+    <div class="clip act05-diagram" data-start="0" data-duration="5.117" data-track-index="2">
+      <svg viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="act05-glow-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1e2bfa" stop-opacity="0.55" />
+            <stop offset="55%" stop-color="#1e2bfa" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#1e2bfa" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+
+        <!-- ambient full-ring ghost — senses "4 positions" -->
+        <circle cx="540" cy="630" r="260" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="2 12" opacity="0.14" />
+
+        <!-- Observe (9 o'clock) — untouched, faint dotted placeholder -->
+        <circle cx="280" cy="630" r="44" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="2 8" opacity="0.22" />
+
+        <!-- established arc: Perceive -> Reason -->
+        <path id="act05-arc-pr" d="M 540 370 A 260 260 0 0 1 800 630" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" />
+
+        <!-- new arc this frame: Reason -> Act -->
+        <path id="act05-arc-ra" d="M 800 630 A 260 260 0 0 1 540 890" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" />
+
+        <!-- connector lines: Act node -> tool chips -->
+        <path id="act05-conn-search" d="M 500 918 L 330 1052" fill="none" stroke="#1e2bfa" stroke-width="3" stroke-linecap="round" opacity="0.45" />
+        <path id="act05-conn-code" d="M 540 934 L 540 1118" fill="none" stroke="#1e2bfa" stroke-width="3" stroke-linecap="round" opacity="0.45" />
+        <path id="act05-conn-api" d="M 580 918 L 750 1052" fill="none" stroke="#1e2bfa" stroke-width="3" stroke-linecap="round" opacity="0.45" />
+
+        <!-- Act glow (behind node) -->
+        <circle id="act05-act-glow" cx="540" cy="890" r="170" fill="url(#act05-glow-grad)" />
+
+        <!-- Perceive node (dimmed, carried forward) -->
+        <g id="act05-node-perceive" class="act05-node">
+          <circle cx="540" cy="370" r="44" fill="#1e2bfa" />
+          <text class="act05-node-label" x="540" y="298" text-anchor="middle" fill="#1e2bfa">Perceive</text>
+        </g>
+
+        <!-- Reason node (dims this frame) -->
+        <g id="act05-node-reason" class="act05-node">
+          <circle cx="800" cy="630" r="44" fill="#1e2bfa" />
+          <text class="act05-node-label" x="862" y="638" text-anchor="start" fill="#1e2bfa">Reason</text>
+        </g>
+
+        <!-- Act node: ghost -> solid fill this frame -->
+        <circle id="act05-act-ghost" cx="540" cy="890" r="44" fill="none" stroke="#9a9a9a" stroke-width="2" stroke-dasharray="2 8" opacity="0.22" />
+        <circle id="act05-act-fill" cx="540" cy="890" r="44" fill="#1e2bfa" />
+        <text id="act05-act-label" class="act05-node-label" x="540" y="982" text-anchor="middle" fill="#1e2bfa" opacity="0">Act</text>
+      </svg>
+    </div>
+
+    <div class="clip act05-chips" data-start="2.0" data-duration="3.117" data-track-index="3">
+      <div class="act05-chip-glow" id="act05-chip-glow-code"></div>
+
+      <div class="act05-chip" id="act05-chip-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="6" />
+          <line x1="14.5" y1="14.5" x2="20" y2="20" />
+        </svg>
+        <span class="act05-chip-label">search</span>
+      </div>
+
+      <div class="act05-chip" id="act05-chip-code">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="8,6 2,12 8,18" />
+          <polyline points="16,6 22,12 16,18" />
+        </svg>
+        <span class="act05-chip-label">run code</span>
+      </div>
+
+      <div class="act05-chip" id="act05-chip-api">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="8" height="8" rx="1.5" />
+          <path d="M13 12 H21 M21 12 L16.5 7.5 M21 12 L16.5 16.5" />
+        </svg>
+        <span class="act05-chip-label">call API</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var eyebrow = document.getElementById("act05-eyebrow");
+      var steppill = document.getElementById("act05-steppill");
+      var headline = document.getElementById("act05-headline");
+
+      var nodePerceive = document.getElementById("act05-node-perceive");
+      var nodeReason = document.getElementById("act05-node-reason");
+      var arcPR = document.getElementById("act05-arc-pr");
+      var arcRA = document.getElementById("act05-arc-ra");
+
+      var actGhost = document.getElementById("act05-act-ghost");
+      var actFill = document.getElementById("act05-act-fill");
+      var actGlow = document.getElementById("act05-act-glow");
+      var actLabel = document.getElementById("act05-act-label");
+
+      var connSearch = document.getElementById("act05-conn-search");
+      var connCode = document.getElementById("act05-conn-code");
+      var connApi = document.getElementById("act05-conn-api");
+
+      var chipSearch = document.getElementById("act05-chip-search");
+      var chipCode = document.getElementById("act05-chip-code");
+      var chipApi = document.getElementById("act05-chip-api");
+      var chipGlowCode = document.getElementById("act05-chip-glow-code");
+
+      // Measure the two draw-on arcs (real geometry, not a guessed length).
+      var lenPR = arcPR.getTotalLength();
+      arcPR.style.strokeDasharray = lenPR;
+      arcPR.style.strokeDashoffset = 0; // already fully drawn — carried forward from Frame 4
+
+      var lenRA = arcRA.getTotalLength();
+      arcRA.style.strokeDasharray = lenRA;
+      arcRA.style.strokeDashoffset = lenRA;
+
+      // Connector lines (Act node -> chips) self-draw as each chip fans out.
+      [connSearch, connCode, connApi].forEach(function (p) {
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ---- Setup (t=0): ring exactly as Frame 4 left it ----
+      gsap.set(nodePerceive, { opacity: 0.65 });
+      gsap.set(arcPR, { opacity: 1 });
+      gsap.set(nodeReason, { opacity: 1 });
+      gsap.set([actFill, actGlow], { opacity: 0, scale: 0.75 });
+      gsap.set(actLabel, { opacity: 0 });
+      gsap.set([chipSearch, chipCode, chipApi], { opacity: 0, scale: 0.4 });
+      gsap.set(chipGlowCode, { opacity: 0, scale: 0.85 });
+
+      tl.fromTo(eyebrow, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0.0);
+      tl.fromTo(steppill, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0.1);
+
+      // Scene 1 (0.0-0.7s): Reason settles to ~65% opacity — a quick, smooth dim.
+      // Its feeding arc dims with it so the two read as one supporting unit.
+      tl.to(nodeReason, { opacity: 0.65, duration: 0.6, ease: "power1.out" }, 0.0);
+      tl.to(arcPR, { opacity: 0.65, duration: 0.6, ease: "power1.out" }, 0.0);
+
+      // Scene 2 (0.7-2.0s): "Next: act" — the arc self-draws from Reason to Act.
+      tl.to(arcRA, { strokeDashoffset: 0, duration: 0.85, ease: "power2.out" }, 0.7);
+
+      // Act node fills solid primary and glows once, landing as the arc completes.
+      tl.to(actGhost, { opacity: 0, duration: 0.25, ease: "power1.out" }, 1.5);
+      tl.fromTo(
+        actGlow,
+        { opacity: 0, scale: 0.85 },
+        { opacity: 0.34, scale: 1, duration: 0.5, ease: "power2.out" },
+        1.45
+      );
+      tl.to(actFill, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 1.55);
+      tl.fromTo(actLabel, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 1.7);
+
+      // Headline "Act" lands with the node.
+      tl.fromTo(headline, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1.6);
+
+      // Scene 3 (2.0-4.117s): three tool chips fan out from the Act node,
+      // staggered one per named tool (dynamic-content-sequencing timeline,
+      // computed once — not hardcoded per-item offsets).
+      var CHIP_ITEMS = [
+        { conn: connSearch, chip: chipSearch, dx: 540 - 320, dy: 890 - 1080 },
+        { conn: connCode, chip: chipCode, dx: 540 - 540, dy: 890 - 1150 },
+        { conn: connApi, chip: chipApi, dx: 540 - 760, dy: 890 - 1080 },
+      ];
+
+      // Evenly computed cadence — one reveal per named tool, not hardcoded
+      // per-item offsets: SCENE3_START + i * STEP.
+      var SCENE3_START = 2.0;
+      var STEP = 0.45;
+      var CONN_DUR = 0.22;
+      var CHIP_DUR = 0.3;
+
+      CHIP_ITEMS.forEach(function (item, i) {
+        var start = SCENE3_START + i * STEP;
+
+        tl.to(item.conn, { strokeDashoffset: 0, duration: CONN_DUR, ease: "power2.out" }, start);
+
+        tl.fromTo(
+          item.chip,
+          { opacity: 0, scale: 0.4, x: item.dx, y: item.dy },
+          { opacity: 1, scale: 1, x: 0, y: 0, duration: CHIP_DUR, ease: "back.out(1.3)" },
+          start + 0.03
+        );
+      });
+
+      // As the line ends: "run code" is the one that's selected and fires —
+      // scales up + glows while the other two settle dim (scale-swap-style
+      // decisive pick, not a menu).
+      var SELECT_START = 3.7;
+      tl.fromTo(
+        chipGlowCode,
+        { opacity: 0, scale: 0.85 },
+        { opacity: 0.4, scale: 1, duration: 0.4, ease: "power2.out" },
+        SELECT_START - 0.1
+      );
+      tl.to(chipCode, { scale: 1.14, duration: 0.35, ease: "back.out(1.6)" }, SELECT_START);
+      tl.to(
+        chipCode,
+        {
+          backgroundColor: "rgba(30,43,250,0.15)",
+          borderColor: "#1e2bfa",
+          duration: 0.35,
+          ease: "power2.out",
+        },
+        SELECT_START
+      );
+      tl.to(connCode, { opacity: 0.85, strokeWidth: 4, duration: 0.3, ease: "power2.out" }, SELECT_START);
+
+      tl.to([chipSearch, chipApi], { opacity: 0.5, scale: 0.92, duration: 0.35, ease: "power2.out" }, SELECT_START);
+      tl.to([connSearch, connApi], { opacity: 0.22, duration: 0.3, ease: "power2.out" }, SELECT_START);
+
+      // Holds to 4.117s — the decisive pick reads, no further motion.
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["05-act"] = tl;
+    })();
+  </script>
+</template>

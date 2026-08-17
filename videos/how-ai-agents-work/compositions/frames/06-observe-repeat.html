@@ -1,0 +1,407 @@
+<template>
+  <style>
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
+
+    #root {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: transparent;
+      font-family: "Inter", sans-serif;
+    }
+
+    #root .clip {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── background ── */
+    .obs6-bg {
+      background: #fdfae7;
+    }
+
+    /* ── stage ── */
+    .obs6-stage {
+      position: absolute;
+      inset: 0;
+    }
+
+    .obs6-ring-svg {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: visible;
+    }
+
+    .obs6-ring-guide {
+      fill: none;
+      stroke: #9a9a9a;
+      stroke-width: 2;
+      stroke-dasharray: 2 14;
+      stroke-linecap: round;
+      opacity: 0.15;
+    }
+
+    .obs6-arc {
+      fill: none;
+      stroke: #1e2bfa;
+      stroke-width: 7;
+      stroke-linecap: round;
+    }
+
+    #obs6-loop-icon {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    /* ── ring-wide pulse glow (final closing bloom) ── */
+    .obs6-ring-glow {
+      position: absolute;
+      left: 190px;
+      top: 280px;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(20, 27, 190, 0.55) 0%,
+        rgba(30, 43, 250, 0.28) 38%,
+        rgba(30, 43, 250, 0) 70%
+      );
+      opacity: 0;
+      z-index: 1;
+    }
+
+    /* ── nodes ── */
+    .obs6-node {
+      position: absolute;
+      width: 108px;
+      height: 108px;
+      z-index: 3;
+    }
+
+    .obs6-node-circle {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1e2bfa;
+    }
+
+    .obs6-node-circle svg {
+      width: 42px;
+      height: 42px;
+    }
+
+    .obs6-node-unlit {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 2px dashed #9a9a9a;
+    }
+
+    .obs6-node-unlit svg {
+      width: 38px;
+      height: 38px;
+      opacity: 0.55;
+    }
+
+    .obs6-node-glow {
+      position: absolute;
+      left: -70px;
+      top: -70px;
+      width: 248px;
+      height: 248px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(20, 27, 190, 0.55) 0%,
+        rgba(30, 43, 250, 0.22) 45%,
+        rgba(30, 43, 250, 0) 72%
+      );
+      opacity: 0;
+      z-index: 2;
+    }
+
+    /* ── labels ── */
+    .obs6-label {
+      position: absolute;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 26px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #1e2bfa;
+      z-index: 3;
+    }
+
+    .obs6-label-perceive {
+      left: 440px;
+      top: 268px;
+      width: 200px;
+      text-align: center;
+    }
+
+    .obs6-label-reason {
+      left: 868px;
+      top: 613px;
+      width: 145px;
+      text-align: left;
+    }
+
+    .obs6-label-act {
+      left: 440px;
+      top: 958px;
+      width: 200px;
+      text-align: center;
+    }
+
+    .obs6-label-observe {
+      left: 67px;
+      top: 613px;
+      width: 145px;
+      text-align: right;
+      opacity: 0;
+    }
+
+    /* ── tool chips (frame 5 continuity, supporting) ── */
+    .obs6-chips {
+      position: absolute;
+      left: 363px;
+      top: 1012px;
+      width: 354px;
+      height: 42px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 3;
+      opacity: 1;
+    }
+
+    .obs6-chip {
+      width: 110px;
+      height: 42px;
+      border-radius: 100px;
+      background: rgba(30, 43, 250, 0.08);
+      border: 1px solid rgba(30, 43, 250, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #1e2bfa;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="06-observe-repeat"
+    data-width="1080"
+    data-height="1920"
+    data-start="0"
+    data-duration="5.651"
+  >
+    <div class="clip obs6-bg" data-start="0" data-duration="5.651" data-track-index="0"></div>
+
+    <div class="clip obs6-stage" data-start="0" data-duration="5.651" data-track-index="1">
+      <svg class="obs6-ring-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <circle class="obs6-ring-guide" cx="540" cy="630" r="260" />
+
+        <!-- Perceive -> Reason (drawn in Frame 4, carried in dimmed) -->
+        <path class="obs6-arc" id="obs6-arc-pr" d="M 540 370 A 260 260 0 0 1 800 630" style="opacity:0.65" />
+        <!-- Reason -> Act (drawn in Frame 5, carried in dimmed) -->
+        <path class="obs6-arc" id="obs6-arc-ra" d="M 800 630 A 260 260 0 0 1 540 890" style="opacity:0.65" />
+        <!-- Act -> Observe (this frame, Scene 2) -->
+        <path class="obs6-arc" id="obs6-arc-ao" d="M 540 890 A 260 260 0 0 1 280 630" />
+        <!-- Observe -> Perceive, THE CLOSING ARC (this frame, Scene 3) -->
+        <path class="obs6-arc" id="obs6-arc-op" d="M 280 630 A 260 260 0 0 1 540 370" />
+
+        <!-- center "loop / go again" glyph, appears when the ring closes -->
+        <g transform="translate(540,630)">
+          <g id="obs6-loop-icon">
+            <path d="M -22 -4 A 22 22 0 1 1 -22 4" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" />
+            <path d="M -30 -10 L -22 -4 L -14 -12" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M 22 4 A 22 22 0 1 1 22 -4" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" />
+            <path d="M 30 10 L 22 4 L 14 12" fill="none" stroke="#1e2bfa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+          </g>
+        </g>
+      </svg>
+
+      <div class="obs6-ring-glow" id="obs6-ring-glow"></div>
+
+      <!-- Perceive node (12 o'clock) — already lit, dimmed ~65% -->
+      <div class="obs6-node" id="obs6-node-perceive" style="left: 486px; top: 316px; opacity: 0.65">
+        <div class="obs6-node-circle">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 20 C10 8,30 8,36 20 C30 32,10 32,4 20 Z" fill="none" stroke="#fdfae7" stroke-width="3" />
+            <circle cx="20" cy="20" r="5" fill="#fdfae7" />
+          </svg>
+        </div>
+      </div>
+      <div class="obs6-label obs6-label-perceive">PERCEIVE</div>
+
+      <!-- Reason node (3 o'clock) — already lit, dimmed ~65% -->
+      <div class="obs6-node" id="obs6-node-reason" style="left: 746px; top: 576px; opacity: 0.65">
+        <div class="obs6-node-circle">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4 L20 36 M4 20 L36 20 M9 9 L31 31 M31 9 L9 31" fill="none" stroke="#fdfae7" stroke-width="3" stroke-linecap="round" />
+          </svg>
+        </div>
+      </div>
+      <div class="obs6-label obs6-label-reason">REASON</div>
+
+      <!-- Act node (6 o'clock) — full brightness as Frame 5 left it, dims to 65% in Scene 1 -->
+      <div class="obs6-node" id="obs6-node-act" style="left: 486px; top: 836px; opacity: 1">
+        <div class="obs6-node-circle">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 3 L9 22 L18 22 L16 37 L32 16 L22 16 Z" fill="#fdfae7" />
+          </svg>
+        </div>
+      </div>
+      <div class="obs6-label obs6-label-act">ACT</div>
+
+      <!-- Observe node (9 o'clock) — starts unlit, lights in Scene 2 -->
+      <div class="obs6-node" id="obs6-node-observe" style="left: 226px; top: 576px; opacity: 1">
+        <div class="obs6-node-glow" id="obs6-glow-observe"></div>
+        <div class="obs6-node-unlit" id="obs6-node-observe-unlit">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 21 L16 29 L33 10" fill="none" stroke="#9a9a9a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="obs6-node-circle" id="obs6-node-observe-lit" style="opacity: 0">
+          <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 21 L16 29 L33 10" fill="none" stroke="#fdfae7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+      </div>
+      <div class="obs6-label obs6-label-observe" id="obs6-label-observe">OBSERVE</div>
+
+      <!-- tool chips carried from Frame 5, supporting, stays dimmed -->
+      <div class="obs6-chips" id="obs6-chips">
+        <div class="obs6-chip">Search</div>
+        <div class="obs6-chip">Code</div>
+        <div class="obs6-chip">API</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+
+      // Measure + arm every arc's dash pattern from its real geometry.
+      var arcIds = ["obs6-arc-pr", "obs6-arc-ra", "obs6-arc-ao", "obs6-arc-op"];
+      arcIds.forEach(function (id) {
+        var p = document.getElementById(id);
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = String(len);
+        p.style.strokeDashoffset = String(len);
+      });
+      // Perceive->Reason and Reason->Act were drawn in earlier frames on this
+      // shared stage — this frame carries them in already fully drawn.
+      document.getElementById("obs6-arc-pr").style.strokeDashoffset = "0";
+      document.getElementById("obs6-arc-ra").style.strokeDashoffset = "0";
+
+      var tl = gsap.timeline({ paused: true });
+
+      // ── Scene 1 (0.0–0.7s): Act node + tool chips settle to ~65% opacity,
+      // matching how Frame 5 left the stage. Perceive/Reason are already
+      // carried in dimmed above.
+      tl.to("#obs6-node-act", { opacity: 0.65, duration: 0.55, ease: "power3.out" }, 0.05);
+      tl.to("#obs6-chips", { opacity: 0.65, duration: 0.55, ease: "power3.out" }, 0.05);
+
+      // ── Scene 2 (0.7–2.2s): arc self-draws Act -> Observe, Observe node
+      // fills primary and glows once, label settles in.
+      tl.to(
+        "#obs6-arc-ao",
+        { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" },
+        0.75,
+      );
+
+      // Observe crossfades from the unlit dashed placeholder to its lit fill,
+      // landing on the arc's settle — one beat, not two.
+      tl.to("#obs6-node-observe-unlit", { opacity: 0, duration: 0.3, ease: "power2.out" }, 1.45);
+      tl.to("#obs6-node-observe-lit", { opacity: 1, duration: 0.3, ease: "power2.out" }, 1.45);
+
+      // ambient-glow-bloom (bloom-and-hold variant) behind the Observe node.
+      tl.fromTo(
+        "#obs6-glow-observe",
+        { opacity: 0, scale: 0.85 },
+        { opacity: 0.3, scale: 1, duration: 0.55, ease: "power2.out" },
+        1.45,
+      );
+
+      tl.fromTo(
+        "#obs6-label-observe",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        1.55,
+      );
+
+      // ── Scene 3 (2.2–4.651s): the FINAL arc self-draws Observe -> Perceive,
+      // closing the ring. On landing, one finite glow pulse across the whole
+      // ring + all 4 nodes brighten together, then settle and hold.
+      tl.to(
+        "#obs6-arc-op",
+        { strokeDashoffset: 0, duration: 0.75, ease: "power2.out" },
+        2.3,
+      );
+
+      var CLOSE_LANDING = 2.3 + 0.75; // 3.05s — the ring is now complete.
+
+      // one-shot ring-wide glow bloom — bloom in, hold a beat, fade back out.
+      // finite, never a repeat/yoyo.
+      tl.fromTo(
+        "#obs6-ring-glow",
+        { opacity: 0, scale: 0.86 },
+        { opacity: 0.4, scale: 1, duration: 0.4, ease: "power2.out" },
+        CLOSE_LANDING,
+      );
+      tl.to("#obs6-ring-glow", { opacity: 0, duration: 0.75, ease: "power1.in" }, CLOSE_LANDING + 0.55);
+
+      // the completed loop glyph appears at the ring's center.
+      tl.fromTo(
+        "#obs6-loop-icon",
+        { opacity: 0, scale: 0 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" },
+        CLOSE_LANDING,
+      );
+
+      // all 4 nodes + the 3 completed arcs brighten together for a beat —
+      // the diagram's resolved, completed state.
+      tl.to(
+        "#obs6-node-perceive, #obs6-node-reason, #obs6-node-act, #obs6-node-observe, #obs6-arc-pr, #obs6-arc-ra, #obs6-arc-ao",
+        { opacity: 1, duration: 0.5, ease: "power3.out" },
+        CLOSE_LANDING,
+      );
+      tl.to(
+        ".obs6-node-circle",
+        { scale: 1.04, duration: 0.22, ease: "power2.out" },
+        CLOSE_LANDING,
+      );
+      tl.to(
+        ".obs6-node-circle",
+        { scale: 1, duration: 0.4, ease: "power3.out" },
+        CLOSE_LANDING + 0.22,
+      );
+
+      // resolved state holds to the end of the frame.
+
+      window.__timelines["06-observe-repeat"] = tl;
+    })();
+  </script>
+</template>

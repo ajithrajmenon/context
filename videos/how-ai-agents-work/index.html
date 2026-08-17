@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #fdfae7;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="38.934"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div
+        id="el-01-hook"
+        class="scene"
+        data-composition-id="01-hook"
+        data-composition-src="compositions/frames/01-hook.html"
+        data-start="0"
+        data-duration="5.651"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-01-hook-voice"
+        src="assets/voice/01.wav"
+        data-start="0"
+        data-duration="4.651"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-02-name-the-loop"
+        class="scene"
+        data-composition-id="02-name-the-loop"
+        data-composition-src="compositions/frames/02-name-the-loop.html"
+        data-start="4.651"
+        data-duration="5.288"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-02-name-the-loop-voice"
+        src="assets/voice/02.wav"
+        data-start="4.651"
+        data-duration="4.288"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-03-perceive"
+        class="scene"
+        data-composition-id="03-perceive"
+        data-composition-src="compositions/frames/03-perceive.html"
+        data-start="8.939"
+        data-duration="5.523"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-03-perceive-voice"
+        src="assets/voice/03.wav"
+        data-start="8.939"
+        data-duration="4.523"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-04-reason"
+        class="scene"
+        data-composition-id="04-reason"
+        data-composition-src="compositions/frames/04-reason.html"
+        data-start="13.462"
+        data-duration="5.032"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-04-reason-voice"
+        src="assets/voice/04.wav"
+        data-start="13.462"
+        data-duration="4.032"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-05-act"
+        class="scene"
+        data-composition-id="05-act"
+        data-composition-src="compositions/frames/05-act.html"
+        data-start="17.494"
+        data-duration="5.117"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-05-act-voice"
+        src="assets/voice/05.wav"
+        data-start="17.494"
+        data-duration="4.117"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-06-observe-repeat"
+        class="scene"
+        data-composition-id="06-observe-repeat"
+        data-composition-src="compositions/frames/06-observe-repeat.html"
+        data-start="21.611"
+        data-duration="5.651"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-06-observe-repeat-voice"
+        src="assets/voice/06.wav"
+        data-start="21.611"
+        data-duration="4.651"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-07-why-the-loop-wins"
+        class="scene"
+        data-composition-id="07-why-the-loop-wins"
+        data-composition-src="compositions/frames/07-why-the-loop-wins.html"
+        data-start="26.262"
+        data-duration="6.12"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-07-why-the-loop-wins-voice"
+        src="assets/voice/07.wav"
+        data-start="26.262"
+        data-duration="5.12"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-08-thesis"
+        class="scene"
+        data-composition-id="08-thesis"
+        data-composition-src="compositions/frames/08-thesis.html"
+        data-start="31.382"
+        data-duration="4.64"
+        data-track-index="1"
+      ></div>
+      <audio
+        id="el-08-thesis-voice"
+        src="assets/voice/08.wav"
+        data-start="31.382"
+        data-duration="3.84"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <div
+        id="el-09-close"
+        class="scene"
+        data-composition-id="09-close"
+        data-composition-src="compositions/frames/09-close.html"
+        data-start="35.222"
+        data-duration="3.712"
+        data-track-index="0"
+      ></div>
+      <audio
+        id="el-09-close-voice"
+        src="assets/voice/09.wav"
+        data-start="35.222"
+        data-duration="3.712"
+        data-track-index="10"
+        data-volume="1"
+      ></audio>
+
+      <!-- BGM -->
+      <audio
+        id="el-bgm"
+        src="assets/bgm/track.wav"
+        data-start="0"
+        data-duration="38.934"
+        data-track-index="11"
+        data-volume="0.12"
+      ></audio>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      // ── frame transitions (injected by transitions.mjs) ──
+      (function () { var tl = window.__timelines["main"];
+        tl.to("#el-01-hook", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 4.651);
+        tl.fromTo("#el-02-name-the-loop", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 4.651);
+        tl.to("#el-02-name-the-loop", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 8.939);
+        tl.fromTo("#el-03-perceive", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 8.939);
+        tl.to("#el-03-perceive", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 13.462);
+        tl.fromTo("#el-04-reason", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 13.462);
+        tl.to("#el-04-reason", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 17.494);
+        tl.fromTo("#el-05-act", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 17.494);
+        tl.to("#el-05-act", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 21.611);
+        tl.fromTo("#el-06-observe-repeat", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 21.611);
+        tl.to("#el-06-observe-repeat", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 26.262);
+        tl.fromTo("#el-07-why-the-loop-wins", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 26.262);
+        tl.to("#el-07-why-the-loop-wins", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 31.382);
+        tl.fromTo("#el-08-thesis", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 31.382);
+        tl.to("#el-08-thesis", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 35.222);
+        tl.fromTo("#el-09-close", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 35.222);
+        tl.to({}, { duration: 38.934 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+      // ── frame transitions (injected by transitions.mjs) ──
+      (function () { var tl = window.__timelines["main"];
+        tl.to("#el-01-hook", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 4.651);
+        tl.fromTo("#el-02-name-the-loop", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 4.651);
+        tl.to("#el-02-name-the-loop", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 8.939);
+        tl.fromTo("#el-03-perceive", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 8.939);
+        tl.to("#el-03-perceive", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 13.462);
+        tl.fromTo("#el-04-reason", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 13.462);
+        tl.to("#el-04-reason", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 17.494);
+        tl.fromTo("#el-05-act", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 17.494);
+        tl.to("#el-05-act", { x: -1080, duration: 0.5, ease: "power3.inOut" }, 21.611);
+        tl.fromTo("#el-06-observe-repeat", { x: 1080, opacity: 1 }, { x: 0, duration: 0.5, ease: "power3.inOut" }, 21.611);
+        tl.to("#el-06-observe-repeat", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 26.262);
+        tl.fromTo("#el-07-why-the-loop-wins", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 26.262);
+        tl.to("#el-07-why-the-loop-wins", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 31.382);
+        tl.fromTo("#el-08-thesis", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 31.382);
+        tl.to("#el-08-thesis", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 35.222);
+        tl.fromTo("#el-09-close", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 35.222);
+        tl.to({}, { duration: 38.934 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+    </script>
+  </body>
+</html>

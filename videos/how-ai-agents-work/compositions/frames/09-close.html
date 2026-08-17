@@ -1,0 +1,168 @@
+<template>
+  <style>
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
+
+    #root {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      container-type: size;
+      font-family: "Inter", sans-serif;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ground */
+    .close-bg {
+      background: #fdfae7;
+    }
+
+    /* atmosphere — concentric closing rings, cover/closing only per frame.md */
+    .close-rings {
+      pointer-events: none;
+    }
+    .close-ring {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      border-radius: 50%;
+      border: 1px solid rgba(30, 43, 250, 1);
+    }
+    .close-ring--outer {
+      width: 1180px;
+      height: 1180px;
+      border-color: rgba(30, 43, 250, 0.05);
+    }
+    .close-ring--mid {
+      width: 900px;
+      height: 900px;
+      border-color: rgba(30, 43, 250, 0.08);
+    }
+    .close-ring--inner {
+      width: 620px;
+      height: 620px;
+      border-color: rgba(30, 43, 250, 0.12);
+    }
+
+    /* text beats */
+    .close-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 60px;
+      text-align: center;
+    }
+    .close-stmt {
+      margin: 0;
+      max-width: 880px;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #111111;
+      transform-origin: 50% 50%;
+      will-change: transform, opacity;
+    }
+    #close-line1 .close-stmt {
+      font-size: 62px;
+      line-height: 1.28;
+    }
+    .close-quote {
+      color: #6b6b6b;
+    }
+    .close-line2-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .close-accent {
+      width: 60px;
+      height: 4px;
+      border-radius: 2px;
+      background: #1e2bfa;
+      margin-bottom: 28px;
+      transform-origin: 50% 50%;
+    }
+    #close-line2 .close-stmt {
+      font-size: 74px;
+      line-height: 1.24;
+    }
+    .close-loop {
+      color: #1e2bfa;
+    }
+  </style>
+
+  <div id="root" data-composition-id="09-close" data-width="1080" data-height="1920">
+    <div class="clip close-bg" data-start="0" data-duration="3.712" data-track-index="0"></div>
+
+    <div class="clip close-rings" id="close-rings" data-start="0" data-duration="3.712" data-track-index="1">
+      <div class="close-ring close-ring--outer"></div>
+      <div class="close-ring close-ring--mid"></div>
+      <div class="close-ring close-ring--inner"></div>
+    </div>
+
+    <div class="clip close-line" id="close-line1" data-start="0" data-duration="2.1" data-track-index="2">
+      <p class="close-stmt">Next time you see <span class="close-quote">&ldquo;</span>AI agent<span class="close-quote">&rdquo;</span> &mdash;</p>
+    </div>
+
+    <div class="clip close-line" id="close-line2" data-start="1.7" data-duration="2.012" data-track-index="3">
+      <div class="close-line2-inner">
+        <div class="close-accent" id="close-accent"></div>
+        <p class="close-stmt">look for the <span class="close-loop">loop</span> underneath.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+
+    // atmosphere settles in first
+    tl.fromTo(
+      "#close-rings",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.9, ease: "power1.out" },
+      0,
+    );
+
+    // Scene 1 (0.0-1.8s): opening line fades/scales in, holds
+    tl.fromTo(
+      "#close-line1 .close-stmt",
+      { opacity: 0, scale: 0.92 },
+      { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" },
+      0,
+    );
+
+    // Scene 2 (1.8-3.712s): line 1 clears — fade + slight scale-down
+    tl.to(
+      "#close-line1 .close-stmt",
+      { opacity: 0, scale: 0.94, duration: 0.25, ease: "power2.in" },
+      1.8,
+    );
+
+    // accent rule draws in beside the closing line
+    tl.fromTo(
+      "#close-accent",
+      { scaleX: 0 },
+      { scaleX: 1, duration: 0.4, ease: "power2.out" },
+      1.8,
+    );
+
+    // closing line fades/scales in and takes the line's place — final frame, holds
+    tl.fromTo(
+      "#close-line2 .close-stmt",
+      { opacity: 0, scale: 0.92 },
+      { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" },
+      1.8,
+    );
+
+    window.__timelines["09-close"] = tl;
+  </script>
+</template>

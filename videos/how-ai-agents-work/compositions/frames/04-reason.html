@@ -1,0 +1,397 @@
+<template>
+  <style>
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 500; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 600; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Space Grotesk"; font-style: normal; font-weight: 700; font-display: swap; src: url("assets/fonts/SpaceGrotesk-variable-latin.woff2") format("woff2"); }
+
+
+    #root {
+      --bg: #fdfae7;
+      --primary: #1e2bfa;
+      --text: #111111;
+      --text-muted: #6b6b6b;
+      --text-light: #9a9a9a;
+      --accent-light: rgba(30, 43, 250, 0.08);
+      --border: rgba(30, 43, 250, 0.2);
+
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      box-sizing: border-box;
+    }
+    #root * {
+      box-sizing: border-box;
+    }
+
+    /* ---- background ---- */
+    #r4-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+    }
+
+    /* ---- stage svg (ring + arc + node outlines) ---- */
+    .r4-svg-layer {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #r4-ring-base {
+      fill: none;
+      stroke: var(--text-light);
+      stroke-width: 2;
+      stroke-dasharray: 2 14;
+      opacity: 0.18;
+    }
+    .r4-outline-dotted {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 2;
+      stroke-dasharray: 2 10;
+    }
+    #r4-arc-reason {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    #r4-node-outline-reason {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 4;
+    }
+
+    /* ---- Perceive (dims this frame) ---- */
+    #r4-perceive-group {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+    }
+    #r4-perceive-node {
+      position: absolute;
+      left: 476px;
+      top: 306px;
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+    .r4-perceive-label {
+      position: absolute;
+      left: 440px;
+      top: 448px;
+      width: 200px;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    .r4-chip-row {
+      position: absolute;
+      left: 340px;
+      top: 490px;
+      width: 400px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .r4-chip {
+      background: var(--accent-light);
+      color: var(--primary);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    /* ---- Reason (this frame's focal) ---- */
+    #r4-reason-glow {
+      position: absolute;
+      left: 700px;
+      top: 530px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(30, 43, 250, 0.55) 0%,
+        rgba(30, 43, 250, 0) 70%
+      );
+      opacity: 0;
+    }
+    #r4-reason-node {
+      position: absolute;
+      left: 736px;
+      top: 566px;
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0;
+    }
+    .r4-reason-label {
+      position: absolute;
+      left: 700px;
+      top: 706px;
+      width: 200px;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      opacity: 0;
+    }
+
+    /* ---- scale-swap: "?" -> "next step" ---- */
+    #r4-swap-wrap {
+      position: absolute;
+      left: 670px;
+      top: 598px;
+      width: 260px;
+      height: 64px;
+    }
+    #r4-qmark {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 56px;
+      color: var(--bg);
+      transform-origin: 50% 50%;
+      z-index: 1;
+      opacity: 0;
+    }
+    #r4-nextstep {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      border-radius: 32px;
+      transform-origin: 50% 50%;
+      z-index: 2;
+      opacity: 0;
+    }
+    #r4-nextstep span {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bg);
+      white-space: nowrap;
+    }
+
+    /* ---- headline chrome ---- */
+    #r4-accent-line {
+      position: absolute;
+      left: 510px;
+      top: 1000px;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+      opacity: 0;
+    }
+    #r4-headline {
+      position: absolute;
+      left: 90px;
+      top: 1028px;
+      width: 900px;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 108px;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      color: var(--text);
+      opacity: 0;
+    }
+    #r4-tagline {
+      position: absolute;
+      left: 140px;
+      top: 1170px;
+      width: 800px;
+      text-align: center;
+      font-family: "Inter", sans-serif;
+      font-weight: 400;
+      font-size: 34px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      opacity: 0;
+    }
+  </style>
+
+  <div id="root" data-composition-id="04-reason" data-width="1080" data-height="1920" data-duration="5.032">
+    <div id="r4-bg" class="clip" data-start="0" data-duration="5.032" data-track-index="0"></div>
+
+    <div id="r4-stage" class="clip" data-start="0" data-duration="5.032" data-track-index="1">
+      <!-- ring + arcs + dotted node outlines -->
+      <svg class="r4-svg-layer" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <circle id="r4-ring-base" cx="540" cy="630" r="260" />
+        <circle class="r4-outline-dotted" cx="540" cy="890" r="64" />
+        <circle class="r4-outline-dotted" cx="280" cy="630" r="64" />
+        <path id="r4-arc-reason" d="M 540 370 A 260 260 0 0 1 800 630" />
+        <circle id="r4-node-outline-reason" cx="800" cy="630" r="64" />
+      </svg>
+
+      <!-- Perceive (established last frame, dims this frame) -->
+      <div id="r4-perceive-group">
+        <div id="r4-perceive-node"></div>
+        <div class="r4-perceive-label">Perceive</div>
+        <div class="r4-chip-row">
+          <div class="r4-chip">goal</div>
+          <div class="r4-chip">context</div>
+          <div class="r4-chip">last result</div>
+        </div>
+      </div>
+
+      <!-- Reason (this frame's focal) -->
+      <div id="r4-reason-glow"></div>
+      <div id="r4-reason-node"></div>
+      <div class="r4-reason-label">Reason</div>
+
+      <div id="r4-swap-wrap">
+        <div id="r4-qmark">?</div>
+        <div id="r4-nextstep"><span>next step</span></div>
+      </div>
+
+      <!-- headline chrome -->
+      <div id="r4-accent-line"></div>
+      <div id="r4-headline">Reason</div>
+      <div id="r4-tagline">One step, not the whole plan.</div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script>
+    (function () {
+      // ---- measured SVG path setup (svg-path-draw) ----
+      var arc = document.querySelector("#r4-arc-reason");
+      var arcLen = arc.getTotalLength();
+      arc.style.strokeDasharray = arcLen;
+      arc.style.strokeDashoffset = arcLen;
+
+      var outline = document.querySelector("#r4-node-outline-reason");
+      var outlineLen = outline.getTotalLength();
+      outline.style.strokeDasharray = outlineLen;
+      outline.style.strokeDashoffset = outlineLen;
+
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0-0.8s): Perceive settles to ~65% opacity — smooth, not a hard cut.
+      tl.fromTo(
+        "#r4-perceive-group",
+        { opacity: 1 },
+        { opacity: 0.65, duration: 0.5, ease: "power2.out" },
+        0.1
+      );
+
+      // Scene 2 (0.8-2.2s): arc self-draws Perceive -> Reason, node outline draws,
+      // node fills solid, glows once, label settles.
+      tl.to(
+        "#r4-arc-reason",
+        { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" },
+        0.8
+      );
+      tl.to(
+        "#r4-node-outline-reason",
+        { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" },
+        1.25
+      );
+      tl.fromTo(
+        "#r4-reason-node",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.3, ease: "power1.out" },
+        1.6
+      );
+      // finite glow bloom — one-shot expand then fade, never a repeat/loop
+      tl.fromTo(
+        "#r4-reason-glow",
+        { opacity: 0, scale: 0.6 },
+        { opacity: 0.55, scale: 1.3, duration: 0.2, ease: "power2.out" },
+        1.85
+      );
+      tl.to(
+        "#r4-reason-glow",
+        { opacity: 0, scale: 1.6, duration: 0.3, ease: "power2.out" },
+        2.06
+      );
+      tl.fromTo(
+        "#r4-reason-label",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" },
+        1.9
+      );
+
+      // headline chrome arrives alongside the node lighting up
+      tl.fromTo(
+        "#r4-accent-line",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        1.9
+      );
+      tl.fromTo(
+        "#r4-headline",
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        1.95
+      );
+      tl.fromTo(
+        "#r4-tagline",
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        2.6
+      );
+
+      // Scene 3 (2.2-4.032s): "?" appears, then resolves into "next step"
+      // (scale-swap-transition, same-center handoff), timed to "next step" in the VO.
+      tl.fromTo(
+        "#r4-qmark",
+        { opacity: 0, scale: 0.85 },
+        { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out" },
+        2.2
+      );
+
+      // scale-swap-transition: TRIGGER=2.9, EXIT_DUR=0.3, ENTER_DUR=0.5, OVERLAP=0.12, BOUNCE=1.4 (soft)
+      tl.to(
+        "#r4-qmark",
+        { scale: 0.7, opacity: 0, duration: 0.3, ease: "power2.in" },
+        2.9
+      );
+      tl.fromTo(
+        "#r4-nextstep",
+        { scale: 0.7, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.4)" },
+        3.08
+      );
+
+      // hold; subtle jitter only
+      tl.to("#r4-swap-wrap", { x: 2, duration: 0.15, ease: "power1.inOut" }, 3.7);
+      tl.to("#r4-swap-wrap", { x: 0, duration: 0.15, ease: "power1.inOut" }, 3.85);
+
+      window.__timelines["04-reason"] = tl;
+    })();
+  </script>
+</template>
